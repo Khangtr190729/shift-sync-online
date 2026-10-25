@@ -90,7 +90,7 @@ export const MySchedulePage = () => {
     if (!store) return;
     try {
       setLoadingSchedule(true);
-      const res = await scheduleApi.getMySchedule(week, year);
+      const res = await scheduleApi.getMySchedule(week, year, store?._id);
       if (res.success && (res.shifts || res.data)) {
         setScheduleData({
           shifts: res.shifts || res.data?.shifts || [],

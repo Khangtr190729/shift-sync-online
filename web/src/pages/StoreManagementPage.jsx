@@ -19,9 +19,11 @@ import {
 } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import { storeApi } from '../services/api';
+import CreateBranchModal from '../components/store/CreateBranchModal';
 
 export const StoreManagementPage = () => {
-  const { store, refreshUser } = useAuth();
+  const { store, stores, switchStore, refreshUser } = useAuth();
+  const [branchModalOpen, setBranchModalOpen] = useState(false);
 
   // Helper to safely extract 6-digit code string from store data
   const extractCode = (s) => {
@@ -127,10 +129,13 @@ export const StoreManagementPage = () => {
     try {
       setSavingStore(true);
       setFeedback(null);
-      const res = await storeApi.updateMyStore(storeForm);
+      const res = await storeApi.updateMyStore({
+        ...storeForm,
+        storeId: store?._id,
+      });
       if (res.success) {
         setFeedback({ type: 'success', message: 'Cập nhật thông tin cửa hàng thành công!' });
-        await refreshUser();
+        await refreshUser(store?._id);
       }
     } catch (err) {
       setFeedback({ type: 'error', message: err.message || 'Lỗi khi cập nhật cửa hàng' });
@@ -141,10 +146,11 @@ export const StoreManagementPage = () => {
 
   // Generate new 6-digit code
   const handleGenerateCode = async () => {
+    if (!store?._id) return;
     try {
       setGeneratingCode(true);
       setFeedback(null);
-      const res = await storeApi.generateInviteCode();
+      const res = await storeApi.generateInviteCode(store._id);
       if (res.success) {
         const code = res.inviteCode || res.data?.inviteCode || '';
         const expires = res.expiresAt || res.data?.expiresAt || null;
@@ -154,7 +160,7 @@ export const StoreManagementPage = () => {
           type: 'success',
           message: 'Đã tạo mã mời 6 chữ số mới có hiệu lực trong 60 phút!'
         });
-        await refreshUser();
+        await refreshUser(store._id);
       }
     } catch (err) {
       setFeedback({ type: 'error', message: err.message || 'Lỗi khi tạo mã mời' });
@@ -187,6 +193,7 @@ export const StoreManagementPage = () => {
       setInvitingDirect(true);
       setFeedback(null);
       const payload = {
+        storeId: store?._id,
         email,
         hourlyWage: Number(directForm.hourlyWage),
         employmentType: directForm.employmentType
@@ -202,7 +209,7 @@ export const StoreManagementPage = () => {
           hourlyWage: 20000,
           employmentType: 'PART_TIME'
         });
-        await refreshUser();
+        await refreshUser(store?._id);
       }
     } catch (err) {
       setFeedback({ type: 'error', message: err.message || 'Lỗi khi mời nhân viên' });
@@ -291,21 +298,84 @@ export const StoreManagementPage = () => {
   return (
     <div className="max-w-4xl space-y-6">
       {/* Header */}
-      <div className="bg-white p-5 rounded-2xl border border-slate-200/80 shadow-sm flex items-center justify-between">
+      <div className="bg-white p-5 rounded-2xl border border-slate-200/80 shadow-sm flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <div>
           <h2 className="text-lg font-bold text-slate-900 tracking-tight flex items-center gap-2">
             <Store className="w-5 h-5 text-[#EA701B]" />
-            <span>Cài đặt Cửa hàng & Mã mời</span>
+            <span>Hệ thống Cơ sở & Mã mời</span>
           </h2>
           <p className="text-xs text-slate-500 mt-0.5">
-            Quản lý thông tin quán và cấp phát mã số mời nhân viên mới gia nhập.
+            Quản lý thông tin từng chi nhánh và cấp phát mã số mời nhân viên mới gia nhập.
           </p>
         </div>
-        <div className="flex items-center gap-1.5 px-3 py-1 bg-orange-100 text-[#EA701B] rounded-full text-xs font-bold">
-          <ShieldCheck className="w-4 h-4" />
-          <span>Dành riêng cho Chủ cửa hàng</span>
+        <div className="flex items-center gap-2">
+          <button
+            type="button"
+            onClick={() => setBranchModalOpen(true)}
+            className="flex items-center gap-1.5 px-3.5 py-2 bg-gradient-to-r from-[#EA701B] to-[#FF8C38] text-white text-xs font-bold rounded-xl shadow-sm hover:opacity-95 transition-all btn-press"
+          >
+            <span>+ Mở thêm chi nhánh</span>
+          </button>
+          <div className="hidden md:flex items-center gap-1.5 px-3 py-1.5 bg-orange-100 text-[#EA701B] rounded-xl text-xs font-bold">
+            <ShieldCheck className="w-4 h-4" />
+            <span>Chủ cửa hàng</span>
+          </div>
         </div>
       </div>
+
+      {/* BRANCH SELECTOR CARDS */}
+      {stores && stores.length > 0 && (
+        <div className="bg-white p-5 rounded-2xl border border-slate-200/80 shadow-sm space-y-3">
+          <div className="flex items-center justify-between">
+            <h3 className="text-xs font-bold text-slate-700 uppercase tracking-wider flex items-center gap-1.5">
+              <span>Các cơ sở đang hoạt động</span>
+              <span className="px-1.5 py-0.2 bg-orange-100 text-[#EA701B] rounded-full text-[11px]">
+                {stores.length}
+              </span>
+            </h3>
+            <span className="text-[11px] text-slate-400">Bấm vào chi nhánh để chuyển giao diện quản lý</span>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
+            {stores.map((s) => {
+              const isSelected = String(s._id) === String(store?._id);
+              return (
+                <button
+                  key={s._id}
+                  type="button"
+                  onClick={() => switchStore(s._id)}
+                  className={`text-left p-3.5 rounded-2xl border transition-all flex flex-col justify-between gap-2 group ${
+                    isSelected
+                      ? 'bg-[#FFF0E5] border-orange-300 ring-2 ring-[#EA701B]/20 shadow-xs'
+                      : 'bg-slate-50/70 hover:bg-slate-50 border-slate-200/70 hover:border-orange-200'
+                  }`}
+                >
+                  <div className="flex items-start justify-between gap-2">
+                    <div className="min-w-0 flex-1">
+                      <p className={`text-xs font-bold truncate ${isSelected ? 'text-[#EA701B]' : 'text-slate-800'}`}>
+                        {s.name}
+                      </p>
+                      <p className="text-[11px] text-slate-500 truncate mt-0.5 flex items-center gap-1">
+                        <MapPin className="w-3 h-3 shrink-0 text-slate-400" />
+                        <span>{s.address || 'Chưa có địa chỉ'}</span>
+                      </p>
+                    </div>
+                    {isSelected ? (
+                      <span className="text-[10px] font-bold px-2 py-0.5 bg-[#EA701B] text-white rounded-full shrink-0">
+                        Đang chọn
+                      </span>
+                    ) : (
+                      <span className="text-[10px] font-medium text-slate-400 group-hover:text-[#EA701B] shrink-0">
+                        Chọn
+                      </span>
+                    )}
+                  </div>
+                </button>
+              );
+            })}
+          </div>
+        </div>
+      )}
 
       {/* Feedback banner */}
       {feedback && (
@@ -546,6 +616,12 @@ export const StoreManagementPage = () => {
           </div>
         </form>
       </div>
+
+      {/* Create Branch Modal */}
+      <CreateBranchModal
+        isOpen={branchModalOpen}
+        onClose={() => setBranchModalOpen(false)}
+      />
     </div>
   );
 };

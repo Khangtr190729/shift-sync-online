@@ -20,6 +20,7 @@ import {
 import { useAuth } from '../contexts/AuthContext';
 import Logo from '../components/Logo';
 import { getRoleLabel } from '../utils/formatters';
+import StoreSwitcher from '../components/store/StoreSwitcher';
 
 export const WebLayout = () => {
   const { user, store, roleInStore, logout } = useAuth();
@@ -51,7 +52,7 @@ export const WebLayout = () => {
     ...(isShiftEligible ? [{ name: 'Lịch của tôi', path: '/my-schedule', icon: CalendarClock }] : []),
     { name: 'Nhân viên', path: '/employees', icon: Users },
     { name: 'Ca làm', path: '/shifts', icon: Clock },
-    ...(isOwner ? [{ name: 'Cửa hàng', path: '/store-management', icon: Store }] : []),
+    ...(isOwner ? [{ name: 'Cơ sở & Chi nhánh', path: '/store-management', icon: Store }] : []),
     { name: 'Hồ sơ cá nhân', path: '/profile', icon: UserCheck }
   ];
 
@@ -69,16 +70,10 @@ export const WebLayout = () => {
           <Logo size="md" />
         </div>
 
-        {/* Current Store Pill (if exists) */}
+        {/* Current Store Switcher */}
         {store && (
-          <div className="p-4 mx-4 my-3 bg-[#FFF0E5] rounded-2xl border border-orange-200/60 flex items-center gap-3">
-            <div className="w-9 h-9 rounded-xl bg-[#EA701B] flex items-center justify-center text-white shrink-0 shadow-sm">
-              <StoreIcon className="w-5 h-5" />
-            </div>
-            <div className="min-w-0 flex-1">
-              <p className="text-xs font-medium text-[#EA701B] uppercase tracking-wider">Cửa hàng</p>
-              <p className="text-sm font-bold text-slate-800 truncate">{store.name}</p>
-            </div>
+          <div className="mx-4 my-3">
+            <StoreSwitcher />
           </div>
         )}
 
@@ -264,6 +259,13 @@ export const WebLayout = () => {
                   <X className="w-5 h-5" />
                 </button>
               </div>
+
+              {/* Mobile Store Switcher */}
+              {store && (
+                <div className="pt-3 pb-1">
+                  <StoreSwitcher isMobile={true} />
+                </div>
+              )}
               <div className="flex-1 py-4 space-y-1">
                 {navItems.map((item) => (
                   <NavLink
