@@ -16,6 +16,7 @@ export const createStoreSchema = z.object({
  * Schema cập nhật thông tin cửa hàng
  */
 export const updateStoreSchema = z.object({
+  storeId: z.string().trim().optional(),
   name: z
     .string()
     .trim()
@@ -42,6 +43,7 @@ export const joinByCodeSchema = z.object({
  */
 export const inviteEmployeeSchema = z
   .object({
+    storeId: z.string().trim().optional(),
     email: z.string().trim().optional(),
     identifier: z.string().trim().optional(),
     targetUserId: z.string().trim().optional(),

@@ -2,6 +2,7 @@ import express from 'express';
 import {
   createStore,
   getMyStore,
+  getMyStores,
   updateMyStore,
   generateInviteCode,
   joinByCode,
@@ -39,6 +40,9 @@ router.post('/', validateBody(createStoreSchema), createStore);
 
 // 2. Lấy thông tin cửa hàng của tôi (ADMIN hoặc EMPLOYEE)
 router.get('/my-store', getMyStore);
+
+// 2b. Lấy danh sách tất cả các cửa hàng của tôi (ADMIN hoặc EMPLOYEE)
+router.get('/my-stores', getMyStores);
 
 // 3. Cập nhật thông tin cửa hàng (ADMIN)
 router.put('/my-store', validateBody(updateStoreSchema), updateMyStore);

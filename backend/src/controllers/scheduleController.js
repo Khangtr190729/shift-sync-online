@@ -310,7 +310,7 @@ export const publishSchedule = async (req, res) => {
  */
 export const getMySchedule = async (req, res) => {
   try {
-    const { week, year } = req.query;
+    const { week, year, storeId } = req.query;
     const userId = req.user.id;
 
     if (!week || !year) {
@@ -320,16 +320,22 @@ export const getMySchedule = async (req, res) => {
       });
     }
 
-    const schedule = await Schedule.findOne({
+    const query = {
       week: Number(week),
       year: Number(year),
       'assignments.userId': userId,
-    })
+    };
+    if (storeId) {
+      query.storeId = storeId;
+    }
+
+    // Tìm tất cả bảng lịch thỏa điều kiện (hỗ trợ nhân viên làm việc tại nhiều chi nhánh)
+    const schedules = await Schedule.find(query)
       .populate('storeId', 'name address')
       .populate('assignments.shiftId', 'name startTime endTime durationHours color peakLevel')
       .populate('assignments.userId', 'fullName avatar');
 
-    if (!schedule) {
+    if (!schedules || schedules.length === 0) {
       return res.status(200).json({
         success: true,
         hasSchedule: false,
@@ -342,55 +348,68 @@ export const getMySchedule = async (req, res) => {
       });
     }
 
-    const myShifts = schedule.assignments
-      .filter((a) => {
-        const uId = a.userId?._id ? a.userId._id.toString() : a.userId?.toString();
-        return uId === userId;
-      })
-      .map((a) => {
-        const sId = a.shiftId?._id ? a.shiftId._id.toString() : a.shiftId?.toString();
-        const coworkers = schedule.assignments
-          .filter((other) => {
-            const otherUId = other.userId?._id ? other.userId._id.toString() : other.userId?.toString();
-            const otherSId = other.shiftId?._id ? other.shiftId._id.toString() : other.shiftId?.toString();
-            return other.date === a.date && otherSId === sId && otherUId !== userId;
-          })
-          .map((other) => ({
-            _id: other.userId?._id || other.userId,
-            name: other.userId?.fullName || 'Đồng nghiệp',
-            avatar: other.userId?.avatar || '',
-          }));
+    const myShifts = [];
+    for (const schedule of schedules) {
+      const shiftsInSchedule = schedule.assignments
+        .filter((a) => {
+          const uId = a.userId?._id ? a.userId._id.toString() : a.userId?.toString();
+          return uId === userId;
+        })
+        .map((a) => {
+          const sId = a.shiftId?._id ? a.shiftId._id.toString() : a.shiftId?.toString();
+          const coworkers = schedule.assignments
+            .filter((other) => {
+              const otherUId = other.userId?._id ? other.userId._id.toString() : other.userId?.toString();
+              const otherSId = other.shiftId?._id ? other.shiftId._id.toString() : other.shiftId?.toString();
+              return other.date === a.date && otherSId === sId && otherUId !== userId;
+            })
+            .map((other) => ({
+              _id: other.userId?._id || other.userId,
+              name: other.userId?.fullName || 'Đồng nghiệp',
+              avatar: other.userId?.avatar || '',
+            }));
 
-        return {
-          assignmentId: a._id,
-          date: a.date,
-          dayOfWeek: a.dayOfWeek,
-          shiftName: a.shiftId ? a.shiftId.name : 'N/A',
-          startTime: a.shiftId ? a.shiftId.startTime : '',
-          endTime: a.shiftId ? a.shiftId.endTime : '',
-          hours: a.hours,
-          hourlyWage: a.hourlyWage,
-          totalPay: a.totalPay,
-          attendanceStatus: a.attendanceStatus || 'COMPLETED',
-          penaltyType: a.penaltyType || 'NONE',
-          deductedHours: a.deductedHours || 0,
-          deductedPay: a.deductedPay || 0,
-          missedReason: a.missedReason || '',
-          color: a.shiftId ? a.shiftId.color : '#3B82F6',
-          coworkers,
-          shift: a.shiftId
-            ? {
-                _id: a.shiftId._id,
-                name: a.shiftId.name,
-                startTime: a.shiftId.startTime,
-                endTime: a.shiftId.endTime,
-                durationHours: a.hours || a.shiftId.durationHours,
-                color: a.shiftId.color,
-                peakLevel: a.shiftId.peakLevel || 1,
-              }
-            : null,
-        };
-      });
+          return {
+            assignmentId: a._id,
+            store: schedule.storeId
+              ? {
+                  _id: schedule.storeId._id,
+                  name: schedule.storeId.name,
+                  address: schedule.storeId.address,
+                }
+              : null,
+            date: a.date,
+            dayOfWeek: a.dayOfWeek,
+            shiftName: a.shiftId ? a.shiftId.name : 'N/A',
+            startTime: a.shiftId ? a.shiftId.startTime : '',
+            endTime: a.shiftId ? a.shiftId.endTime : '',
+            hours: a.hours,
+            hourlyWage: a.hourlyWage,
+            totalPay: a.totalPay,
+            attendanceStatus: a.attendanceStatus || 'COMPLETED',
+            penaltyType: a.penaltyType || 'NONE',
+            deductedHours: a.deductedHours || 0,
+            deductedPay: a.deductedPay || 0,
+            missedReason: a.missedReason || '',
+            color: a.shiftId ? a.shiftId.color : '#3B82F6',
+            coworkers,
+            shift: a.shiftId
+              ? {
+                  _id: a.shiftId._id,
+                  name: a.shiftId.name,
+                  startTime: a.shiftId.startTime,
+                  endTime: a.shiftId.endTime,
+                  durationHours: a.hours || a.shiftId.durationHours,
+                  color: a.shiftId.color,
+                  peakLevel: a.shiftId.peakLevel || 1,
+                }
+              : null,
+          };
+        });
+      myShifts.push(...shiftsInSchedule);
+    }
+
+    myShifts.sort((a, b) => a.date.localeCompare(b.date) || a.startTime.localeCompare(b.startTime));
 
     const totalHours = myShifts.reduce((acc, cur) => {
       if (cur.attendanceStatus === 'MISSED') return acc;

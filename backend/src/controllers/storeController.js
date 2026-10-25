@@ -22,24 +22,14 @@ export const createStore = async (req, res) => {
       });
     }
 
-    // 2. Kiểm tra xem chủ quán đã có cửa hàng chưa (mỗi chủ 1 cửa hàng chính)
-    const existingStore = await Store.findOne({ ownerId: userId });
-    if (existingStore) {
-      return res.status(400).json({
-        success: false,
-        message: `Bạn đã tạo cửa hàng "${existingStore.name}". Mỗi tài khoản chủ hiện tại quản lý 1 cửa hàng chính.`,
-        store: existingStore,
-      });
-    }
-
-    // 3. Tạo cửa hàng
+    // 2. Tạo cửa hàng / chi nhánh mới
     const newStore = await Store.create({
       name: name.trim(),
       address: address ? address.trim() : '',
       ownerId: userId,
     });
 
-    // 5. Tự động thêm chủ quán vào bảng thành viên với vai trò Chủ cửa hàng (ADMIN)
+    // 3. Tự động thêm chủ quán vào bảng thành viên với vai trò Chủ cửa hàng (ADMIN)
     await StoreMember.create({
       storeId: newStore._id,
       userId: userId,
@@ -51,7 +41,7 @@ export const createStore = async (req, res) => {
 
     return res.status(201).json({
       success: true,
-      message: 'Tạo cửa hàng thành công!',
+      message: 'Tạo cơ sở cửa hàng thành công!',
       store: newStore,
     });
   } catch (error) {
@@ -71,54 +61,121 @@ export const createStore = async (req, res) => {
 export const getMyStore = async (req, res) => {
   try {
     const userId = req.user.id;
+    const requestedStoreId = req.query.storeId;
 
-    // 1. Nếu là ADMIN: Tìm cửa hàng do mình sở hữu
+    // 1. Nếu là ADMIN: Tìm danh sách cửa hàng do mình sở hữu
     if (req.user.systemRole === 'ADMIN') {
-      const store = await Store.findOne({ ownerId: userId }).populate('ownerId', 'fullName email');
-      if (!store) {
+      const stores = await Store.find({ ownerId: userId })
+        .sort({ createdAt: -1 })
+        .populate('ownerId', 'fullName email');
+
+      if (!stores || stores.length === 0) {
         return res.status(200).json({
           success: true,
           hasStore: false,
+          stores: [],
           message: 'Bạn chưa tạo cửa hàng nào. Vui lòng tạo cửa hàng mới.',
         });
       }
 
-      // Đếm số lượng thành viên
-      const totalMembers = await StoreMember.countDocuments({ storeId: store._id, status: 'ACTIVE' });
+      let selectedStore = stores[0];
+      if (requestedStoreId) {
+        const found = stores.find((s) => s._id.toString() === requestedStoreId.toString());
+        if (found) selectedStore = found;
+      }
+
+      // Đếm số lượng thành viên của cửa hàng đang chọn
+      const totalMembers = await StoreMember.countDocuments({
+        storeId: selectedStore._id,
+        status: 'ACTIVE',
+      });
 
       return res.status(200).json({
         success: true,
         hasStore: true,
         roleInStore: 'ADMIN',
-        store,
+        store: selectedStore,
+        stores,
         totalMembers,
       });
     }
 
-    // 2. Nếu là EMPLOYEE: Tìm cửa hàng mà mình đang là thành viên
-    const membership = await StoreMember.findOne({ userId, status: 'ACTIVE' }).populate({
+    // 2. Nếu là EMPLOYEE: Tìm các cửa hàng mà mình đang là thành viên
+    const memberships = await StoreMember.find({ userId, status: 'ACTIVE' }).populate({
       path: 'storeId',
       populate: { path: 'ownerId', select: 'fullName email' },
     });
 
-    if (!membership || !membership.storeId) {
+    const validMemberships = memberships.filter((m) => m.storeId);
+
+    if (validMemberships.length === 0) {
       return res.status(200).json({
         success: true,
         hasStore: false,
+        stores: [],
         message: 'Bạn chưa gia nhập cửa hàng nào. Hãy nhập mã mời 6 số để vào cửa hàng của bạn.',
       });
+    }
+
+    let selectedMembership = validMemberships[0];
+    if (requestedStoreId) {
+      const found = validMemberships.find(
+        (m) => m.storeId._id.toString() === requestedStoreId.toString()
+      );
+      if (found) selectedMembership = found;
     }
 
     return res.status(200).json({
       success: true,
       hasStore: true,
-      roleInStore: membership.roleInStore,
-      employmentType: membership.employmentType,
-      hourlyWage: membership.hourlyWage,
-      store: membership.storeId,
+      roleInStore: selectedMembership.roleInStore,
+      employmentType: selectedMembership.employmentType,
+      hourlyWage: selectedMembership.hourlyWage,
+      store: selectedMembership.storeId,
+      stores: validMemberships.map((m) => m.storeId),
     });
   } catch (error) {
     console.error('Lỗi lấy thông tin cửa hàng:', error);
+    return res.status(500).json({
+      success: false,
+      message: `Lỗi máy chủ: ${error.message}`,
+    });
+  }
+};
+
+/**
+ * @desc    Lấy danh sách tất cả các cửa hàng của tôi (Chủ sở hữu hoặc Thành viên)
+ * @route   GET /api/stores/my-stores
+ * @access  Private
+ */
+export const getMyStores = async (req, res) => {
+  try {
+    const userId = req.user.id;
+
+    if (req.user.systemRole === 'ADMIN') {
+      const stores = await Store.find({ ownerId: userId })
+        .sort({ createdAt: -1 })
+        .populate('ownerId', 'fullName email');
+
+      return res.status(200).json({
+        success: true,
+        stores,
+      });
+    }
+
+    const memberships = await StoreMember.find({ userId, status: 'ACTIVE' }).populate({
+      path: 'storeId',
+      populate: { path: 'ownerId', select: 'fullName email' },
+    });
+
+    const stores = memberships.filter((m) => m.storeId).map((m) => m.storeId);
+
+    return res.status(200).json({
+      success: true,
+      stores,
+    });
+  } catch (error) {
+    console.error('Lỗi lấy danh sách cửa hàng:', error);
     return res.status(500).json({
       success: false,
       message: `Lỗi máy chủ: ${error.message}`,
@@ -133,8 +190,9 @@ export const getMyStore = async (req, res) => {
  */
 export const updateMyStore = async (req, res) => {
   try {
-    const { name, address } = req.body;
+    const { name, address, storeId } = req.body;
     const userId = req.user.id;
+    const targetStoreId = storeId || req.query.storeId;
 
     if (req.user.systemRole !== 'ADMIN') {
       return res.status(403).json({
@@ -143,11 +201,15 @@ export const updateMyStore = async (req, res) => {
       });
     }
 
-    const store = await Store.findOne({ ownerId: userId });
+    const query = { ownerId: userId };
+    if (targetStoreId) {
+      query._id = targetStoreId;
+    }
+    const store = await Store.findOne(query);
     if (!store) {
       return res.status(404).json({
         success: false,
-        message: 'Bạn chưa có cửa hàng nào.',
+        message: 'Không tìm thấy cửa hàng để cập nhật.',
       });
     }
 
@@ -178,6 +240,7 @@ export const updateMyStore = async (req, res) => {
 export const generateInviteCode = async (req, res) => {
   try {
     const userId = req.user.id;
+    const targetStoreId = req.body?.storeId || req.query?.storeId;
 
     if (req.user.systemRole !== 'ADMIN') {
       return res.status(403).json({
@@ -186,7 +249,11 @@ export const generateInviteCode = async (req, res) => {
       });
     }
 
-    const store = await Store.findOne({ ownerId: userId });
+    const query = { ownerId: userId };
+    if (targetStoreId) {
+      query._id = targetStoreId;
+    }
+    const store = await Store.findOne(query);
     if (!store) {
       return res.status(404).json({
         success: false,
@@ -324,9 +391,10 @@ export const joinByCode = async (req, res) => {
  */
 export const inviteById = async (req, res) => {
   try {
-    const { email, identifier, targetUserId, employmentType, hourlyWage } = req.body;
+    const { email, identifier, targetUserId, employmentType, hourlyWage, storeId } = req.body;
     const cleanEmail = (email || identifier || targetUserId || '').trim();
     const userId = req.user.id;
+    const targetStoreId = storeId || req.query?.storeId;
 
     if (req.user.systemRole !== 'ADMIN') {
       return res.status(403).json({
@@ -342,11 +410,15 @@ export const inviteById = async (req, res) => {
       });
     }
 
-    const store = await Store.findOne({ ownerId: userId });
+    const query = { ownerId: userId };
+    if (targetStoreId) {
+      query._id = targetStoreId;
+    }
+    const store = await Store.findOne(query);
     if (!store) {
       return res.status(404).json({
         success: false,
-        message: 'Bạn chưa có cửa hàng nào. Vui lòng tạo cửa hàng trước.',
+        message: 'Không tìm thấy cửa hàng để thêm nhân viên.',
       });
     }
 
