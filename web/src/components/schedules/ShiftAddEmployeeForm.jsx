@@ -65,7 +65,10 @@ export const ShiftAddEmployeeForm = ({
             if (alreadyIn) {
               note = `[Đã có trong ca này] ${m.user?.name || m.fullName}`;
             } else if (conflict) {
-              note = `[Trùng ca: ${conflict.name} (${conflict.startTime} - ${conflict.endTime})] ${m.user?.name || m.fullName}`;
+              const prefix = conflict.isCrossStore
+                ? `[Trùng ca tại ${conflict.storeName}: ${conflict.name} (${conflict.startTime} - ${conflict.endTime})]`
+                : `[Trùng ca: ${conflict.name} (${conflict.startTime} - ${conflict.endTime})]`;
+              note = `${prefix} ${m.user?.name || m.fullName}`;
             }
 
             return (
@@ -100,9 +103,21 @@ export const ShiftAddEmployeeForm = ({
         <div className="p-2.5 bg-red-50 border border-red-200 rounded-xl flex items-start gap-2 text-xs text-red-700 animate-fade-in mt-1">
           <AlertTriangle className="w-4 h-4 text-red-600 shrink-0 mt-0.5" />
           <div>
-            <p className="font-bold text-red-800">Cảnh báo: Trùng giờ làm việc!</p>
+            <p className="font-bold text-red-800">
+              {selectedConflict.isCrossStore
+                ? `Cảnh báo: Trùng ca tại chi nhánh "${selectedConflict.storeName}"!`
+                : 'Cảnh báo: Trùng giờ làm việc!'}
+            </p>
             <p className="mt-0.5 text-slate-600">
-              Nhân viên này đã được phân ca <b>"{selectedConflict.name}" ({selectedConflict.startTime} - {selectedConflict.endTime})</b> vào ngày này. Không thể phân 2 ca cùng khung giờ!
+              {selectedConflict.isCrossStore ? (
+                <>
+                  Nhân viên này đã có ca <b>"{selectedConflict.name}" ({selectedConflict.startTime} - {selectedConflict.endTime})</b> tại chi nhánh <b>"{selectedConflict.storeName}"</b> vào ngày này. Không thể phân 2 ca cùng khung giờ!
+                </>
+              ) : (
+                <>
+                  Nhân viên này đã được phân ca <b>"{selectedConflict.name}" ({selectedConflict.startTime} - {selectedConflict.endTime})</b> vào ngày này. Không thể phân 2 ca cùng khung giờ!
+                </>
+              )}
             </p>
           </div>
         </div>

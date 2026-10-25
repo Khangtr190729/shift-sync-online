@@ -112,6 +112,7 @@ export const ScheduleManagementPage = () => {
   const [saving, setSaving] = useState(false);
   const [publishModalOpen, setPublishModalOpen] = useState(false);
   const [feedback, setFeedback] = useState(null);
+  const [crossStoreShifts, setCrossStoreShifts] = useState([]);
 
   // Auto-schedule Modal State
   const [autoScheduleModalOpen, setAutoScheduleModalOpen] = useState(false);
@@ -175,6 +176,11 @@ export const ScheduleManagementPage = () => {
     try {
       setLoading(true);
       const res = await scheduleApi.getWeekSchedule(store._id, week, year);
+      if (res.crossStoreShifts) {
+        setCrossStoreShifts(res.crossStoreShifts);
+      } else {
+        setCrossStoreShifts([]);
+      }
       if (res.success && res.hasSchedule && res.schedule) {
         setScheduleStatus(res.schedule.status || 'DRAFT');
         const raw = res.schedule.assignments || [];
@@ -278,9 +284,24 @@ export const ScheduleManagementPage = () => {
           return otherShift;
         }
       }
+
+      // Kiểm tra trùng ca với các chi nhánh khác
+      const crossConflict = crossStoreShifts.find((c) => {
+        if (getUserId(c.userId) !== uId || c.date !== dateStr) return false;
+        return c.shift && checkShiftOverlap(targetShift, c.shift);
+      });
+
+      if (crossConflict) {
+        return {
+          ...crossConflict.shift,
+          isCrossStore: true,
+          storeName: crossConflict.storeName,
+        };
+      }
+
       return null;
     },
-    [assignments, shifts]
+    [assignments, shifts, crossStoreShifts]
   );
 
   const getAssignmentConflict = useCallback(
@@ -309,9 +330,24 @@ export const ScheduleManagementPage = () => {
       if (conflicting) {
         return shifts.find((s) => getShiftId(s._id) === getShiftId(conflicting.shiftId)) || conflicting.shiftObj;
       }
+
+      // Kiểm tra trùng ca với các chi nhánh khác
+      const crossConflict = crossStoreShifts.find((c) => {
+        if (getUserId(c.userId) !== targetUserId || c.date !== assignment.date) return false;
+        return c.shift && checkShiftOverlap(targetShift, c.shift);
+      });
+
+      if (crossConflict) {
+        return {
+          ...crossConflict.shift,
+          isCrossStore: true,
+          storeName: crossConflict.storeName,
+        };
+      }
+
       return null;
     },
-    [assignments, shifts]
+    [assignments, shifts, crossStoreShifts]
   );
 
   const scheduleConflicts = useMemo(() => {
@@ -360,9 +396,30 @@ export const ScheduleManagementPage = () => {
           });
         }
       });
+
+      // Kiểm tra trùng ca với các chi nhánh khác
+      const crossConflict = crossStoreShifts.find(
+        (c) => getUserId(c.userId) === uId1 && c.date === a1.date && c.shift && checkShiftOverlap(shift1, c.shift)
+      );
+
+      if (crossConflict) {
+        const emp = members.find((m) => getUserId(m.user?._id || m.userId) === uId1);
+        const empName = emp?.user?.name || emp?.fullName || a1.userObj?.name || 'Nhân viên';
+        conflicts.push({
+          date: a1.date,
+          userId: uId1,
+          employeeName: empName,
+          shift1,
+          shift2: crossConflict.shift,
+          isDuplicate: false,
+          isCrossStore: true,
+          storeName: crossConflict.storeName,
+          message: `Lỗi trùng ca liên chi nhánh: Nhân viên "${empName}" đã có ca "${crossConflict.shift.name}" (${crossConflict.shift.startTime} - ${crossConflict.shift.endTime}) tại chi nhánh "${crossConflict.storeName}" vào ngày ${a1.date}!`,
+        });
+      }
     });
     return conflicts;
-  }, [assignments, shifts, members]);
+  }, [assignments, shifts, members, crossStoreShifts]);
 
   const validateAssignmentsNoOverlap = useCallback(() => {
     if (scheduleConflicts.length > 0) {
