@@ -19,11 +19,13 @@ import StoreInfoSection from '../components/profile/StoreInfoSection';
 import EditProfileSection from '../components/profile/EditProfileSection';
 import ChangePasswordSection from '../components/profile/ChangePasswordSection';
 import StoreSettingsModal from '../components/profile/StoreSettingsModal';
+import StoreSelectorModal from '../components/admin/dashboard/StoreSelectorModal';
 
 export const ProfileScreen = () => {
   const {
     user,
     store,
+    stores,
     roleInStore,
     employmentType,
     hourlyWage,
@@ -34,6 +36,7 @@ export const ProfileScreen = () => {
 
   // Store Settings Modal state
   const [storeModalVisible, setStoreModalVisible] = useState(false);
+  const [branchModalVisible, setBranchModalVisible] = useState(false);
   const [savingStore, setSavingStore] = useState(false);
 
   // Profile Form state
@@ -173,11 +176,13 @@ export const ProfileScreen = () => {
         {/* 2. Store Info Section */}
         <StoreInfoSection
           store={store}
+          storesCount={stores?.length || 1}
           roleInStore={roleInStore}
           employmentType={employmentType}
           hourlyWage={hourlyWage}
           isAdmin={isAdmin}
           onOpenStoreSettings={() => setStoreModalVisible(true)}
+          onOpenBranchSelector={() => setBranchModalVisible(true)}
         />
 
         {/* 3. Personal Info Form */}
@@ -245,6 +250,12 @@ export const ProfileScreen = () => {
           saving={savingStore}
         />
       )}
+
+      {/* Branch Selector Modal */}
+      <StoreSelectorModal
+        visible={branchModalVisible}
+        onClose={() => setBranchModalVisible(false)}
+      />
     </KeyboardAvoidingView>
   );
 };

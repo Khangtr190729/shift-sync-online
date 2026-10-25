@@ -6,6 +6,7 @@ import {
   RefreshControl,
   StyleSheet,
   ActivityIndicator,
+  TouchableOpacity,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useAuth } from '../context/AuthContext';
@@ -27,9 +28,10 @@ import NextShiftCard from '../components/schedule/NextShiftCard';
 import ShiftCardItem from '../components/schedule/ShiftCardItem';
 import EmptyShiftState from '../components/schedule/EmptyShiftState';
 import ShiftDetailModal from '../components/ShiftDetailModal';
+import StoreSelectorModal from '../components/admin/dashboard/StoreSelectorModal';
 
 export const MyScheduleScreen = () => {
-  const { user, store } = useAuth();
+  const { user, store, stores } = useAuth();
 
   const [currentMonday, setCurrentMonday] = useState(() => getMondayOfWeek());
   const [selectedDate, setSelectedDate] = useState(() => formatDateToISO(new Date()));
@@ -37,6 +39,7 @@ export const MyScheduleScreen = () => {
   const [loading, setLoading] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
   const [activeShiftDetail, setActiveShiftDetail] = useState(null);
+  const [branchModalVisible, setBranchModalVisible] = useState(false);
 
   const daysOfWeek = useMemo(() => getDaysOfWeek(currentMonday), [currentMonday]);
   const { week, year } = useMemo(() => getWeekNumberAndYear(currentMonday), [currentMonday]);
@@ -51,7 +54,7 @@ export const MyScheduleScreen = () => {
       } else {
         setLoading(true);
       }
-      const res = await scheduleApi.getMySchedule(week, year);
+      const res = await scheduleApi.getMySchedule(week, year, store?._id);
       if (res && res.success) {
         setScheduleData({
           shifts: res.shifts || [],
@@ -136,10 +139,22 @@ export const MyScheduleScreen = () => {
       >
         {/* Store & Employee Header */}
         <View style={styles.topHeader}>
-          <View style={styles.storeBadge}>
+          <TouchableOpacity
+            style={styles.storeBadge}
+            onPress={() => stores?.length > 1 && setBranchModalVisible(true)}
+            activeOpacity={stores?.length > 1 ? 0.7 : 1}
+          >
             <Ionicons name="storefront" size={14} color={colors.primary} />
             <Text style={styles.storeName}>{store?.name || 'Cửa hàng'}</Text>
-          </View>
+            {stores?.length > 1 && (
+              <View style={styles.branchCountPill}>
+                <Text style={styles.branchCountText}>{stores.length}</Text>
+              </View>
+            )}
+            {stores?.length > 1 && (
+              <Ionicons name="chevron-down" size={13} color={colors.primary} />
+            )}
+          </TouchableOpacity>
           <Text style={styles.greetingTitle}>
             Xin chào, {user?.fullName || 'nhân viên'}! 👋
           </Text>
@@ -210,6 +225,12 @@ export const MyScheduleScreen = () => {
         storeName={store?.name}
         onClose={() => setActiveShiftDetail(null)}
       />
+
+      {/* Branch Selector Modal */}
+      <StoreSelectorModal
+        visible={branchModalVisible}
+        onClose={() => setBranchModalVisible(false)}
+      />
     </View>
   );
 };
@@ -232,9 +253,9 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     gap: 6,
     backgroundColor: colors.primaryLight,
-    paddingVertical: 4,
+    paddingVertical: 5,
     paddingHorizontal: 10,
-    borderRadius: 8,
+    borderRadius: 10,
     alignSelf: 'flex-start',
     marginBottom: 8,
   },
@@ -242,6 +263,18 @@ const styles = StyleSheet.create({
     fontSize: 12,
     fontWeight: '700',
     color: colors.primaryDark,
+  },
+  branchCountPill: {
+    backgroundColor: colors.primary,
+    paddingHorizontal: 6,
+    paddingVertical: 1,
+    borderRadius: 8,
+    marginLeft: 2,
+  },
+  branchCountText: {
+    color: '#FFFFFF',
+    fontSize: 10,
+    fontWeight: '800',
   },
   greetingTitle: {
     fontSize: 22,

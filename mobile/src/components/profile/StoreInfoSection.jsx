@@ -11,6 +11,8 @@ export const StoreInfoSection = ({
   employmentType,
   isAdmin = false,
   onOpenStoreSettings,
+  onOpenBranchSelector,
+  storesCount = 1,
 }) => {
   const empTypeInfo = getEmploymentTypeLabel(employmentType);
 
@@ -19,19 +21,32 @@ export const StoreInfoSection = ({
       <View style={styles.cardHeader}>
         <View style={styles.headerTitleRow}>
           <Ionicons name="storefront" size={18} color={colors.primary} />
-          <Text style={styles.cardTitle}>Thông tin cửa hàng</Text>
+          <Text style={styles.cardTitle}>Thông tin cơ sở & Chi nhánh</Text>
         </View>
 
-        {isAdmin && onOpenStoreSettings && (
-          <TouchableOpacity
-            style={styles.editStoreBtn}
-            onPress={onOpenStoreSettings}
-            activeOpacity={0.7}
-          >
-            <Ionicons name="pencil" size={13} color={colors.primaryDark} />
-            <Text style={styles.editStoreBtnText}>Chỉnh sửa</Text>
-          </TouchableOpacity>
-        )}
+        <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
+          {(isAdmin || storesCount > 1) && onOpenBranchSelector && (
+            <TouchableOpacity
+              style={styles.branchBtn}
+              onPress={onOpenBranchSelector}
+              activeOpacity={0.7}
+            >
+              <Ionicons name="swap-horizontal" size={13} color={colors.primary} />
+              <Text style={styles.branchBtnText}>Đổi ({storesCount})</Text>
+            </TouchableOpacity>
+          )}
+
+          {isAdmin && onOpenStoreSettings && (
+            <TouchableOpacity
+              style={styles.editStoreBtn}
+              onPress={onOpenStoreSettings}
+              activeOpacity={0.7}
+            >
+              <Ionicons name="pencil" size={13} color={colors.primaryDark} />
+              <Text style={styles.editStoreBtnText}>Sửa</Text>
+            </TouchableOpacity>
+          )}
+        </View>
       </View>
 
       <View style={styles.infoRow}>
@@ -122,6 +137,22 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontWeight: '800',
     color: colors.text,
+  },
+  branchBtn: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+    backgroundColor: '#FFF7ED',
+    borderWidth: 1,
+    borderColor: '#FED7AA',
+    paddingVertical: 4,
+    paddingHorizontal: 8,
+    borderRadius: 8,
+  },
+  branchBtnText: {
+    fontSize: 11,
+    fontWeight: '700',
+    color: colors.primary,
   },
   editStoreBtn: {
     flexDirection: 'row',

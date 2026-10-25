@@ -4,6 +4,7 @@ import { Platform } from 'react-native';
 const TOKEN_KEY = 'ca_lam_online_token';
 const USER_KEY = 'ca_lam_online_user';
 const API_URL_KEY = 'ca_lam_online_api_url';
+const ACTIVE_STORE_KEY = 'ca_lam_online_active_store_id';
 
 // In-memory fallback if SecureStore is not available (e.g. web preview)
 const memoryStorage = {};
@@ -132,8 +133,55 @@ export const tokenStorage = {
     }
   },
 
+  // --- ACTIVE STORE ID ---
+  saveActiveStoreId: async (storeId) => {
+    try {
+      const available = await isSecureStoreAvailable();
+      if (available) {
+        await SecureStore.setItemAsync(ACTIVE_STORE_KEY, String(storeId));
+      } else if (typeof localStorage !== 'undefined') {
+        localStorage.setItem(ACTIVE_STORE_KEY, String(storeId));
+      } else {
+        memoryStorage[ACTIVE_STORE_KEY] = String(storeId);
+      }
+    } catch (e) {
+      console.warn('Error saving active store ID:', e);
+      memoryStorage[ACTIVE_STORE_KEY] = String(storeId);
+    }
+  },
+
+  getActiveStoreId: async () => {
+    try {
+      const available = await isSecureStoreAvailable();
+      if (available) {
+        return await SecureStore.getItemAsync(ACTIVE_STORE_KEY);
+      } else if (typeof localStorage !== 'undefined') {
+        return localStorage.getItem(ACTIVE_STORE_KEY);
+      } else {
+        return memoryStorage[ACTIVE_STORE_KEY] || null;
+      }
+    } catch {
+      return memoryStorage[ACTIVE_STORE_KEY] || null;
+    }
+  },
+
+  deleteActiveStoreId: async () => {
+    try {
+      const available = await isSecureStoreAvailable();
+      if (available) {
+        await SecureStore.deleteItemAsync(ACTIVE_STORE_KEY);
+      } else if (typeof localStorage !== 'undefined') {
+        localStorage.removeItem(ACTIVE_STORE_KEY);
+      }
+      delete memoryStorage[ACTIVE_STORE_KEY];
+    } catch {
+      delete memoryStorage[ACTIVE_STORE_KEY];
+    }
+  },
+
   clearAll: async () => {
     await tokenStorage.deleteToken();
+    await tokenStorage.deleteActiveStoreId();
     try {
       const available = await isSecureStoreAvailable();
       if (available) {

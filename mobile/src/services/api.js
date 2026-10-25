@@ -100,9 +100,10 @@ export const authApi = {
 // --- STORE APIS ---
 export const storeApi = {
   createStore: (data) => api.post('/stores', data),
-  getMyStore: () => api.get('/stores/my-store'),
+  getMyStore: (storeId) => api.get(`/stores/my-store${storeId ? `?storeId=${storeId}` : ''}`),
+  getMyStores: () => api.get('/stores/my-stores'),
   updateMyStore: (data) => api.put('/stores/my-store', data),
-  generateInviteCode: () => api.post('/stores/generate-invite-code'),
+  generateInviteCode: (storeId) => api.post('/stores/generate-invite-code', { storeId }),
   joinByCode: (inviteCode) => api.post('/stores/join-by-code', { inviteCode }),
   inviteByIdOrEmail: (data) => api.post('/stores/invite-by-id', data),
 };
@@ -145,7 +146,8 @@ export const scheduleApi = {
     }
     return api.get(url);
   },
-  getMySchedule: (week, year) => api.get(`/schedules/my-schedule?week=${week}&year=${year}`),
+  getMySchedule: (week, year, storeId) =>
+    api.get(`/schedules/my-schedule?week=${week}&year=${year}${storeId ? `&storeId=${storeId}` : ''}`),
 };
 
 // --- USER APIS ---

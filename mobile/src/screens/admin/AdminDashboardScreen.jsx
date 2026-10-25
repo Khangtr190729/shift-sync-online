@@ -6,6 +6,7 @@ import {
   RefreshControl,
   StyleSheet,
   Alert,
+  TouchableOpacity,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useAuth } from '../../context/AuthContext';
@@ -16,9 +17,11 @@ import { getMondayOfWeek, getWeekNumberAndYear } from '../../utils/formatters';
 import StatOverviewCards from '../../components/admin/dashboard/StatOverviewCards';
 import QuickActionsGrid from '../../components/admin/dashboard/QuickActionsGrid';
 import TodayShiftsSection from '../../components/admin/dashboard/TodayShiftsSection';
+import StoreSelectorModal from '../../components/admin/dashboard/StoreSelectorModal';
 
 export const AdminDashboardScreen = ({ navigation }) => {
-  const { user, store } = useAuth();
+  const { user, store, stores } = useAuth();
+  const [storeModalVisible, setStoreModalVisible] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
   const [memberCount, setMemberCount] = useState(0);
   const [shiftsCount, setShiftsCount] = useState(0);
@@ -153,10 +156,21 @@ export const AdminDashboardScreen = ({ navigation }) => {
       >
         {/* Header Store & Owner info */}
         <View style={styles.topHeader}>
-          <View style={styles.storeBadge}>
+          <TouchableOpacity
+            style={styles.storeBadge}
+            onPress={() => setStoreModalVisible(true)}
+            activeOpacity={0.7}
+          >
             <Ionicons name="storefront" size={14} color={colors.primary} />
             <Text style={styles.storeName}>{store?.name || 'Cửa hàng của tôi'}</Text>
-          </View>
+            {stores?.length > 1 && (
+              <View style={styles.branchCountBadge}>
+                <Text style={styles.branchCountText}>{stores.length}</Text>
+              </View>
+            )}
+            <Ionicons name="chevron-down" size={12} color={colors.primaryDark} style={{ marginLeft: 2 }} />
+          </TouchableOpacity>
+
           <Text style={styles.greetingTitle}>
             Xin chào Chủ quán {user?.fullName || ''}! 👑
           </Text>
@@ -189,6 +203,12 @@ export const AdminDashboardScreen = ({ navigation }) => {
           onGoToSchedule={() => navigation.navigate('AdminSchedule')}
         />
       </ScrollView>
+
+      {/* Store & Branch Selector Modal */}
+      <StoreSelectorModal
+        visible={storeModalVisible}
+        onClose={() => setStoreModalVisible(false)}
+      />
     </View>
   );
 };
@@ -211,9 +231,11 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     gap: 6,
     backgroundColor: colors.primaryLight,
-    paddingVertical: 4,
-    paddingHorizontal: 10,
-    borderRadius: 8,
+    paddingVertical: 6,
+    paddingHorizontal: 12,
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: '#FED7AA',
     alignSelf: 'flex-start',
     marginBottom: 8,
   },
@@ -221,6 +243,18 @@ const styles = StyleSheet.create({
     fontSize: 12,
     fontWeight: '700',
     color: colors.primaryDark,
+  },
+  branchCountBadge: {
+    backgroundColor: colors.primary,
+    paddingHorizontal: 5,
+    paddingVertical: 1,
+    borderRadius: 8,
+    marginLeft: 2,
+  },
+  branchCountText: {
+    color: '#FFFFFF',
+    fontSize: 10,
+    fontWeight: '800',
   },
   greetingTitle: {
     fontSize: 22,

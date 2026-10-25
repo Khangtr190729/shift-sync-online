@@ -7,6 +7,7 @@ const AuthContext = createContext(null);
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [store, setStore] = useState(null);
+  const [stores, setStores] = useState([]);
   const [roleInStore, setRoleInStore] = useState(null);
   const [employmentType, setEmploymentType] = useState('PART_TIME');
   const [hourlyWage, setHourlyWage] = useState(0);
@@ -14,11 +15,16 @@ export const AuthProvider = ({ children }) => {
   const [isLoading, setIsLoading] = useState(true);
 
   // Tải lại thông tin cửa hàng hiện tại của người dùng (Chủ quán hoặc Nhân viên)
-  const fetchMyStore = useCallback(async () => {
+  const fetchMyStore = useCallback(async (targetStoreId) => {
     try {
-      const res = await storeApi.getMyStore();
+      const activeId = targetStoreId || (await tokenStorage.getActiveStoreId());
+      const res = await storeApi.getMyStore(activeId);
       if (res && res.success && res.store) {
         setStore(res.store);
+        setStores(res.stores || [res.store]);
+        if (res.store?._id) {
+          await tokenStorage.saveActiveStoreId(res.store._id);
+        }
         const resolvedRole =
           res.roleInStore ||
           (user?.systemRole === 'ADMIN' || String(res.store.ownerId) === String(user?._id || user?.id)
@@ -30,6 +36,7 @@ export const AuthProvider = ({ children }) => {
         return res.store;
       } else {
         setStore(null);
+        setStores([]);
         setRoleInStore(user?.systemRole === 'ADMIN' ? 'ADMIN' : null);
         setEmploymentType('PART_TIME');
         setHourlyWage(0);
@@ -37,6 +44,7 @@ export const AuthProvider = ({ children }) => {
       }
     } catch {
       setStore(null);
+      setStores([]);
       setRoleInStore(user?.systemRole === 'ADMIN' ? 'ADMIN' : null);
       setEmploymentType('PART_TIME');
       setHourlyWage(0);
@@ -141,15 +149,24 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
-  // Tạo cửa hàng mới (Dành cho Chủ quán ADMIN)
+  // Tạo thêm chi nhánh / cửa hàng mới (Dành cho Chủ quán ADMIN)
   const createStore = async (storeData) => {
     const res = await storeApi.createStore(storeData);
     if (res && res.success && res.store) {
-      setStore(res.store);
-      setRoleInStore('ADMIN');
+      await tokenStorage.saveActiveStoreId(res.store._id);
+      await fetchMyStore(res.store._id);
       return res.store;
     }
     throw new Error(res?.message || 'Không thể tạo cửa hàng.');
+  };
+
+  // Chuyển đổi giữa các cơ sở / chi nhánh
+  const switchStore = async (storeId) => {
+    if (!storeId) return;
+    await tokenStorage.saveActiveStoreId(storeId);
+    const target = stores.find((s) => String(s._id) === String(storeId));
+    if (target) setStore(target);
+    await fetchMyStore(storeId);
   };
 
   // Đăng xuất
@@ -162,6 +179,7 @@ export const AuthProvider = ({ children }) => {
     setToken(null);
     setUser(null);
     setStore(null);
+    setStores([]);
     setRoleInStore(null);
     setEmploymentType('PART_TIME');
     setHourlyWage(0);
@@ -191,6 +209,7 @@ export const AuthProvider = ({ children }) => {
       value={{
         user,
         store,
+        stores,
         roleInStore,
         employmentType,
         hourlyWage,
@@ -200,10 +219,12 @@ export const AuthProvider = ({ children }) => {
         login,
         register,
         createStore,
+        switchStore,
         logout,
         fetchMyStore,
         refreshUserAndStore,
         setStore,
+        setStores,
       }}
     >
       {children}
