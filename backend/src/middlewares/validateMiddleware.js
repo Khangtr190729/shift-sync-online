@@ -19,7 +19,11 @@ export const validateRequest = (schemas) => {
             })),
           });
         }
-        req.params = parsedParams.data;
+        try {
+          req.params = parsedParams.data;
+        } catch {
+          Object.assign(req.params, parsedParams.data);
+        }
       }
 
       // 2. Kiểm tra Query nếu có schema
@@ -36,7 +40,16 @@ export const validateRequest = (schemas) => {
             })),
           });
         }
-        req.query = parsedQuery.data;
+        try {
+          req.query = parsedQuery.data;
+        } catch {
+          Object.defineProperty(req, 'query', {
+            value: parsedQuery.data,
+            writable: true,
+            enumerable: true,
+            configurable: true,
+          });
+        }
       }
 
       // 3. Kiểm tra Body nếu có schema
