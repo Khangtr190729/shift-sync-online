@@ -4,7 +4,14 @@ import { authApi, storeApi } from '../services/api';
 const AuthContext = createContext(null);
 
 export const AuthProvider = ({ children }) => {
-  const [user, setUser] = useState(null);
+  const [user, setUser] = useState(() => {
+    try {
+      const saved = localStorage.getItem('ca_lam_user');
+      return saved ? JSON.parse(saved) : null;
+    } catch {
+      return null;
+    }
+  });
   const [store, setStore] = useState(null);
   const [stores, setStores] = useState([]);
   const [roleInStore, setRoleInStore] = useState(null);
@@ -38,9 +45,11 @@ export const AuthProvider = ({ children }) => {
           role: rawUser.systemRole || rawUser.role
         };
         setUser(normalizedUser);
+        localStorage.setItem('ca_lam_user', JSON.stringify(normalizedUser));
 
         // Fetch store for current user (use saved active branch if available)
-        const activeStoreId = requestedStoreId || localStorage.getItem('ca_lam_active_store_id');
+        const savedStoreId = localStorage.getItem('ca_lam_active_store_id');
+        const activeStoreId = requestedStoreId || (savedStoreId && savedStoreId !== 'undefined' ? savedStoreId : null);
         try {
           const storeRes = await storeApi.getMyStore(activeStoreId);
           if (storeRes.success && storeRes.hasStore) {
@@ -55,13 +64,12 @@ export const AuthProvider = ({ children }) => {
             setStores([]);
             setRoleInStore(normalizedUser.role);
           }
-        } catch {
-          setStore(null);
-          setStores([]);
-          setRoleInStore(normalizedUser.role);
+        } catch (storeErr) {
+          console.warn('Could not fetch store info:', storeErr.message);
         }
       } else {
         localStorage.removeItem('ca_lam_token');
+        localStorage.removeItem('ca_lam_user');
         localStorage.removeItem('ca_lam_active_store_id');
         setUser(null);
         setStore(null);
@@ -69,13 +77,18 @@ export const AuthProvider = ({ children }) => {
         setRoleInStore(null);
       }
     } catch (err) {
-      console.error('Failed to load user session:', err);
-      localStorage.removeItem('ca_lam_token');
-      localStorage.removeItem('ca_lam_active_store_id');
-      setUser(null);
-      setStore(null);
-      setStores([]);
-      setRoleInStore(null);
+      console.warn('Failed to load user session:', err);
+      // Chỉ đăng xuất khi server phản hồi 401 hoặc 403 (Token hết hạn / không hợp lệ)
+      // KHÔNG đăng xuất khi lỗi mạng hoặc server backend đang khởi động lại
+      if (err.status === 401 || err.status === 403 || err.message?.includes('401') || err.message?.includes('hết hạn')) {
+        localStorage.removeItem('ca_lam_token');
+        localStorage.removeItem('ca_lam_user');
+        localStorage.removeItem('ca_lam_active_store_id');
+        setUser(null);
+        setStore(null);
+        setStores([]);
+        setRoleInStore(null);
+      }
     } finally {
       setLoading(false);
     }
@@ -121,6 +134,7 @@ export const AuthProvider = ({ children }) => {
         name: rawUser?.fullName || rawUser?.name,
         role: rawUser?.systemRole || rawUser?.role
       };
+      localStorage.setItem('ca_lam_user', JSON.stringify(normalizedUser));
       setUser(normalizedUser);
       await loadCurrentUser();
       return { token, user: normalizedUser };
@@ -141,6 +155,7 @@ export const AuthProvider = ({ children }) => {
         name: rawUser?.fullName || rawUser?.name,
         role: rawUser?.systemRole || rawUser?.role
       };
+      localStorage.setItem('ca_lam_user', JSON.stringify(normalizedUser));
       setUser(normalizedUser);
       await loadCurrentUser();
       return { token, user: normalizedUser };
@@ -150,6 +165,7 @@ export const AuthProvider = ({ children }) => {
 
   const logout = () => {
     localStorage.removeItem('ca_lam_token');
+    localStorage.removeItem('ca_lam_user');
     localStorage.removeItem('ca_lam_active_store_id');
     setUser(null);
     setStore(null);

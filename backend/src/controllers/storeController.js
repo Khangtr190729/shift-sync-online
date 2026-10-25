@@ -63,10 +63,10 @@ export const getMyStore = async (req, res) => {
     const userId = req.user.id;
     const requestedStoreId = req.query.storeId;
 
-    // 1. Nếu là ADMIN: Tìm danh sách cửa hàng do mình sở hữu
+    // 1. Nếu là ADMIN: Tìm danh sách cửa hàng do mình sở hữu (cơ sở gốc trước, chi nhánh sau)
     if (req.user.systemRole === 'ADMIN') {
       const stores = await Store.find({ ownerId: userId })
-        .sort({ createdAt: -1 })
+        .sort({ createdAt: 1 })
         .populate('ownerId', 'fullName email');
 
       if (!stores || stores.length === 0) {
@@ -101,10 +101,12 @@ export const getMyStore = async (req, res) => {
     }
 
     // 2. Nếu là EMPLOYEE: Tìm các cửa hàng mà mình đang là thành viên
-    const memberships = await StoreMember.find({ userId, status: 'ACTIVE' }).populate({
-      path: 'storeId',
-      populate: { path: 'ownerId', select: 'fullName email' },
-    });
+    const memberships = await StoreMember.find({ userId, status: 'ACTIVE' })
+      .sort({ createdAt: 1 })
+      .populate({
+        path: 'storeId',
+        populate: { path: 'ownerId', select: 'fullName email' },
+      });
 
     const validMemberships = memberships.filter((m) => m.storeId);
 
@@ -154,7 +156,7 @@ export const getMyStores = async (req, res) => {
 
     if (req.user.systemRole === 'ADMIN') {
       const stores = await Store.find({ ownerId: userId })
-        .sort({ createdAt: -1 })
+        .sort({ createdAt: 1 })
         .populate('ownerId', 'fullName email');
 
       return res.status(200).json({
@@ -163,10 +165,12 @@ export const getMyStores = async (req, res) => {
       });
     }
 
-    const memberships = await StoreMember.find({ userId, status: 'ACTIVE' }).populate({
-      path: 'storeId',
-      populate: { path: 'ownerId', select: 'fullName email' },
-    });
+    const memberships = await StoreMember.find({ userId, status: 'ACTIVE' })
+      .sort({ createdAt: 1 })
+      .populate({
+        path: 'storeId',
+        populate: { path: 'ownerId', select: 'fullName email' },
+      });
 
     const stores = memberships.filter((m) => m.storeId).map((m) => m.storeId);
 
