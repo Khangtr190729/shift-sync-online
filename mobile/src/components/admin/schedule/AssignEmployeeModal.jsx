@@ -6,9 +6,11 @@ import {
   TouchableOpacity,
   ScrollView,
   StyleSheet,
+  Alert,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import colors from '../../../theme/colors';
+import AssignMemberItem from './AssignMemberItem';
 
 export const AssignEmployeeModal = ({
   visible,
@@ -16,12 +18,36 @@ export const AssignEmployeeModal = ({
   targetShift,
   members = [],
   onSelectMember,
+  getConflictingShift,
 }) => {
   if (!targetShift) return null;
 
   const currentAssignedIds = new Set(
     (targetShift.assignments || []).map((a) => a.userId?._id || a.userId || a.id)
   );
+
+  const handleMemberPress = (member, isAssigned, conflict) => {
+    if (isAssigned) {
+      Alert.alert('Đã có trong ca', 'Nhân viên này đã được phân công vào ca làm này rồi.');
+      return;
+    }
+    if (conflict) {
+      const empName = member.userId?.fullName || member.fullName || 'Nhân viên';
+      if (conflict.isCrossStore) {
+        Alert.alert(
+          `Trùng ca tại chi nhánh "${conflict.storeName}"!`,
+          `Nhân viên "${empName}" đã có ca "${conflict.name}" (${conflict.startTime} - ${conflict.endTime}) tại chi nhánh "${conflict.storeName}" vào ngày này. Không thể phân 2 ca cùng khung giờ!`
+        );
+      } else {
+        Alert.alert(
+          'Trùng giờ làm việc!',
+          `Nhân viên "${empName}" đã được phân ca "${conflict.name}" (${conflict.startTime} - ${conflict.endTime}) vào ngày này. Không thể phân 2 ca cùng khung giờ!`
+        );
+      }
+      return;
+    }
+    onSelectMember(member);
+  };
 
   return (
     <Modal
@@ -33,7 +59,7 @@ export const AssignEmployeeModal = ({
       <View style={styles.overlay}>
         <View style={styles.modalBox}>
           <View style={styles.header}>
-            <View>
+            <View style={styles.headerTitleWrap}>
               <Text style={styles.title}>Thêm nhân viên vào ca</Text>
               <Text style={styles.subtitle}>
                 {targetShift.shiftName || targetShift.shift?.name} ({targetShift.startTime} — {targetShift.endTime})
@@ -51,45 +77,20 @@ export const AssignEmployeeModal = ({
               <Text style={styles.emptyText}>Chưa có nhân viên nào trong quán.</Text>
             ) : (
               members.map((member) => {
-                const isAssigned = currentAssignedIds.has(member.userId?._id || member.userId);
+                const uId = member.userId?._id || member.userId;
+                const isAssigned = currentAssignedIds.has(uId);
+                const conflict = getConflictingShift
+                  ? getConflictingShift(uId, targetShift.date, targetShift.shiftId)
+                  : null;
 
                 return (
-                  <TouchableOpacity
-                    key={member._id || member.userId?._id}
-                    style={[
-                      styles.memberItem,
-                      isAssigned && styles.memberItemDisabled,
-                    ]}
-                    onPress={() => !isAssigned && onSelectMember(member)}
-                    disabled={isAssigned}
-                    activeOpacity={0.7}
-                  >
-                    <View style={styles.memberLeft}>
-                      <View style={styles.avatar}>
-                        <Text style={styles.avatarText}>
-                          {(member.userId?.fullName || 'N').charAt(0).toUpperCase()}
-                        </Text>
-                      </View>
-                      <View>
-                        <Text style={styles.memberName}>
-                          {member.userId?.fullName || 'Nhân viên'}
-                        </Text>
-                        <Text style={styles.memberRole}>
-                          {member.employmentType === 'FULL_TIME' ? 'Full-time' : 'Part-time'} • {member.userId?.email}
-                        </Text>
-                      </View>
-                    </View>
-
-                    {isAssigned ? (
-                      <View style={styles.assignedTag}>
-                        <Text style={styles.assignedTagText}>Đã có trong ca</Text>
-                      </View>
-                    ) : (
-                      <View style={styles.addIcon}>
-                        <Ionicons name="add" size={18} color={colors.primary} />
-                      </View>
-                    )}
-                  </TouchableOpacity>
+                  <AssignMemberItem
+                    key={member._id || uId}
+                    member={member}
+                    isAssigned={isAssigned}
+                    conflict={conflict}
+                    onPress={() => handleMemberPress(member, isAssigned, conflict)}
+                  />
                 );
               })
             )}
@@ -111,7 +112,7 @@ const styles = StyleSheet.create({
     borderTopLeftRadius: 24,
     borderTopRightRadius: 24,
     padding: 22,
-    maxHeight: '75%',
+    maxHeight: '80%',
   },
   header: {
     flexDirection: 'row',
@@ -121,6 +122,10 @@ const styles = StyleSheet.create({
     paddingBottom: 12,
     borderBottomWidth: 1,
     borderBottomColor: '#F1F5F9',
+  },
+  headerTitleWrap: {
+    flex: 1,
+    paddingRight: 8,
   },
   title: {
     fontSize: 18,
@@ -140,70 +145,7 @@ const styles = StyleSheet.create({
     marginBottom: 10,
   },
   listScroll: {
-    maxHeight: 340,
-  },
-  memberItem: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    padding: 12,
-    borderRadius: 14,
-    borderWidth: 1,
-    borderColor: '#E2E8F0',
-    marginBottom: 8,
-    backgroundColor: '#F8FAFC',
-  },
-  memberItemDisabled: {
-    opacity: 0.5,
-    backgroundColor: '#F1F5F9',
-  },
-  memberLeft: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 10,
-    flex: 1,
-  },
-  avatar: {
-    width: 38,
-    height: 38,
-    borderRadius: 12,
-    backgroundColor: colors.primaryLight,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  avatarText: {
-    fontSize: 15,
-    fontWeight: '800',
-    color: colors.primaryDark,
-  },
-  memberName: {
-    fontSize: 13,
-    fontWeight: '700',
-    color: colors.text,
-  },
-  memberRole: {
-    fontSize: 11,
-    color: colors.textSecondary,
-    marginTop: 2,
-  },
-  assignedTag: {
-    backgroundColor: '#E2E8F0',
-    paddingVertical: 4,
-    paddingHorizontal: 8,
-    borderRadius: 6,
-  },
-  assignedTagText: {
-    fontSize: 10,
-    fontWeight: '700',
-    color: colors.textSecondary,
-  },
-  addIcon: {
-    width: 32,
-    height: 32,
-    borderRadius: 16,
-    backgroundColor: colors.primaryLight,
-    alignItems: 'center',
-    justifyContent: 'center',
+    maxHeight: 380,
   },
   emptyText: {
     fontSize: 12,

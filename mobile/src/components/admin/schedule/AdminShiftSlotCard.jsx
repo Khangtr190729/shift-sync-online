@@ -2,13 +2,14 @@ import React from 'react';
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import colors from '../../../theme/colors';
-import { formatVND } from '../../../utils/formatters';
+import ShiftEmployeeChip from './ShiftEmployeeChip';
 
 export const AdminShiftSlotCard = ({
   shiftItem,
   onAssignEmployee,
   onRemoveEmployee,
   onEvaluateEmployee,
+  getAssignmentConflict,
   isPublished = false,
 }) => {
   const shiftName = shiftItem.shiftName || shiftItem.shift?.name || 'Ca làm';
@@ -63,106 +64,32 @@ export const AdminShiftSlotCard = ({
 
         <View style={styles.chipsWrap}>
           {assignments.map((assign, idx) => {
-            const empName =
-              assign.userId?.fullName || assign.userName || assign.fullName || 'Nhân viên';
             const empId = assign.userId?._id || assign.userId || assign.id;
-            const isMissed = assign.attendanceStatus === 'MISSED';
-            const isPartial = assign.attendanceStatus === 'PARTIAL';
+            const conflict = getAssignmentConflict ? getAssignmentConflict(assign) : null;
 
             return (
-              <TouchableOpacity
+              <ShiftEmployeeChip
                 key={empId || idx}
-                style={[
-                  styles.employeeChip,
-                  isMissed && styles.chipMissed,
-                  isPartial && styles.chipPartial,
-                ]}
-                onPress={() => onEvaluateEmployee && onEvaluateEmployee(shiftItem, assign)}
-                activeOpacity={0.8}
-              >
-                <View style={styles.chipContent}>
-                  <Ionicons
-                    name={
-                      isMissed
-                        ? 'close-circle'
-                        : isPartial
-                        ? 'alert-circle'
-                        : 'person-circle'
-                    }
-                    size={16}
-                    color={
-                      isMissed
-                        ? colors.danger
-                        : isPartial
-                        ? '#D97706'
-                        : colors.primary
-                    }
-                  />
-                  <Text
-                    style={[
-                      styles.employeeChipName,
-                      isMissed && styles.nameMissed,
-                    ]}
-                  >
-                    {empName}
-                  </Text>
-
-                  {/* Status badges */}
-                  {isMissed && (
-                    <View style={styles.missedTag}>
-                      <Text style={styles.missedTagText}>Vắng (-100%)</Text>
-                    </View>
-                  )}
-                  {isPartial && (
-                    <View style={styles.partialTag}>
-                      <Text style={styles.partialTagText}>
-                        -{formatVND(assign.deductedPay || 0)}
-                      </Text>
-                    </View>
-                  )}
-                </View>
-
-                {/* Actions inside chip */}
-                <View style={styles.chipActions}>
-                  {onEvaluateEmployee && (
-                    <TouchableOpacity
-                      onPress={() => onEvaluateEmployee(shiftItem, assign)}
-                      hitSlop={{ top: 8, bottom: 8, left: 4, right: 4 }}
-                      style={styles.actionBtn}
-                      title="Đánh giá ca"
-                    >
-                      <Ionicons
-                        name="create-outline"
-                        size={15}
-                        color={isPartial ? '#D97706' : isMissed ? colors.danger : colors.primary}
-                      />
-                    </TouchableOpacity>
-                  )}
-
-                  {!isPublished && (
-                    <TouchableOpacity
-                      onPress={() => onRemoveEmployee(shiftItem, empId)}
-                      hitSlop={{ top: 8, bottom: 8, left: 4, right: 6 }}
-                      style={styles.actionBtn}
-                      title="Xóa khỏi ca"
-                    >
-                      <Ionicons name="close-circle" size={16} color={colors.danger} />
-                    </TouchableOpacity>
-                  )}
-                </View>
-              </TouchableOpacity>
+                assign={assign}
+                shiftItem={shiftItem}
+                conflict={conflict}
+                isPublished={isPublished}
+                onEvaluateEmployee={onEvaluateEmployee}
+                onRemoveEmployee={onRemoveEmployee}
+              />
             );
           })}
 
-          {/* Add Employee Button (only if not published or if owner wants to add) */}
-          <TouchableOpacity
-            style={styles.addBtn}
-            onPress={() => onAssignEmployee(shiftItem)}
-            activeOpacity={0.7}
-          >
-            <Ionicons name="add" size={15} color={colors.primary} />
-            <Text style={styles.addBtnText}>Thêm nhân viên</Text>
-          </TouchableOpacity>
+          {!isPublished && (
+            <TouchableOpacity
+              style={styles.addBtn}
+              onPress={() => onAssignEmployee && onAssignEmployee(shiftItem)}
+              activeOpacity={0.7}
+            >
+              <Ionicons name="add" size={15} color={colors.primary} />
+              <Text style={styles.addBtnText}>Thêm nhân viên</Text>
+            </TouchableOpacity>
+          )}
         </View>
       </View>
     </View>
@@ -178,33 +105,33 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: '#E2E8F0',
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1 },
+    shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.03,
-    shadowRadius: 3,
+    shadowRadius: 8,
     elevation: 2,
   },
   cardHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'flex-start',
-    paddingBottom: 12,
+    marginBottom: 12,
+    paddingBottom: 10,
     borderBottomWidth: 1,
     borderBottomColor: '#F1F5F9',
-    marginBottom: 12,
   },
   headerLeft: {
     flex: 1,
   },
   shiftName: {
-    fontSize: 16,
+    fontSize: 15,
     fontWeight: '800',
     color: colors.text,
-    marginBottom: 4,
   },
   timeRow: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: 4,
+    marginTop: 3,
   },
   timeText: {
     fontSize: 12,
@@ -212,17 +139,17 @@ const styles = StyleSheet.create({
     fontWeight: '600',
   },
   peakBadge: {
-    backgroundColor: '#FFFBEB',
+    backgroundColor: '#FFF7ED',
     paddingVertical: 4,
     paddingHorizontal: 8,
     borderRadius: 8,
     borderWidth: 1,
-    borderColor: '#FDE68A',
+    borderColor: '#FED7AA',
   },
   peakText: {
     fontSize: 10,
     fontWeight: '700',
-    color: '#D97706',
+    color: colors.primaryDark,
   },
   employeesSection: {
     marginTop: 2,
@@ -247,73 +174,6 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     flexWrap: 'wrap',
     gap: 8,
-  },
-  employeeChip: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    backgroundColor: '#FFF7ED',
-    borderWidth: 1,
-    borderColor: '#FED7AA',
-    paddingVertical: 6,
-    paddingHorizontal: 10,
-    borderRadius: 12,
-    gap: 8,
-  },
-  chipMissed: {
-    backgroundColor: '#FEF2F2',
-    borderColor: '#FECACA',
-  },
-  chipPartial: {
-    backgroundColor: '#FFFBEB',
-    borderColor: '#FDE68A',
-  },
-  chipContent: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 6,
-  },
-  employeeChipName: {
-    fontSize: 12,
-    fontWeight: '700',
-    color: colors.text,
-  },
-  nameMissed: {
-    textDecorationLine: 'line-through',
-    color: colors.textSecondary,
-  },
-  missedTag: {
-    backgroundColor: '#FEE2E2',
-    paddingHorizontal: 5,
-    paddingVertical: 1,
-    borderRadius: 4,
-  },
-  missedTagText: {
-    fontSize: 9,
-    fontWeight: '700',
-    color: colors.danger,
-  },
-  partialTag: {
-    backgroundColor: '#FEF3C7',
-    paddingHorizontal: 5,
-    paddingVertical: 1,
-    borderRadius: 4,
-  },
-  partialTagText: {
-    fontSize: 9,
-    fontWeight: '700',
-    color: '#D97706',
-  },
-  chipActions: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 6,
-    paddingLeft: 4,
-    borderLeftWidth: 1,
-    borderLeftColor: '#E2E8F0',
-  },
-  actionBtn: {
-    padding: 2,
   },
   addBtn: {
     flexDirection: 'row',
