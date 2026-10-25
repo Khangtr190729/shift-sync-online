@@ -152,3 +152,29 @@ export const calculateDuration = (startTime, endTime) => {
     return 0;
   }
 };
+
+/**
+ * Chuyển đổi định dạng thời gian "HH:MM" sang số phút
+ */
+export const timeToMinutes = (timeStr) => {
+  if (!timeStr || typeof timeStr !== 'string') return 0;
+  const [h, m] = timeStr.split(':').map(Number);
+  return (h || 0) * 60 + (m || 0);
+};
+
+/**
+ * Kiểm tra xem 2 ca làm việc có bị trùng hoặc giao thoa khung giờ hay không
+ */
+export const checkShiftOverlap = (shift1, shift2) => {
+  if (!shift1 || !shift2) return false;
+  let start1 = timeToMinutes(shift1.startTime);
+  let end1 = timeToMinutes(shift1.endTime);
+  let start2 = timeToMinutes(shift2.startTime);
+  let end2 = timeToMinutes(shift2.endTime);
+
+  // Xử lý ca qua đêm (vượt mốc 24:00)
+  if (end1 <= start1) end1 += 1440;
+  if (end2 <= start2) end2 += 1440;
+
+  return start1 < end2 && start2 < end1;
+};
