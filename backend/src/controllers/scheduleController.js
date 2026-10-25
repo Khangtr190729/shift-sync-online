@@ -1,4 +1,5 @@
 import Schedule from '../models/Schedule.js';
+import StoreMember from '../models/StoreMember.js';
 import { sendScheduleEmail } from '../services/emailService.js';
 import { verifyStoreAccess } from '../services/storeAccessService.js';
 import {
@@ -44,6 +45,45 @@ export const getStoreSchedule = async (req, res) => {
       .populate('assignments.shiftId', 'name startTime endTime durationHours color')
       .populate('assignments.userId', 'fullName email systemRole');
 
+    // Lấy thông tin các ca làm việc của nhân viên ở các chi nhánh khác trong tuần này
+    const storeMembers = await StoreMember.find({ storeId, status: 'ACTIVE' });
+    const memberUserIds = storeMembers.map((m) => m.userId);
+
+    const otherSchedules = await Schedule.find({
+      storeId: { $ne: storeId },
+      week: Number(week),
+      year: Number(year),
+      'assignments.userId': { $in: memberUserIds },
+    })
+      .populate('storeId', 'name')
+      .populate('assignments.shiftId', 'name startTime endTime durationHours color')
+      .populate('assignments.userId', 'fullName');
+
+    const crossStoreShifts = [];
+    for (const otherSched of otherSchedules) {
+      for (const a of otherSched.assignments || []) {
+        const uId = a.userId?._id ? a.userId._id.toString() : a.userId?.toString();
+        if (memberUserIds.some((id) => id.toString() === uId) && a.shiftId) {
+          crossStoreShifts.push({
+            date: a.date,
+            dayOfWeek: a.dayOfWeek,
+            userId: uId,
+            userName: a.userId?.fullName || 'Nhân viên',
+            storeId: otherSched.storeId?._id,
+            storeName: otherSched.storeId?.name || 'Chi nhánh khác',
+            shift: {
+              _id: a.shiftId._id,
+              name: a.shiftId.name,
+              startTime: a.shiftId.startTime,
+              endTime: a.shiftId.endTime,
+              durationHours: a.shiftId.durationHours,
+              color: a.shiftId.color,
+            },
+          });
+        }
+      }
+    }
+
     if (!schedule) {
       return res.status(200).json({
         success: true,
@@ -53,6 +93,7 @@ export const getStoreSchedule = async (req, res) => {
         message: `Chưa có lịch làm việc cho Tuần ${week}/${year}. Bạn có thể bắt đầu tạo bản nháp.`,
         assignments: [],
         salarySummary: [],
+        crossStoreShifts,
       });
     }
 
@@ -64,6 +105,7 @@ export const getStoreSchedule = async (req, res) => {
       storeName: access.store.name,
       schedule,
       salarySummary,
+      crossStoreShifts,
     });
   } catch (error) {
     console.error('Lỗi lấy lịch tuần:', error);
@@ -122,7 +164,9 @@ export const saveDraftSchedule = async (req, res) => {
 
     const { processedAssignments, salarySummary } = await processAssignmentsAndSalary(
       storeId,
-      assignments
+      assignments,
+      week,
+      year
     );
 
     if (schedule) {
@@ -213,7 +257,7 @@ export const publishSchedule = async (req, res) => {
         schedule?.assignments || [],
         schedule?.status === 'PUBLISHED'
       );
-      processedData = await processAssignmentsAndSalary(storeId, assignments);
+      processedData = await processAssignmentsAndSalary(storeId, assignments, week, year);
 
       if (!schedule) {
         schedule = new Schedule({
@@ -233,7 +277,7 @@ export const publishSchedule = async (req, res) => {
           message: 'Không có ca làm nào trong tuần này để xuất bản. Vui lòng xếp lịch trước.',
         });
       }
-      processedData = await processAssignmentsAndSalary(storeId, schedule.assignments);
+      processedData = await processAssignmentsAndSalary(storeId, schedule.assignments, week, year);
     }
 
     schedule.status = 'PUBLISHED';

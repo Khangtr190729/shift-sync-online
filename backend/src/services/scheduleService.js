@@ -11,6 +11,7 @@ import {
   checkShiftOverlap,
   getCurrentVNTime,
   timeToMinutes,
+  getWeekNumberAndYear,
 } from '../utils/timeScheduleHelpers.js';
 import { sendMissedShiftEmail } from './emailService.js';
 
@@ -119,7 +120,7 @@ export const validatePassedShiftImmutability = async (
 /**
  * Service: Xử lý tính toán tiền lương cho từng ca và tổng kết lương
  */
-export const processAssignmentsAndSalary = async (storeId, rawAssignments) => {
+export const processAssignmentsAndSalary = async (storeId, rawAssignments, week, year) => {
   // 1. Lấy toàn bộ ca làm việc của quán để map số giờ
   const shifts = await Shift.find({ storeId });
   const shiftMap = {};
@@ -140,6 +141,55 @@ export const processAssignmentsAndSalary = async (storeId, rawAssignments) => {
       memberMap[m.userId._id.toString()] = m;
     }
   });
+
+  // 2.1. Tra cứu các ca làm việc tại các chi nhánh khác trong cùng tuần để chống trùng ca liên chi nhánh
+  let weekNum = week;
+  let yearNum = year;
+  if (!weekNum || !yearNum) {
+    const firstDate = rawAssignments.find((a) => a.date)?.date;
+    if (firstDate) {
+      const computed = getWeekNumberAndYear(firstDate);
+      weekNum = computed.week;
+      yearNum = computed.year;
+    }
+  }
+
+  const externalShiftsByUserAndDate = {};
+  if (weekNum && yearNum) {
+    const memberUserIds = Object.keys(memberMap);
+    if (memberUserIds.length > 0) {
+      const otherSchedules = await Schedule.find({
+        storeId: { $ne: storeId },
+        week: Number(weekNum),
+        year: Number(yearNum),
+        'assignments.userId': { $in: memberUserIds },
+      })
+        .populate('storeId', 'name')
+        .populate('assignments.shiftId', 'name startTime endTime durationHours');
+
+      for (const otherSched of otherSchedules) {
+        const extStoreName = otherSched.storeId?.name || 'Chi nhánh khác';
+        for (const a of otherSched.assignments || []) {
+          const uId = extractId(a.userId);
+          const extShift = a.shiftId;
+          if (extShift && a.date && memberMap[uId]) {
+            const key = `${uId}_${a.date}`;
+            if (!externalShiftsByUserAndDate[key]) {
+              externalShiftsByUserAndDate[key] = [];
+            }
+            externalShiftsByUserAndDate[key].push({
+              shiftId: extShift._id,
+              name: extShift.name,
+              startTime: extShift.startTime,
+              endTime: extShift.endTime,
+              durationHours: extShift.durationHours,
+              storeName: extStoreName,
+            });
+          }
+        }
+      }
+    }
+  }
 
   // 3. Kiểm tra logic trùng giờ làm việc: 1 người không thể làm 2 ca trùng/giao thoa giờ trong 1 ngày
   const userDateShifts = {};
@@ -178,11 +228,24 @@ export const processAssignmentsAndSalary = async (storeId, rawAssignments) => {
         throw err;
       }
 
-      // 2. Kiểm tra nếu trùng khung giờ giữa 2 ca khác nhau
+      // 2. Kiểm tra nếu trùng khung giờ giữa 2 ca khác nhau trong cùng một quán
       if (checkShiftOverlap(shift, existingShift)) {
         const memberName = member.userId ? (member.userId.fullName || member.userId.name) : 'Nhân viên';
         const err = new Error(
           `Lỗi trùng ca: Nhân viên "${memberName}" bị trùng giờ làm việc vào ngày ${item.date} giữa ca "${existingShift.name}" (${existingShift.startTime} - ${existingShift.endTime}) và ca "${shift.name}" (${shift.startTime} - ${shift.endTime}). Một người không thể làm 2 ca trong cùng khung giờ!`
+        );
+        err.statusCode = 400;
+        throw err;
+      }
+    }
+
+    // 3. Kiểm tra nếu trùng khung giờ với ca ở chi nhánh khác của nhân viên
+    const extShifts = externalShiftsByUserAndDate[key] || [];
+    for (const ext of extShifts) {
+      if (checkShiftOverlap(shift, ext)) {
+        const memberName = member.userId ? (member.userId.fullName || member.userId.name) : 'Nhân viên';
+        const err = new Error(
+          `Lỗi trùng ca liên chi nhánh: Nhân viên "${memberName}" đã có ca làm việc "${ext.name}" (${ext.startTime} - ${ext.endTime}) tại chi nhánh "${ext.storeName}" vào ngày ${item.date}. Một nhân viên không thể làm 2 ca trùng hoặc giao thoa khung giờ dù ở 2 chi nhánh khác nhau!`
         );
         err.statusCode = 400;
         throw err;
@@ -600,6 +663,40 @@ export const generateAutoSchedule = async ({
     staffPerShift,
   });
 
+  // Tra cứu các ca làm việc tại các chi nhánh khác trong cùng tuần của các nhân viên
+  const memberUserIds = validMembers.map((m) => m.userId._id);
+  const otherSchedules = await Schedule.find({
+    storeId: { $ne: storeId },
+    week: Number(week),
+    year: Number(year),
+    'assignments.userId': { $in: memberUserIds },
+  })
+    .populate('storeId', 'name')
+    .populate('assignments.shiftId', 'name startTime endTime durationHours');
+
+  const externalShiftsByUserAndDate = {};
+  for (const otherSched of otherSchedules) {
+    const extStoreName = otherSched.storeId?.name || 'Chi nhánh khác';
+    for (const a of otherSched.assignments || []) {
+      const uId = extractId(a.userId);
+      const extShift = a.shiftId;
+      if (extShift && a.date) {
+        const key = `${uId}_${a.date}`;
+        if (!externalShiftsByUserAndDate[key]) {
+          externalShiftsByUserAndDate[key] = [];
+        }
+        externalShiftsByUserAndDate[key].push({
+          shiftId: extShift._id,
+          name: extShift.name,
+          startTime: extShift.startTime,
+          endTime: extShift.endTime,
+          durationHours: extShift.durationHours,
+          storeName: extStoreName,
+        });
+      }
+    }
+  }
+
   // 3. Thuật toán phân bổ ca tối ưu
   for (const day of weekDays) {
     // Bỏ qua các ngày đã qua trong quá khứ (ví dụ: đã qua Thứ Hai thì bỏ qua Thứ Hai)
@@ -638,6 +735,10 @@ export const generateAutoSchedule = async ({
           if (dateShifts.length >= maxPerDay) return false;
           if (dateShifts.some((s) => checkShiftOverlap(shift, s))) return false;
 
+          // Bắt buộc không trùng giờ với ca ở chi nhánh khác của nhân viên
+          const extShifts = externalShiftsByUserAndDate[`${uId}_${day.date}`] || [];
+          if (extShifts.some((ext) => checkShiftOverlap(shift, ext))) return false;
+
           return true;
         });
 
@@ -650,6 +751,10 @@ export const generateAutoSchedule = async ({
 
             if (dateShifts.some((s) => s._id.toString() === sId)) return false;
             if (dateShifts.some((s) => checkShiftOverlap(shift, s))) return false;
+
+            // Bắt buộc không trùng giờ với ca ở chi nhánh khác của nhân viên
+            const extShifts = externalShiftsByUserAndDate[`${uId}_${day.date}`] || [];
+            if (extShifts.some((ext) => checkShiftOverlap(shift, ext))) return false;
 
             return true;
           });
