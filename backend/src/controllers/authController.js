@@ -1,5 +1,6 @@
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
+import crypto from 'crypto';
 import User from '../models/User.js';
 import { sendPasswordResetOtpEmail } from '../services/emailService.js';
 
@@ -30,17 +31,20 @@ export const generateAccessToken = (user) => {
 
 /**
  * Tạo Refresh Token (RT) - Thời gian sống dài (30 ngày)
+ * Kèm định danh jti (JWT ID duy nhất) để thực hiện Refresh Token Rotation & Reuse Detection
  */
-export const generateRefreshToken = (user) => {
-  return jwt.sign(
+export const generateRefreshToken = (user, jti = crypto.randomUUID()) => {
+  const token = jwt.sign(
     {
       id: user._id,
+      jti,
     },
     process.env.JWT_REFRESH_SECRET || process.env.JWT_SECRET,
     {
       expiresIn: process.env.JWT_REFRESH_EXPIRES_IN || REFRESH_TOKEN_EXPIRY,
     }
   );
+  return { token, jti };
 };
 
 /**
@@ -115,9 +119,12 @@ export const register = async (req, res) => {
       systemRole,
     });
 
-    // 4. Tạo cặp token AT (15m) & RT (30d) và đưa vào 2 Cookie HttpOnly riêng biệt
+    // 4. Tạo cặp token AT (15m) & RT (30d kèm jti) và đưa vào 2 Cookie HttpOnly riêng biệt
     const accessToken = generateAccessToken(newUser);
-    const refreshToken = generateRefreshToken(newUser);
+    const { token: refreshToken, jti } = generateRefreshToken(newUser);
+    newUser.refreshTokens = [jti];
+    await newUser.save();
+
     setAuthCookies(res, accessToken, refreshToken);
 
     // 5. Trả về kết quả (loại bỏ mật khẩu)
@@ -172,9 +179,14 @@ export const login = async (req, res) => {
       });
     }
 
-    // 3. Tạo cặp token AT (15m) & RT (30d) và đưa vào 2 Cookie HttpOnly riêng biệt
+    // 3. Tạo cặp token AT (15m) & RT (30d kèm jti) và đưa vào 2 Cookie HttpOnly riêng biệt
     const accessToken = generateAccessToken(user);
-    const refreshToken = generateRefreshToken(user);
+    const { token: refreshToken, jti } = generateRefreshToken(user);
+
+    // Lưu jti phiên đăng nhập (giữ tối đa 10 phiên đồng thời gần nhất)
+    user.refreshTokens = [...(user.refreshTokens || []).slice(-9), jti];
+    await user.save();
+
     setAuthCookies(res, accessToken, refreshToken);
 
     return res.status(200).json({
@@ -231,6 +243,7 @@ export const getMe = async (req, res) => {
 
 /**
  * @desc    Làm mới Access Token khi hết hạn 15 phút bằng Cookie Refresh Token (30 ngày)
+ *          Tích hợp cơ chế Xoay vòng Token (RTR) & Tự động phát hiện gian lận (Reuse Detection)
  * @route   POST /api/auth/refresh
  * @access  Public (Xác thực qua Cookie refreshToken hoặc body)
  */
@@ -246,12 +259,23 @@ export const refreshTokens = async (req, res) => {
       });
     }
 
-    // Xác thực chữ ký số của Refresh Token
-    const decoded = jwt.verify(
-      refreshToken,
-      process.env.JWT_REFRESH_SECRET || process.env.JWT_SECRET
-    );
+    // 1. Xác thực chữ ký số của Refresh Token
+    let decoded;
+    try {
+      decoded = jwt.verify(
+        refreshToken,
+        process.env.JWT_REFRESH_SECRET || process.env.JWT_SECRET
+      );
+    } catch (err) {
+      clearAuthCookies(res);
+      return res.status(401).json({
+        success: false,
+        code: 'REFRESH_TOKEN_EXPIRED',
+        message: 'Phiên Refresh Token đã hết hạn hoặc không hợp lệ. Vui lòng đăng nhập lại.',
+      });
+    }
 
+    // 2. Tìm người dùng
     const user = await User.findById(decoded.id);
     if (!user) {
       clearAuthCookies(res);
@@ -262,16 +286,47 @@ export const refreshTokens = async (req, res) => {
       });
     }
 
-    // Cấp mới Access Token (15m) & Refresh Token mới (Refresh Token Rotation)
-    const newAccessToken = generateAccessToken(user);
-    const newRefreshToken = generateRefreshToken(user);
+    // 3. --- CƠ CHẾ PHÁT HIỆN TÁI SỬ DỤNG GIAN LẬN (AUTOMATIC REUSE DETECTION) ---
+    const presentedJti = decoded.jti;
+    const isTokenValid = presentedJti && Array.isArray(user.refreshTokens) && user.refreshTokens.includes(presentedJti);
 
-    // Cập nhật lại 2 Cookie HttpOnly cho trình duyệt
+    if (!isTokenValid) {
+      // CẢNH BÁO BẢO MẬT ĐỎ: Mã token này đã từng bị sử dụng hoặc đã bị thu hồi!
+      // Khả năng token đã bị kẻ gian đánh cắp và đang cố sử dụng lại.
+      // HÀNH ĐỘNG KHẨN CẤP: Hủy sạch toàn bộ mọi phiên đăng nhập của tài khoản này!
+      console.warn(
+        `[CẢNH BÁO BẢO MẬT] Phát hiện tái sử dụng Refresh Token của user ${user.email} (jti: ${presentedJti}). Đang thu hồi toàn bộ các phiên hoạt động!`
+      );
+      user.refreshTokens = [];
+      await user.save();
+      clearAuthCookies(res);
+
+      return res.status(403).json({
+        success: false,
+        code: 'REFRESH_TOKEN_REUSE_DETECTED',
+        message:
+          'Cảnh báo bảo mật: Phát hiện mã Refresh Token đã từng được sử dụng. Để bảo vệ tài khoản, toàn bộ phiên đăng nhập đã bị hủy. Vui lòng đăng nhập lại.',
+      });
+    }
+
+    // 4. --- XOAY VÒNG TOKEN HỢP LỆ (REFRESH TOKEN ROTATION - RTR) ---
+    // Hủy ngay jti vừa dùng khỏi danh sách
+    const remainingTokens = user.refreshTokens.filter((tokenJti) => tokenJti !== presentedJti);
+
+    // Cấp mới cặp token (AT 15m và RT 30d với jti hoàn toàn mới)
+    const newAccessToken = generateAccessToken(user);
+    const { token: newRefreshToken, jti: newJti } = generateRefreshToken(user);
+
+    // Cập nhật jti mới vào danh sách phiên hợp lệ
+    user.refreshTokens = [...remainingTokens.slice(-9), newJti];
+    await user.save();
+
+    // Cập nhật lại cả 2 Cookie HttpOnly cho trình duyệt
     setAuthCookies(res, newAccessToken, newRefreshToken);
 
     return res.status(200).json({
       success: true,
-      message: 'Làm mới phiên đăng nhập thành công!',
+      message: 'Xoay vòng phiên đăng nhập thành công!',
       token: newAccessToken,
       refreshToken: newRefreshToken,
       user: {
@@ -287,21 +342,36 @@ export const refreshTokens = async (req, res) => {
   } catch (error) {
     console.error('Lỗi làm mới token:', error.message);
     clearAuthCookies(res);
-    return res.status(401).json({
+    return res.status(500).json({
       success: false,
-      code: 'REFRESH_TOKEN_EXPIRED',
-      message: 'Phiên Refresh Token đã hết hạn hoặc không hợp lệ. Vui lòng đăng nhập lại.',
+      code: 'SERVER_ERROR',
+      message: `Lỗi máy chủ khi làm mới token: ${error.message}`,
     });
   }
 };
 
 /**
- * @desc    Đăng xuất: Xóa sạch cả 2 Cookie HttpOnly (AT & RT)
+ * @desc    Đăng xuất: Xóa jti khỏi cơ sở dữ liệu và dọn sạch cả 2 Cookie HttpOnly (AT & RT)
  * @route   POST /api/auth/logout
  * @access  Public
  */
 export const logout = async (req, res) => {
   try {
+    const refreshToken = req.cookies?.refreshToken || req.body?.refreshToken;
+
+    if (refreshToken) {
+      try {
+        const decoded = jwt.decode(refreshToken);
+        if (decoded?.id && decoded?.jti) {
+          await User.findByIdAndUpdate(decoded.id, {
+            $pull: { refreshTokens: decoded.jti },
+          });
+        }
+      } catch (e) {
+        // Bỏ qua lỗi giải mã khi đăng xuất
+      }
+    }
+
     clearAuthCookies(res);
     return res.status(200).json({
       success: true,
@@ -466,11 +536,12 @@ export const resetPasswordWithOtp = async (req, res) => {
     const salt = await bcrypt.genSalt(10);
     user.password = await bcrypt.hash(newPassword, salt);
 
-    // Hủy mã OTP sau khi đổi mật khẩu thành công
+    // Hủy mã OTP sau khi đổi mật khẩu thành công và thu hồi toàn bộ phiên đăng nhập cũ
     user.resetPasswordOtp = {
       code: null,
       expiresAt: null,
     };
+    user.refreshTokens = []; // Buộc tất cả các thiết bị phải đăng nhập lại với mật khẩu mới
 
     await user.save();
 

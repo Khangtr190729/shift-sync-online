@@ -49,6 +49,10 @@ const userSchema = new mongoose.Schema(
         default: null,
       },
     },
+    refreshTokens: {
+      type: [String], // Danh sách jti (JWT ID) hợp lệ cho cơ chế Refresh Token Rotation & Reuse Detection
+      default: [],
+    },
   },
   {
     timestamps: true,

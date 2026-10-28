@@ -78,6 +78,8 @@ export const changePassword = async (req, res) => {
     // Băm mật khẩu mới và lưu
     const salt = await bcrypt.genSalt(10);
     user.password = await bcrypt.hash(newPassword, salt);
+    // Thu hồi các phiên đăng nhập cũ trên thiết bị khác để đảm bảo an toàn
+    user.refreshTokens = [];
     await user.save();
 
     return res.status(200).json({
