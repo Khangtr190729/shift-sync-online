@@ -50,7 +50,7 @@ export const ScheduleAlerts = ({
               Lịch hiện tại đang ở trạng thái <strong>Bản nháp</strong>. Bạn có thể bấm vào từng ca để xem, thêm/bớt nhân viên, sau đó bấm <strong>"Xác nhận & gửi email"</strong> khi đã sẵn sàng công bố cho nhân viên.
             </span>
           </div>
-          <span className="px-2.5 py-1 bg-amber-200/70 text-amber-800 text-[11px] font-bold rounded-lg shrink-0 hidden sm:inline-block">
+          <span className="px-2.5 py-1 bg-amber-100 text-amber-800 text-[11px] font-medium rounded-full shrink-0 hidden sm:inline-block border border-amber-200/60">
             Bản nháp chờ quản lý duyệt
           </span>
         </div>

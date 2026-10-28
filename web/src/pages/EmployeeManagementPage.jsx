@@ -150,16 +150,16 @@ export const EmployeeManagementPage = () => {
   return (
     <div className="space-y-6">
       {/* Header and Controls */}
-      <div className="bg-white p-5 rounded-2xl border border-slate-200/80 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-4">
+      <div className="bg-white p-5 rounded-2xl border border-[#e5e5e7] shadow-xs flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
-          <h2 className="text-lg font-bold text-slate-900 tracking-tight flex items-center gap-2">
-            <Users className="w-5 h-5 text-[#EA701B]" />
+          <h2 className="text-lg font-semibold text-[#1d1d1f] tracking-tight flex items-center gap-2">
+            <Users className="w-5 h-5 text-[#0066cc]" />
             <span>Danh sách nhân viên cửa hàng</span>
-            <span className="text-xs px-2.5 py-0.5 rounded-full bg-orange-100 text-[#EA701B] font-bold">
+            <span className="text-xs px-2.5 py-0.5 rounded-full bg-blue-50 text-[#0066cc] border border-blue-200/60 font-medium">
               {members.length} nhân sự
             </span>
           </h2>
-          <p className="text-xs text-slate-500 mt-0.5">
+          <p className="text-xs text-[#6e6e73] mt-0.5">
             Quản lý mức lương theo giờ, loại hợp đồng và quyền hạn quản lý ca làm.
           </p>
         </div>
@@ -167,20 +167,20 @@ export const EmployeeManagementPage = () => {
         {/* Search bar & Invite shortcut */}
         <div className="flex items-center gap-3">
           <div className="relative">
-            <Search className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
+            <Search className="w-4 h-4 text-[#86868b] absolute left-3 top-1/2 -translate-y-1/2" />
             <input
               type="text"
               placeholder="Tìm theo tên, email..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="pl-9 pr-4 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-medium text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-[#EA701B] w-56 md:w-64"
+              className="pl-9 pr-4 py-2 bg-[#f5f5f7] border border-[#d2d2d7] rounded-full text-xs font-normal text-[#1d1d1f] placeholder-[#86868b] focus:outline-none focus:border-[#0066cc] focus:ring-2 focus:ring-[#0066cc]/20 transition w-56 md:w-64"
             />
           </div>
 
           {isAdmin && (
             <Link
               to="/store-management"
-              className="flex items-center gap-1.5 px-3.5 py-2 bg-[#EA701B] text-white text-xs font-bold rounded-xl shadow-xs hover:bg-[#D55E0D] transition"
+              className="flex items-center gap-1.5 px-4 py-2 bg-[#0066cc] text-white text-xs font-medium rounded-full shadow-xs hover:bg-[#0071e3] transition active:scale-[0.98]"
             >
               <UserPlus className="w-4 h-4" />
               <span>Mời nhân viên</span>
@@ -194,22 +194,22 @@ export const EmployeeManagementPage = () => {
         <div
           className={`p-4 rounded-xl flex items-center justify-between text-sm font-medium animate-fade-in ${
             feedback.type === 'success'
-              ? 'bg-emerald-50 text-emerald-800 border border-emerald-200'
-              : 'bg-red-50 text-red-800 border border-red-200'
+              ? 'bg-emerald-50 text-emerald-800 border border-emerald-200/60'
+              : 'bg-rose-50 text-rose-800 border border-rose-200/60'
           }`}
         >
           <div className="flex items-center gap-2.5">
             {feedback.type === 'success' ? (
               <CheckCircle className="w-5 h-5 text-emerald-600" />
             ) : (
-              <AlertCircle className="w-5 h-5 text-red-600" />
+              <AlertCircle className="w-5 h-5 text-rose-600" />
             )}
             <span>{feedback.message}</span>
           </div>
           <button
             type="button"
             onClick={() => setFeedback(null)}
-            className="p-1 hover:bg-black/5 rounded-lg"
+            className="p-1 hover:bg-black/5 rounded-full"
           >
             <X className="w-4 h-4" />
           </button>
@@ -217,16 +217,16 @@ export const EmployeeManagementPage = () => {
       )}
 
       {/* Employee Table */}
-      <div className="bg-white rounded-2xl border border-slate-200/80 shadow-sm overflow-hidden">
+      <div className="bg-white rounded-2xl border border-[#e5e5e7] shadow-xs overflow-hidden">
         {loading ? (
-          <div className="p-12 text-center text-slate-400 text-sm">
+          <div className="p-12 text-center text-[#86868b] text-sm">
             Đang tải danh sách nhân sự...
           </div>
         ) : filteredMembers.length === 0 ? (
           <div className="p-12 text-center">
-            <Users className="w-12 h-12 text-slate-300 mx-auto mb-2" />
-            <p className="text-sm font-bold text-slate-700">Không tìm thấy nhân viên phù hợp</p>
-            <p className="text-xs text-slate-500 mt-1">
+            <Users className="w-12 h-12 text-[#86868b] mx-auto mb-2" />
+            <p className="text-sm font-semibold text-[#1d1d1f]">Không tìm thấy nhân viên phù hợp</p>
+            <p className="text-xs text-[#6e6e73] mt-1">
               Hãy thử tìm kiếm với từ khóa khác hoặc chia sẻ mã mời 6 chữ số cho nhân viên mới.
             </p>
           </div>
@@ -234,7 +234,7 @@ export const EmployeeManagementPage = () => {
           <div className="overflow-x-auto">
             <table className="w-full border-collapse text-left">
               <thead>
-                <tr className="bg-[#FFF0E5] border-b border-orange-100 text-xs font-bold uppercase tracking-wider text-slate-600">
+                <tr className="bg-[#f5f5f7] border-b border-[#e5e5e7] text-xs font-semibold uppercase tracking-wider text-[#6e6e73]">
                   <th className="p-4">Nhân viên</th>
                   <th className="p-4">Hình thức làm việc</th>
                   <th className="p-4">Vai trò / Quyền</th>
@@ -242,7 +242,7 @@ export const EmployeeManagementPage = () => {
                   <th className="p-4 text-right">Thao tác</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-slate-100 text-sm">
+              <tbody className="divide-y divide-[#e5e5e7] text-sm">
                 {filteredMembers.map((member) => {
                   const roleBadge = getRoleLabel(member.role);
                   const typeBadge = getEmploymentTypeLabel(member.employmentType);
@@ -250,23 +250,23 @@ export const EmployeeManagementPage = () => {
                   const isStoreOwner = member.isOwner || member.role === 'ADMIN';
 
                   return (
-                    <tr key={member._id} className="hover:bg-orange-50/20 transition">
+                    <tr key={member._id} className="hover:bg-[#fafafc] transition">
                       {/* Name & Email */}
                       <td className="p-4">
                         <div className="flex items-center gap-3">
-                          <div className="w-10 h-10 rounded-full bg-orange-100 text-[#EA701B] font-bold text-sm flex items-center justify-center shrink-0 border border-orange-200">
+                          <div className="w-10 h-10 rounded-full bg-blue-50 text-[#0066cc] font-medium text-sm flex items-center justify-center shrink-0 border border-blue-200/60">
                             {member.user?.name ? member.user.name.charAt(0).toUpperCase() : 'U'}
                           </div>
                           <div>
-                            <div className="font-bold text-slate-900 flex items-center gap-1.5">
+                            <div className="font-semibold text-[#1d1d1f] flex items-center gap-1.5">
                               <span>{member.user?.name}</span>
                               {isCurrentSelf && (
-                                <span className="text-[10px] bg-slate-200 text-slate-700 px-1.5 py-0.2 rounded-full font-semibold">
+                                <span className="text-[10px] bg-[#f5f5f7] text-[#6e6e73] border border-[#e5e5e7] px-2 py-0.5 rounded-full font-medium">
                                   Bạn
                                 </span>
                               )}
                             </div>
-                            <div className="text-xs text-slate-500 font-mono">
+                            <div className="text-xs text-[#6e6e73] font-mono">
                               {member.user?.email}
                             </div>
                           </div>
@@ -284,12 +284,12 @@ export const EmployeeManagementPage = () => {
                               newType: member.employmentType || 'PART_TIME'
                             })
                           }
-                          className="flex items-center gap-1.5 text-xs font-semibold px-2.5 py-1 rounded-lg border hover:opacity-80 transition cursor-pointer"
+                          className="flex items-center gap-1.5 text-xs font-normal px-2.5 py-1 rounded-full border border-[#e5e5e7] bg-white hover:bg-[#f5f5f7] transition cursor-pointer"
                         >
-                          <span className={`px-2 py-0.5 rounded-md ${typeBadge.badge}`}>
+                          <span className={`px-2 py-0.5 rounded-full ${typeBadge.badge}`}>
                             {typeBadge.text}
                           </span>
-                          <Edit2 className="w-3 h-3 text-slate-400" />
+                          <Edit2 className="w-3 h-3 text-[#86868b]" />
                         </button>
                       </td>
 
@@ -297,7 +297,7 @@ export const EmployeeManagementPage = () => {
                       <td className="p-4">
                         <div className="flex items-center gap-2">
                           <span
-                            className={`inline-flex items-center gap-1 text-xs font-bold px-2.5 py-1 rounded-full border ${roleBadge.color}`}
+                            className={`inline-flex items-center gap-1 text-xs font-medium px-2.5 py-1 rounded-full border ${roleBadge.color}`}
                           >
                             <Shield className="w-3.5 h-3.5" />
                             {roleBadge.text}
@@ -315,7 +315,7 @@ export const EmployeeManagementPage = () => {
                                 })
                               }
                               title="Thay đổi quyền hạn"
-                              className="text-xs text-slate-400 hover:text-[#EA701B] p-1 rounded-md hover:bg-orange-50 transition"
+                              className="text-xs text-[#86868b] hover:text-[#0066cc] p-1.5 rounded-full hover:bg-blue-50 transition cursor-pointer"
                             >
                               <Edit2 className="w-3.5 h-3.5" />
                             </button>
@@ -326,7 +326,7 @@ export const EmployeeManagementPage = () => {
                       {/* Hourly Wage */}
                       <td className="p-4">
                         <div className="flex items-center gap-2">
-                          <span className="font-bold text-slate-900 font-mono text-sm">
+                          <span className="font-semibold text-[#1d1d1f] font-mono text-sm">
                             {formatVND(member.hourlyWage || 0)}
                           </span>
                           <button
@@ -338,7 +338,7 @@ export const EmployeeManagementPage = () => {
                                 newWage: String(member.hourlyWage || 20000)
                               })
                             }
-                            className="p-1 text-slate-400 hover:text-[#EA701B] hover:bg-orange-50 rounded-md transition"
+                            className="p-1.5 text-[#86868b] hover:text-[#0066cc] hover:bg-blue-50 rounded-full transition cursor-pointer"
                             title="Sửa mức lương"
                           >
                             <Edit2 className="w-3.5 h-3.5" />
@@ -352,7 +352,7 @@ export const EmployeeManagementPage = () => {
                           <button
                             type="button"
                             onClick={() => setRemoveModal({ isOpen: true, member })}
-                            className="p-2 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-xl transition"
+                            className="p-2 text-[#86868b] hover:text-rose-600 hover:bg-rose-50 rounded-full transition cursor-pointer"
                             title="Xóa nhân viên khỏi quán"
                           >
                             <Trash2 className="w-4 h-4" />
