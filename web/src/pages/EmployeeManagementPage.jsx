@@ -4,20 +4,20 @@ import {
   Users,
   Search,
   Shield,
-  Briefcase,
-  DollarSign,
   Edit2,
   Trash2,
-  ShieldAlert,
   CheckCircle,
   AlertCircle,
   X,
-  UserCheck,
   UserPlus
 } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import { memberApi } from '../services/api';
 import { formatVND, getRoleLabel, getEmploymentTypeLabel } from '../utils/formatters';
+import { EditMemberWageModal } from '../components/employees/EditMemberWageModal';
+import { EditMemberRoleModal } from '../components/employees/EditMemberRoleModal';
+import { EditMemberTypeModal } from '../components/employees/EditMemberTypeModal';
+import { RemoveMemberConfirmModal } from '../components/employees/RemoveMemberConfirmModal';
 
 export const EmployeeManagementPage = () => {
   const { store, roleInStore, user } = useAuth();
@@ -28,32 +28,11 @@ export const EmployeeManagementPage = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [feedback, setFeedback] = useState(null);
 
-  // Wage Edit Modal
-  const [wageModal, setWageModal] = useState({
-    isOpen: false,
-    member: null,
-    newWage: ''
-  });
-
-  // Role Edit Modal (Admin only)
-  const [roleModal, setRoleModal] = useState({
-    isOpen: false,
-    member: null,
-    newRole: 'EMPLOYEE'
-  });
-
-  // Employment Type Edit Modal
-  const [typeModal, setTypeModal] = useState({
-    isOpen: false,
-    member: null,
-    newType: 'PART_TIME'
-  });
-
-  // Remove Member Confirm Modal (Admin only)
-  const [removeModal, setRemoveModal] = useState({
-    isOpen: false,
-    member: null
-  });
+  // Sub-modal states
+  const [wageModal, setWageModal] = useState({ isOpen: false, member: null, newWage: '' });
+  const [roleModal, setRoleModal] = useState({ isOpen: false, member: null, newRole: 'EMPLOYEE' });
+  const [typeModal, setTypeModal] = useState({ isOpen: false, member: null, newType: 'PART_TIME' });
+  const [removeModal, setRemoveModal] = useState({ isOpen: false, member: null });
 
   const loadMembers = useCallback(async () => {
     if (!store?._id) return;
@@ -389,214 +368,27 @@ export const EmployeeManagementPage = () => {
         )}
       </div>
 
-      {/* MODAL: Edit Hourly Wage */}
-      {wageModal.isOpen && (
-        <div className="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4 overflow-y-auto animate-backdrop-fade">
-          <div className="bg-white rounded-2xl w-full max-w-sm shadow-2xl border border-slate-100 overflow-hidden my-auto max-h-[92vh] flex flex-col animate-modal-pop">
-            <div className="p-5 bg-[#FFF0E5] border-b border-orange-100 flex items-center justify-between shrink-0">
-              <div className="flex items-center gap-2">
-                <DollarSign className="w-5 h-5 text-[#EA701B]" />
-                <h3 className="font-bold text-slate-900 text-sm">Cập nhật lương theo giờ</h3>
-              </div>
-              <button
-                type="button"
-                onClick={() => setWageModal({ isOpen: false, member: null, newWage: '' })}
-                className="p-1 text-slate-400 hover:text-slate-600"
-              >
-                <X className="w-4 h-4" />
-              </button>
-            </div>
-            <div className="p-5 space-y-4">
-              <p className="text-xs text-slate-600">
-                Nhân viên: <b className="text-slate-800">{wageModal.member?.user?.name}</b>
-              </p>
-              <div>
-                <label className="block text-xs font-bold text-slate-700 mb-1">
-                  Mức lương theo giờ (VNĐ/giờ)
-                </label>
-                <div className="relative">
-                  <input
-                    type="number"
-                    step="1000"
-                    min="0"
-                    value={wageModal.newWage}
-                    onChange={(e) =>
-                      setWageModal((prev) => ({ ...prev, newWage: e.target.value }))
-                    }
-                    className="w-full p-2.5 rounded-xl border border-slate-200 text-sm font-bold text-slate-900 font-mono pr-14 focus:outline-none focus:ring-2 focus:ring-[#EA701B]"
-                  />
-                  <span className="absolute right-3 top-1/2 -translate-y-1/2 text-xs font-bold text-slate-400">
-                    VNĐ
-                  </span>
-                </div>
-              </div>
-              <div className="flex justify-end gap-2 pt-2">
-                <button
-                  type="button"
-                  onClick={() => setWageModal({ isOpen: false, member: null, newWage: '' })}
-                  className="px-4 py-2 text-xs font-bold text-slate-600 hover:bg-slate-100 rounded-xl"
-                >
-                  Hủy
-                </button>
-                <button
-                  type="button"
-                  onClick={handleSaveWage}
-                  className="px-4 py-2 text-xs font-bold text-white bg-[#EA701B] hover:bg-[#D55E0D] rounded-xl shadow-xs"
-                >
-                  Lưu thay đổi
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* MODAL: Edit Role (Promote / Demote) */}
-      {roleModal.isOpen && (
-        <div className="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4 overflow-y-auto animate-backdrop-fade">
-          <div className="bg-white rounded-2xl w-full max-w-sm shadow-2xl border border-slate-100 overflow-hidden my-auto max-h-[92vh] flex flex-col animate-modal-pop">
-            <div className="p-5 bg-blue-50 border-b border-blue-100 flex items-center justify-between shrink-0">
-              <div className="flex items-center gap-2">
-                <Shield className="w-5 h-5 text-blue-600" />
-                <h3 className="font-bold text-slate-900 text-sm">Thay đổi vai trò quản lý</h3>
-              </div>
-              <button
-                type="button"
-                onClick={() => setRoleModal({ isOpen: false, member: null, newRole: 'EMPLOYEE' })}
-                className="p-1 text-slate-400 hover:text-slate-600"
-              >
-                <X className="w-4 h-4" />
-              </button>
-            </div>
-            <div className="p-5 space-y-4">
-              <p className="text-xs text-slate-600">
-                Nhân viên: <b className="text-slate-800">{roleModal.member?.user?.name}</b>
-              </p>
-              <div>
-                <label className="block text-xs font-bold text-slate-700 mb-1">
-                  Chọn quyền hạn
-                </label>
-                <select
-                  value={roleModal.newRole}
-                  onChange={(e) =>
-                    setRoleModal((prev) => ({ ...prev, newRole: e.target.value }))
-                  }
-                  className="w-full p-2.5 rounded-xl border border-slate-200 text-sm font-semibold text-slate-800 bg-white"
-                >
-                  <option value="EMPLOYEE">Nhân viên (Chỉ xem lịch & ca của mình)</option>
-                  <option value="MANAGER">Quản lý (Được xếp ca, lưu nháp & xuất bản lịch)</option>
-                </select>
-              </div>
-              <div className="flex justify-end gap-2 pt-2">
-                <button
-                  type="button"
-                  onClick={() => setRoleModal({ isOpen: false, member: null, newRole: 'EMPLOYEE' })}
-                  className="px-4 py-2 text-xs font-bold text-slate-600 hover:bg-slate-100 rounded-xl"
-                >
-                  Hủy
-                </button>
-                <button
-                  type="button"
-                  onClick={handleSaveRole}
-                  className="px-4 py-2 text-xs font-bold text-white bg-blue-600 hover:bg-blue-700 rounded-xl shadow-xs"
-                >
-                  Cập nhật quyền
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* MODAL: Edit Employment Type */}
-      {typeModal.isOpen && (
-        <div className="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4 overflow-y-auto animate-backdrop-fade">
-          <div className="bg-white rounded-2xl w-full max-w-sm shadow-2xl border border-slate-100 overflow-hidden my-auto max-h-[92vh] flex flex-col animate-modal-pop">
-            <div className="p-5 bg-purple-50 border-b border-purple-100 flex items-center justify-between shrink-0">
-              <div className="flex items-center gap-2">
-                <Briefcase className="w-5 h-5 text-purple-600" />
-                <h3 className="font-bold text-slate-900 text-sm">Hình thức làm việc</h3>
-              </div>
-              <button
-                type="button"
-                onClick={() => setTypeModal({ isOpen: false, member: null, newType: 'PART_TIME' })}
-                className="p-1 text-slate-400 hover:text-slate-600"
-              >
-                <X className="w-4 h-4" />
-              </button>
-            </div>
-            <div className="p-5 space-y-4">
-              <p className="text-xs text-slate-600">
-                Nhân viên: <b className="text-slate-800">{typeModal.member?.user?.name}</b>
-              </p>
-              <div>
-                <label className="block text-xs font-bold text-slate-700 mb-1">
-                  Chọn loại hình
-                </label>
-                <select
-                  value={typeModal.newType}
-                  onChange={(e) =>
-                    setTypeModal((prev) => ({ ...prev, newType: e.target.value }))
-                  }
-                  className="w-full p-2.5 rounded-xl border border-slate-200 text-sm font-semibold text-slate-800 bg-white"
-                >
-                  <option value="PART_TIME">Bán thời gian (Part-time)</option>
-                  <option value="FULL_TIME">Toàn thời gian (Full-time)</option>
-                </select>
-              </div>
-              <div className="flex justify-end gap-2 pt-2">
-                <button
-                  type="button"
-                  onClick={() => setTypeModal({ isOpen: false, member: null, newType: 'PART_TIME' })}
-                  className="px-4 py-2 text-xs font-bold text-slate-600 hover:bg-slate-100 rounded-xl"
-                >
-                  Hủy
-                </button>
-                <button
-                  type="button"
-                  onClick={handleSaveType}
-                  className="px-4 py-2 text-xs font-bold text-white bg-purple-600 hover:bg-purple-700 rounded-xl shadow-xs"
-                >
-                  Lưu thay đổi
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* MODAL: Remove Member Confirmation */}
-      {removeModal.isOpen && (
-        <div className="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4 overflow-y-auto animate-backdrop-fade">
-          <div className="bg-white rounded-2xl w-full max-w-sm shadow-2xl border border-slate-100 overflow-hidden my-auto max-h-[92vh] flex flex-col animate-modal-pop">
-            <div className="p-6 text-center space-y-3">
-              <div className="w-12 h-12 rounded-full bg-red-100 text-red-600 mx-auto flex items-center justify-center">
-                <Trash2 className="w-6 h-6" />
-              </div>
-              <h3 className="font-bold text-slate-900 text-base">Xóa nhân viên khỏi quán?</h3>
-              <p className="text-xs text-slate-500">
-                Bạn có chắc muốn xóa <b>{removeModal.member?.user?.name}</b> khỏi danh sách nhân sự của quán? Thao tác này không thể hoàn tác.
-              </p>
-            </div>
-            <div className="p-4 bg-slate-50 border-t border-slate-100 flex justify-end gap-2">
-              <button
-                type="button"
-                onClick={() => setRemoveModal({ isOpen: false, member: null })}
-                className="px-4 py-2 text-xs font-bold text-slate-600 hover:bg-slate-200 rounded-xl"
-              >
-                Hủy
-              </button>
-              <button
-                type="button"
-                onClick={handleConfirmRemove}
-                className="px-4 py-2 text-xs font-bold text-white bg-red-600 hover:bg-red-700 rounded-xl shadow-xs"
-              >
-                Xác nhận xóa
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+      {/* Sub-modals */}
+      <EditMemberWageModal
+        modalState={wageModal}
+        setModalState={setWageModal}
+        onSaveWage={handleSaveWage}
+      />
+      <EditMemberRoleModal
+        modalState={roleModal}
+        setModalState={setRoleModal}
+        onSaveRole={handleSaveRole}
+      />
+      <EditMemberTypeModal
+        modalState={typeModal}
+        setModalState={setTypeModal}
+        onSaveType={handleSaveType}
+      />
+      <RemoveMemberConfirmModal
+        modalState={removeModal}
+        setModalState={setRemoveModal}
+        onConfirmRemove={handleConfirmRemove}
+      />
     </div>
   );
 };

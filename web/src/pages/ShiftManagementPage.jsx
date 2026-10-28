@@ -15,6 +15,8 @@ import {
 import { useAuth } from '../contexts/AuthContext';
 import { shiftApi } from '../services/api';
 import { checkShiftOverlap } from '../utils/formatters';
+import { ShiftFormModal } from '../components/shifts/ShiftFormModal';
+import { DeleteShiftConfirmModal } from '../components/shifts/DeleteShiftConfirmModal';
 
 export const ShiftManagementPage = () => {
   const { store } = useAuth();
@@ -107,7 +109,6 @@ export const ShiftManagementPage = () => {
     }
   };
 
-  // Thời lượng (số tiếng) luôn được tính toán tự động theo thời gian thực từ startTime và endTime
   const computedDuration = useMemo(() => {
     return calculateDuration(shiftModal.startTime, shiftModal.endTime);
   }, [shiftModal.startTime, shiftModal.endTime]);
@@ -116,7 +117,6 @@ export const ShiftManagementPage = () => {
     setShiftModal((prev) => ({ ...prev, [field]: value }));
   };
 
-  // Open modal for Create
   const handleOpenCreate = () => {
     setShiftModal({
       isOpen: true,
@@ -130,7 +130,6 @@ export const ShiftManagementPage = () => {
     });
   };
 
-  // Open modal for Edit
   const handleOpenEdit = (shift) => {
     setShiftModal({
       isOpen: true,
@@ -144,13 +143,11 @@ export const ShiftManagementPage = () => {
     });
   };
 
-  // Quick update shift stars directly from card
   const handleQuickUpdateStars = async (shiftId, newStars) => {
     if (!store?._id) return;
     const targetShift = shifts.find((s) => s._id === shiftId);
     if (!targetShift) return;
 
-    // Optimistic UI update
     setShifts((prev) =>
       prev.map((s) => (s._id === shiftId ? { ...s, peakLevel: newStars } : s))
     );
@@ -161,40 +158,29 @@ export const ShiftManagementPage = () => {
         const labels = { 1: '⭐ Bình thường', 2: '⭐⭐ Khá cao điểm', 3: '⭐⭐⭐ Rất cao điểm' };
         setFeedback({
           type: 'success',
-          message: `Đã cập nhật ca "${targetShift.name}": ${labels[newStars]}. Phục vụ xếp ca tự động!`
+          message: `Đã cập nhật ca "${targetShift.name}": ${labels[newStars]}. Tự động xếp lịch sẽ ưu tiên phân bổ nhân sự theo mức độ này!`
         });
       }
     } catch (err) {
-      console.error('Lỗi cập nhật sao:', err);
       setShifts((prev) =>
         prev.map((s) => (s._id === shiftId ? { ...s, peakLevel: targetShift.peakLevel || 1 } : s))
       );
-      setFeedback({ type: 'error', message: err.message || 'Không thể cập nhật số sao ca' });
+      setFeedback({ type: 'error', message: err.message || 'Lỗi khi cập nhật số sao' });
     }
   };
 
-  // Save Shift
   const handleSaveShift = async (e) => {
     e.preventDefault();
-    if (!shiftModal.name.trim()) {
-      setFeedback({ type: 'error', message: 'Vui lòng nhập tên ca làm việc.' });
-      return;
-    }
-
-    if (computedDuration <= 0) {
-      setFeedback({
-        type: 'error',
-        message: 'Giờ kết thúc phải khác giờ bắt đầu (thời lượng ca phải lớn hơn 0 tiếng).'
-      });
-      return;
-    }
-
-    // Kiểm tra không cho phép tạo/cập nhật ca bị trùng khung giờ
+    if (!store?._id) return;
     if (modalConflict) {
       setFeedback({
         type: 'error',
-        message: `Khung giờ của ca (${shiftModal.startTime} - ${shiftModal.endTime}) bị trùng/giao thoa với ca "${modalConflict.name}" (${modalConflict.startTime} - ${modalConflict.endTime}). Mỗi ca làm việc trong quán phải có khung giờ riêng biệt!`
+        message: `Khung giờ bị trùng với ca "${modalConflict.name}" (${modalConflict.startTime} — ${modalConflict.endTime})! Vui lòng chọn khung giờ khác.`
       });
+      return;
+    }
+    if (computedDuration <= 0) {
+      setFeedback({ type: 'error', message: 'Giờ bắt đầu và kết thúc không hợp lệ (thời lượng phải lớn hơn 0).' });
       return;
     }
 
@@ -209,45 +195,43 @@ export const ShiftManagementPage = () => {
       };
 
       if (shiftModal.isEdit) {
-        await shiftApi.updateShift(store._id, shiftModal.shiftId, payload);
-        setFeedback({ type: 'success', message: 'Cập nhật ca làm thành công!' });
+        const res = await shiftApi.updateShift(store._id, shiftModal.shiftId, payload);
+        if (res.success) {
+          setFeedback({ type: 'success', message: 'Cập nhật ca làm việc thành công!' });
+          setShiftModal((prev) => ({ ...prev, isOpen: false }));
+          loadShifts();
+        }
       } else {
-        await shiftApi.createShift(store._id, payload);
-        setFeedback({ type: 'success', message: 'Tạo ca làm mới thành công!' });
+        const res = await shiftApi.createShift(store._id, payload);
+        if (res.success) {
+          setFeedback({ type: 'success', message: 'Tạo ca làm việc mới thành công!' });
+          setShiftModal((prev) => ({ ...prev, isOpen: false }));
+          loadShifts();
+        }
       }
-
-      setShiftModal({
-        isOpen: false,
-        isEdit: false,
-        shiftId: null,
-        name: '',
-        startTime: '08:00',
-        endTime: '12:00',
-        color: '#EA701B'
-      });
-      loadShifts();
     } catch (err) {
-      setFeedback({ type: 'error', message: err.message || 'Lỗi khi lưu ca làm' });
+      setFeedback({ type: 'error', message: err.message || 'Lỗi khi lưu ca làm việc' });
     }
   };
 
-  // Confirm delete shift
   const handleConfirmDelete = async () => {
-    if (!deleteModal.shift) return;
+    if (!store?._id || !deleteModal.shift) return;
     try {
-      await shiftApi.deleteShift(store._id, deleteModal.shift._id);
-      setFeedback({ type: 'success', message: 'Đã xóa ca làm thành công!' });
-      setDeleteModal({ isOpen: false, shift: null });
-      loadShifts();
+      const res = await shiftApi.deleteShift(store._id, deleteModal.shift._id);
+      if (res.success) {
+        setFeedback({ type: 'success', message: 'Đã xóa ca làm việc.' });
+        setDeleteModal({ isOpen: false, shift: null });
+        loadShifts();
+      }
     } catch (err) {
-      setFeedback({ type: 'error', message: err.message || 'Lỗi khi xóa ca làm' });
+      setFeedback({ type: 'error', message: err.message || 'Lỗi khi xóa ca làm việc' });
     }
   };
 
   return (
     <div className="space-y-6">
-      {/* Header */}
-      <div className="bg-white p-5 rounded-2xl border border-slate-200/80 shadow-sm flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+      {/* Header and Controls */}
+      <div className="bg-white p-5 rounded-2xl border border-slate-200/80 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
           <h2 className="text-lg font-bold text-slate-900 tracking-tight flex items-center gap-2">
             <Clock className="w-5 h-5 text-[#EA701B]" />
@@ -257,30 +241,30 @@ export const ShiftManagementPage = () => {
             </span>
           </h2>
           <p className="text-xs text-slate-500 mt-0.5">
-            Định nghĩa các khung thời gian (Slot 1, Slot 2, Ca Sáng, Ca Chiều...) để xếp lịch biểu.
+            Định nghĩa các khung thời gian (ví dụ: Slot 1, Slot 2, Ca Sáng, Ca Chiều...) để xếp lịch biểu.
           </p>
         </div>
 
         <button
           type="button"
           onClick={handleOpenCreate}
-          className="flex items-center gap-2 px-4 py-2.5 bg-[#EA701B] hover:bg-[#D55E0D] text-white text-xs font-bold rounded-xl transition shadow-xs btn-press hover-lift"
+          className="flex items-center gap-1.5 px-4 py-2 bg-[#EA701B] text-white text-xs font-bold rounded-xl shadow-xs hover:bg-[#D55E0D] transition self-start md:self-auto cursor-pointer"
         >
           <Plus className="w-4 h-4" />
           <span>Thêm ca làm mới</span>
         </button>
       </div>
 
-      {/* Cảnh báo xung đột các ca đã có trong quán */}
+      {/* Global overlap warning banner */}
       {conflictingCount > 0 && (
-        <div className="p-4 bg-amber-50 border-2 border-amber-300 rounded-2xl flex items-start gap-3 shadow-xs animate-fade-in">
+        <div className="p-4 bg-amber-50 border-2 border-amber-300 rounded-2xl flex items-start gap-3 text-amber-900 animate-fade-in shadow-xs">
           <AlertTriangle className="w-5 h-5 text-amber-600 shrink-0 mt-0.5" />
-          <div className="flex-1 text-xs">
-            <h4 className="font-bold text-amber-900 text-sm">
-              Cảnh báo: Có {conflictingCount} ca làm việc đang bị trùng/giao thoa khung giờ với nhau!
-            </h4>
-            <p className="text-amber-800 mt-1 leading-relaxed">
-              Các ca làm việc trong cùng một cửa hàng phải có khung giờ phân biệt. Hãy nhấn vào biểu tượng <b>chỉnh sửa</b> trên các ca bị đánh dấu cảnh báo bên dưới để điều chỉnh giờ bắt đầu hoặc kết thúc, tránh xung đột khi xếp lịch làm việc cho nhân viên.
+          <div className="text-xs space-y-1">
+            <p className="font-extrabold text-sm text-amber-950">
+              Phát hiện {conflictingCount} ca làm việc đang bị trùng khung giờ!
+            </p>
+            <p className="text-amber-800 leading-relaxed">
+              Các ca làm trong cùng một cửa hàng phải có khung thời gian tách biệt rõ ràng. Vui lòng chỉnh sửa lại giờ bắt đầu / kết thúc để tránh gây nhầm lẫn khi xếp lịch.
             </p>
           </div>
         </div>
@@ -313,20 +297,22 @@ export const ShiftManagementPage = () => {
         </div>
       )}
 
-      {/* Shifts Grid Cards */}
+      {/* Shifts Grid */}
       {loading ? (
-        <div className="p-12 text-center text-slate-400 text-sm">Đang tải danh sách ca...</div>
+        <div className="bg-white p-12 rounded-2xl border border-slate-200/80 text-center text-slate-400 text-sm shadow-sm">
+          Đang tải danh sách ca làm...
+        </div>
       ) : shifts.length === 0 ? (
-        <div className="bg-white p-12 rounded-2xl border border-slate-200/80 text-center">
-          <Clock className="w-12 h-12 text-orange-200 mx-auto mb-3" />
-          <h3 className="text-sm font-bold text-slate-800">Chưa có ca làm việc nào</h3>
-          <p className="text-xs text-slate-500 mt-1 mb-4">
+        <div className="bg-white p-12 rounded-2xl border border-slate-200/80 text-center shadow-sm">
+          <Clock className="w-12 h-12 text-slate-300 mx-auto mb-2" />
+          <p className="text-sm font-bold text-slate-700">Chưa có ca làm việc nào</p>
+          <p className="text-xs text-slate-500 mt-1">
             Hãy tạo các ca làm chuẩn (ví dụ: Ca Sáng 08:00 - 12:00, Ca Chiều 13:00 - 17:00).
           </p>
           <button
             type="button"
             onClick={handleOpenCreate}
-            className="px-4 py-2 bg-[#EA701B] text-white text-xs font-bold rounded-xl"
+            className="mt-4 px-4 py-2 bg-[#EA701B] text-white text-xs font-bold rounded-xl shadow-xs hover:bg-[#D55E0D] transition"
           >
             Tạo ca đầu tiên
           </button>
@@ -340,12 +326,15 @@ export const ShiftManagementPage = () => {
             return (
               <div
                 key={shift._id}
-                className={`bg-white rounded-2xl border p-5 shadow-xs hover-lift transition-all duration-200 space-y-4 ${
-                  hasConflict
-                    ? 'border-amber-300 ring-1 ring-amber-300/60 bg-amber-50/10'
-                    : 'border-slate-200/80 hover:border-orange-300'
+                className={`bg-white p-5 rounded-2xl border shadow-xs hover:shadow-md transition space-y-3 relative overflow-hidden ${
+                  hasConflict ? 'border-amber-300 ring-2 ring-amber-200/60 bg-amber-50/10' : 'border-slate-200/80'
                 }`}
               >
+                <div
+                  className="absolute top-0 left-0 right-0 h-1"
+                  style={{ backgroundColor: shift.color || '#EA701B' }}
+                />
+
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2.5">
                     <span
@@ -386,7 +375,7 @@ export const ShiftManagementPage = () => {
                   </span>
                 </div>
 
-                {/* Mức độ cao điểm (1 - 3 sao) - Tối giản */}
+                {/* Mức độ cao điểm (1 - 3 sao) */}
                 <div className="pt-2 flex items-center justify-between">
                   <div className="flex items-center">
                     {[1, 2, 3].map((starVal) => {
@@ -440,211 +429,21 @@ export const ShiftManagementPage = () => {
         </div>
       )}
 
-      {/* CREATE / EDIT SHIFT MODAL */}
-      {shiftModal.isOpen && (
-        <div className="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4 overflow-y-auto animate-backdrop-fade">
-          <div className="bg-white rounded-2xl w-full max-w-md shadow-2xl border border-slate-100 overflow-hidden my-auto max-h-[92vh] flex flex-col animate-modal-pop">
-            <div className="p-5 bg-[#FFF0E5] border-b border-orange-100 flex items-center justify-between shrink-0">
-              <div className="flex items-center gap-2">
-                <Clock className="w-5 h-5 text-[#EA701B]" />
-                <h3 className="font-bold text-slate-900 text-sm">
-                  {shiftModal.isEdit ? 'Chỉnh sửa ca làm việc' : 'Tạo ca làm việc mới'}
-                </h3>
-              </div>
-              <button
-                type="button"
-                onClick={() => setShiftModal((prev) => ({ ...prev, isOpen: false }))}
-                className="p-1.5 text-slate-400 hover:text-slate-600 rounded-lg hover:bg-orange-100/60 btn-press"
-              >
-                <X className="w-4 h-4" />
-              </button>
-            </div>
+      {/* Sub-modals */}
+      <ShiftFormModal
+        shiftModal={shiftModal}
+        setShiftModal={setShiftModal}
+        computedDuration={computedDuration}
+        modalConflict={modalConflict}
+        handleTimeChange={handleTimeChange}
+        onSaveShift={handleSaveShift}
+      />
 
-            <form onSubmit={handleSaveShift} className="p-6 space-y-4 overflow-y-auto">
-              <div>
-                <label className="block text-xs font-bold text-slate-700 mb-1">
-                  Tên ca làm việc <span className="text-red-500">*</span>
-                </label>
-                <input
-                  type="text"
-                  placeholder="Ví dụ: Ca Sáng, Ca Gãy, Slot 1..."
-                  value={shiftModal.name}
-                  onChange={(e) => setShiftModal((prev) => ({ ...prev, name: e.target.value }))}
-                  className="w-full p-2.5 rounded-xl border border-slate-200 text-xs font-semibold text-slate-800 focus:outline-none focus:ring-2 focus:ring-[#EA701B]"
-                  required
-                />
-              </div>
-
-              <div className="grid grid-cols-2 gap-3">
-                <div>
-                  <label className="block text-xs font-bold text-slate-700 mb-1">Giờ bắt đầu</label>
-                  <input
-                    type="time"
-                    value={shiftModal.startTime}
-                    onChange={(e) => handleTimeChange('startTime', e.target.value)}
-                    className="w-full p-2.5 rounded-xl border border-slate-200 text-xs font-mono font-bold text-slate-800 focus:outline-none focus:ring-2 focus:ring-[#EA701B]"
-                    required
-                  />
-                </div>
-                <div>
-                  <label className="block text-xs font-bold text-slate-700 mb-1">Giờ kết thúc</label>
-                  <input
-                    type="time"
-                    value={shiftModal.endTime}
-                    onChange={(e) => handleTimeChange('endTime', e.target.value)}
-                    className="w-full p-2.5 rounded-xl border border-slate-200 text-xs font-mono font-bold text-slate-800 focus:outline-none focus:ring-2 focus:ring-[#EA701B]"
-                    required
-                  />
-                </div>
-              </div>
-
-              <div className="grid grid-cols-2 gap-3">
-                <div>
-                  <label className="block text-xs font-bold text-slate-700 mb-1">
-                    Thời lượng ca (tự động tính)
-                  </label>
-                  <div className="w-full p-2.5 rounded-xl border border-slate-200 bg-slate-50 flex items-center justify-between text-xs font-mono font-bold text-slate-800">
-                    <div className="flex items-center gap-2">
-                      <Clock className="w-4 h-4 text-[#EA701B]" />
-                      <span>{computedDuration > 0 ? `${computedDuration} tiếng` : '0 tiếng'}</span>
-                    </div>
-                    <span className="text-[10px] font-sans font-semibold text-emerald-700 bg-emerald-100/80 px-2 py-0.5 rounded-md">
-                      Tự động
-                    </span>
-                  </div>
-                </div>
-                <div>
-                  <label className="block text-xs font-bold text-slate-700 mb-1">Màu phân biệt</label>
-                  <div className="flex items-center gap-2">
-                    <input
-                      type="color"
-                      value={shiftModal.color}
-                      onChange={(e) => setShiftModal((prev) => ({ ...prev, color: e.target.value }))}
-                      className="w-10 h-9 p-0.5 rounded-xl border border-slate-200 cursor-pointer"
-                    />
-                    <span className="text-xs font-mono text-slate-500 font-semibold">{shiftModal.color}</span>
-                  </div>
-                </div>
-              </div>
-
-              {/* Mức độ cao điểm (1 - 3 sao) */}
-              <div>
-                <label className="block text-xs font-bold text-slate-700 mb-1.5">
-                  Mức độ cao điểm của ca (phục vụ tự động xếp lịch):
-                </label>
-                <div className="grid grid-cols-3 gap-2">
-                  {[
-                    { stars: 1, label: 'Bình thường', desc: '1 sao (Tiêu chuẩn)', badgeColor: 'bg-slate-100 text-slate-700' },
-                    { stars: 2, label: 'Khá cao điểm', desc: '2 sao (Đông khách)', badgeColor: 'bg-amber-100 text-amber-800' },
-                    { stars: 3, label: 'Rất cao điểm', desc: '3 sao (Giờ vàng)', badgeColor: 'bg-rose-100 text-rose-800' },
-                  ].map((opt) => {
-                    const isSelected = (shiftModal.peakLevel || 1) === opt.stars;
-                    return (
-                      <button
-                        key={opt.stars}
-                        type="button"
-                        onClick={() => setShiftModal((prev) => ({ ...prev, peakLevel: opt.stars }))}
-                        className={`p-2.5 rounded-xl border text-left transition flex flex-col justify-between ${
-                          isSelected
-                            ? 'border-[#EA701B] bg-orange-50/70 ring-2 ring-orange-200 shadow-xs'
-                            : 'border-slate-200 bg-white hover:bg-slate-50'
-                        }`}
-                      >
-                        <div className="flex items-center gap-0.5 mb-1.5">
-                          {[1, 2, 3].map((s) => (
-                            <Star
-                              key={s}
-                              className={`w-3.5 h-3.5 ${
-                                s <= opt.stars
-                                  ? 'fill-amber-400 stroke-amber-500 text-amber-500'
-                                  : 'fill-slate-100 stroke-slate-300 text-slate-300'
-                              }`}
-                            />
-                          ))}
-                        </div>
-                        <div>
-                          <div className="text-xs font-bold text-slate-800">{opt.label}</div>
-                          <div className="text-[10px] text-slate-500 mt-0.5">{opt.desc}</div>
-                        </div>
-                      </button>
-                    );
-                  })}
-                </div>
-                <p className="text-[11px] text-slate-500 mt-1.5 italic">
-                  * Thuật toán sẽ ưu tiên phân bổ thêm nhân sự cho ca 2-3 sao dựa trên tổng số nhân viên quán.
-                </p>
-              </div>
-
-              {/* Conflict warning in modal */}
-              {modalConflict && (
-                <div className="p-3 bg-red-50 border border-red-200 rounded-xl flex items-start gap-2 text-xs text-red-700 animate-fade-in">
-                  <AlertTriangle className="w-4 h-4 text-red-600 shrink-0 mt-0.5" />
-                  <div>
-                    <p className="font-bold text-red-800">Cảnh báo: Trùng khung giờ ca làm!</p>
-                    <p className="mt-0.5 text-slate-600">
-                      Khung giờ ({shiftModal.startTime} — {shiftModal.endTime}) bị trùng/giao thoa với ca{' '}
-                      <b>
-                        "{modalConflict.name}" ({modalConflict.startTime} — {modalConflict.endTime})
-                      </b>
-                      . Các ca làm việc trong cửa hàng không được phép trùng khung giờ với nhau!
-                    </p>
-                  </div>
-                </div>
-              )}
-
-              <div className="flex justify-end gap-2 pt-3">
-                <button
-                  type="button"
-                  onClick={() => setShiftModal((prev) => ({ ...prev, isOpen: false }))}
-                  className="px-4 py-2 text-xs font-bold text-slate-600 hover:bg-slate-100 rounded-xl"
-                >
-                  Hủy
-                </button>
-                <button
-                  type="submit"
-                  disabled={!!modalConflict || computedDuration <= 0}
-                  className="px-5 py-2 text-xs font-bold text-white bg-[#EA701B] hover:bg-[#D55E0D] rounded-xl shadow-xs disabled:opacity-40 disabled:cursor-not-allowed transition"
-                >
-                  {shiftModal.isEdit ? 'Lưu cập nhật' : 'Tạo ca làm'}
-                </button>
-              </div>
-            </form>
-          </div>
-        </div>
-      )}
-
-      {/* DELETE CONFIRMATION MODAL */}
-      {deleteModal.isOpen && (
-        <div className="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4 overflow-y-auto animate-backdrop-fade">
-          <div className="bg-white rounded-2xl w-full max-w-sm shadow-2xl border border-slate-100 overflow-hidden my-auto animate-modal-pop">
-            <div className="p-6 text-center space-y-3">
-              <div className="w-12 h-12 rounded-full bg-red-100 text-red-600 mx-auto flex items-center justify-center">
-                <Trash2 className="w-6 h-6" />
-              </div>
-              <h3 className="font-bold text-slate-900 text-base">Xác nhận xóa ca làm?</h3>
-              <p className="text-xs text-slate-500">
-                Bạn có chắc muốn xóa ca <b>{deleteModal.shift?.name}</b> ({deleteModal.shift?.startTime} — {deleteModal.shift?.endTime})?
-              </p>
-            </div>
-            <div className="p-4 bg-slate-50 border-t border-slate-100 flex justify-end gap-2">
-              <button
-                type="button"
-                onClick={() => setDeleteModal({ isOpen: false, shift: null })}
-                className="px-4 py-2 text-xs font-bold text-slate-600 hover:bg-slate-200 rounded-xl btn-press"
-              >
-                Hủy
-              </button>
-              <button
-                type="button"
-                onClick={handleConfirmDelete}
-                className="px-4 py-2 text-xs font-bold text-white bg-red-600 hover:bg-red-700 rounded-xl shadow-xs btn-press hover-lift"
-              >
-                Xóa ca làm
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+      <DeleteShiftConfirmModal
+        deleteModal={deleteModal}
+        setDeleteModal={setDeleteModal}
+        onConfirmDelete={handleConfirmDelete}
+      />
     </div>
   );
 };

@@ -1,14 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import {
   Store,
-  KeyRound,
-  Copy,
-  Check,
-  AlertTriangle,
-  RefreshCw,
-  Mail,
-  UserPlus,
-  Clock,
   Save,
   CheckCircle2,
   AlertCircle,
@@ -20,6 +12,8 @@ import {
 import { useAuth } from '../contexts/AuthContext';
 import { storeApi } from '../services/api';
 import CreateBranchModal from '../components/store/CreateBranchModal';
+import { StoreInviteCodeCard } from '../components/stores/StoreInviteCodeCard';
+import { StoreDirectInviteForm } from '../components/stores/StoreDirectInviteForm';
 
 export const StoreManagementPage = () => {
   const { store, stores, switchStore, refreshUser } = useAuth();
@@ -158,71 +152,66 @@ export const StoreManagementPage = () => {
         setInviteExpires(expires);
         setFeedback({
           type: 'success',
-          message: 'Đã tạo mã mời 6 chữ số mới có hiệu lực trong 60 phút!'
+          message: 'Đã tạo mã mời 6 chữ số mới (có hiệu lực trong 60 phút)!'
         });
-        await refreshUser(store._id);
       }
     } catch (err) {
-      setFeedback({ type: 'error', message: err.message || 'Lỗi khi tạo mã mời' });
+      setFeedback({ type: 'error', message: err.message || 'Không thể tạo mã mời mới' });
     } finally {
       setGeneratingCode(false);
     }
   };
 
   // Copy code to clipboard
-  const handleCopyCode = () => {
-    if (!inviteCode || typeof inviteCode !== 'string') return;
-    navigator.clipboard.writeText(inviteCode);
-    setCopied(true);
-    setTimeout(() => setCopied(false), 2000);
+  const handleCopyCode = async () => {
+    if (!inviteCode) return;
+    try {
+      await navigator.clipboard.writeText(inviteCode);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2500);
+    } catch {
+      setFeedback({ type: 'error', message: 'Không thể sao chép mã vào clipboard' });
+    }
   };
 
-  // Direct invite by Email
+  // Direct invite by email
   const handleDirectInvite = async (e) => {
     e.preventDefault();
-    const email = directForm.email?.trim() || '';
-    if (!email) {
-      setFeedback({
-        type: 'error',
-        message: 'Vui lòng nhập Email của nhân viên cần mời.'
-      });
-      return;
-    }
-
+    if (!store?._id || !directForm.email.trim()) return;
     try {
       setInvitingDirect(true);
       setFeedback(null);
-      const payload = {
-        storeId: store?._id,
-        email,
-        hourlyWage: Number(directForm.hourlyWage),
-        employmentType: directForm.employmentType
-      };
-      const res = await storeApi.inviteByIdOrEmail(payload);
+      const res = await storeApi.inviteDirect(store._id, {
+        email: directForm.email.trim().toLowerCase(),
+        hourlyWage: Number(directForm.hourlyWage) || 20000,
+        employmentType: directForm.employmentType || 'PART_TIME'
+      });
       if (res.success) {
         setFeedback({
           type: 'success',
-          message: res.message || 'Đã thêm nhân viên vào cửa hàng thành công!'
+          message: `Đã thêm nhân viên "${directForm.email}" vào danh sách nhân sự của quán!`
         });
         setDirectForm({
           email: '',
           hourlyWage: 20000,
           employmentType: 'PART_TIME'
         });
-        await refreshUser(store?._id);
       }
     } catch (err) {
-      setFeedback({ type: 'error', message: err.message || 'Lỗi khi mời nhân viên' });
+      setFeedback({
+        type: 'error',
+        message: err.message || 'Không thể thêm nhân viên. Vui lòng kiểm tra lại địa chỉ email.'
+      });
     } finally {
       setInvitingDirect(false);
     }
   };
 
-  // IF NO STORE EXISTS YET: Prompt to create one
+  // Initial Store Creation Fallback
   if (!store) {
     return (
-      <div className="max-w-xl mx-auto py-10 px-4">
-        <div className="bg-white p-8 rounded-3xl border border-orange-200/80 shadow-md space-y-4 text-center">
+      <div className="max-w-xl mx-auto py-12 px-4 text-center">
+        <div className="bg-white p-8 rounded-3xl border border-orange-200/80 shadow-md space-y-4">
           <div className="w-16 h-16 rounded-2xl bg-orange-100 text-[#EA701B] flex items-center justify-center mx-auto">
             <StoreIcon className="w-8 h-8" />
           </div>
@@ -230,12 +219,12 @@ export const StoreManagementPage = () => {
             Tạo cửa hàng của bạn
           </h2>
           <p className="text-xs text-slate-500 leading-relaxed">
-            Bạn cần tạo cửa hàng trước khi có thể sinh mã mời hoặc quản lý nhân sự.
+            Bạn vừa tạo tài khoản Chủ cửa hàng. Hãy đặt tên quán và địa chỉ để bắt đầu tạo ca làm và mời nhân sự.
           </p>
 
           {feedback && (
             <div
-              className={`p-3 rounded-xl text-xs font-semibold flex items-center gap-2 ${
+              className={`p-3 rounded-xl flex items-center gap-2 text-xs font-semibold text-left ${
                 feedback.type === 'success'
                   ? 'bg-emerald-50 text-emerald-800 border border-emerald-200'
                   : 'bg-red-50 text-red-800 border border-red-200'
@@ -289,7 +278,6 @@ export const StoreManagementPage = () => {
     );
   }
 
-  // Safe string representation of invite code
   const hasValidCode =
     Boolean(inviteCode) &&
     typeof inviteCode === 'string' &&
@@ -312,7 +300,7 @@ export const StoreManagementPage = () => {
           <button
             type="button"
             onClick={() => setBranchModalOpen(true)}
-            className="flex items-center gap-1.5 px-3.5 py-2 bg-gradient-to-r from-[#EA701B] to-[#FF8C38] text-white text-xs font-bold rounded-xl shadow-sm hover:opacity-95 transition-all btn-press"
+            className="flex items-center gap-1.5 px-3.5 py-2 bg-gradient-to-r from-[#EA701B] to-[#FF8C38] text-white text-xs font-bold rounded-xl shadow-sm hover:opacity-95 transition-all btn-press cursor-pointer"
           >
             <span>+ Mở thêm chi nhánh</span>
           </button>
@@ -344,7 +332,7 @@ export const StoreManagementPage = () => {
                   key={s._id}
                   type="button"
                   onClick={() => switchStore(s._id)}
-                  className={`text-left p-3.5 rounded-2xl border transition-all flex flex-col justify-between gap-2 group ${
+                  className={`text-left p-3.5 rounded-2xl border transition-all flex flex-col justify-between gap-2 group cursor-pointer ${
                     isSelected
                       ? 'bg-[#FFF0E5] border-orange-300 ring-2 ring-[#EA701B]/20 shadow-xs'
                       : 'bg-slate-50/70 hover:bg-slate-50 border-slate-200/70 hover:border-orange-200'
@@ -405,167 +393,23 @@ export const StoreManagementPage = () => {
       )}
 
       {/* SECTION 1: 6-DIGIT INVITATION CODE */}
-      <div className="bg-white rounded-2xl border border-slate-200/80 shadow-sm p-6 space-y-4">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-3 border-b border-slate-100">
-          <div className="flex items-center gap-2.5">
-            <div className="w-9 h-9 rounded-xl bg-orange-100 text-[#EA701B] flex items-center justify-center">
-              <KeyRound className="w-5 h-5" />
-            </div>
-            <div>
-              <h3 className="text-sm font-bold text-slate-900">Mã mời 6 chữ số cho Nhân viên</h3>
-              <p className="text-xs text-slate-500">
-                Nhân viên tải app / mở web chỉ cần nhập 6 số này để tự động gia nhập quán
-              </p>
-            </div>
-          </div>
-
-          <button
-            type="button"
-            disabled={generatingCode}
-            onClick={handleGenerateCode}
-            className="flex items-center gap-2 px-4 py-2 bg-[#EA701B] text-white text-xs font-bold rounded-xl hover:bg-[#D55E0D] transition shadow-xs disabled:opacity-50"
-          >
-            <RefreshCw className={`w-3.5 h-3.5 ${generatingCode ? 'animate-spin' : ''}`} />
-            <span>{generatingCode ? 'Đang tạo...' : 'Tạo mã mới'}</span>
-          </button>
-        </div>
-
-        {/* Big 6-digit Code Display */}
-        <div className="bg-gradient-to-br from-[#FFF0E5] via-[#FFF7F0] to-orange-50/50 p-6 rounded-2xl border border-orange-200/70 text-center space-y-3">
-          {hasValidCode ? (
-            <>
-              <div className="text-xs font-bold text-[#EA701B] uppercase tracking-wider">
-                Mã mời hiện tại của quán
-              </div>
-              <div className="text-4xl md:text-5xl font-extrabold tracking-widest font-mono text-slate-900 select-all">
-                {inviteCode.slice(0, 3)} {inviteCode.slice(3, 6)}
-              </div>
-
-              {/* Expiration countdown pill */}
-              <div className="flex items-center justify-center gap-2 text-xs font-semibold">
-                <Clock className="w-4 h-4 text-[#EA701B]" />
-                <span className="text-slate-600">Thời gian còn lại:</span>
-                <span className="px-2 py-0.5 rounded-full bg-orange-200 text-[#EA701B] font-mono font-bold">
-                  {remainingTime || '60 phút'}
-                </span>
-              </div>
-
-              {/* Copy button */}
-              <div className="pt-2">
-                <button
-                  type="button"
-                  onClick={handleCopyCode}
-                  className="inline-flex items-center gap-2 px-4 py-2 bg-white border border-orange-200 rounded-xl text-xs font-bold text-slate-700 hover:text-[#EA701B] shadow-xs hover:border-orange-300 transition"
-                >
-                  {copied ? (
-                    <>
-                      <Check className="w-4 h-4 text-emerald-600" />
-                      <span className="text-emerald-700">Đã sao chép mã!</span>
-                    </>
-                  ) : (
-                    <>
-                      <Copy className="w-4 h-4 text-slate-500" />
-                      <span>Sao chép mã 6 số</span>
-                    </>
-                  )}
-                </button>
-              </div>
-            </>
-          ) : (
-            <div className="py-4">
-              <p className="text-xs text-slate-500 mb-3">
-                Chưa có mã mời hoạt động hoặc mã cũ đã hết hạn. Nhấn nút bên dưới để tạo mã 6 chữ số có hiệu lực 60 phút.
-              </p>
-              <button
-                type="button"
-                onClick={handleGenerateCode}
-                className="px-5 py-2.5 bg-[#EA701B] text-white text-xs font-bold rounded-xl shadow-xs"
-              >
-                Tạo mã mời 6 chữ số ngay
-              </button>
-            </div>
-          )}
-
-          {/* Warning notice */}
-          <div className="flex items-center justify-center gap-2 text-[11px] text-amber-700 bg-amber-50 border border-amber-200/80 rounded-xl p-2.5 max-w-lg mx-auto">
-            <AlertTriangle className="w-4 h-4 text-amber-600 shrink-0" />
-            <span>
-              <b>Lưu ý:</b> Khi tạo mã mới, mã mời trước đó sẽ lập tức bị vô hiệu hóa.
-            </span>
-          </div>
-        </div>
-      </div>
+      <StoreInviteCodeCard
+        inviteCode={inviteCode}
+        remainingTime={remainingTime}
+        hasValidCode={hasValidCode}
+        generatingCode={generatingCode}
+        copied={copied}
+        onGenerateCode={handleGenerateCode}
+        onCopyCode={handleCopyCode}
+      />
 
       {/* SECTION 2: DIRECT INVITATION BY EMAIL */}
-      <div className="bg-white rounded-2xl border border-slate-200/80 shadow-sm p-6 space-y-4">
-        <div className="pb-3 border-b border-slate-100 flex items-center gap-2.5">
-          <div className="w-9 h-9 rounded-xl bg-blue-100 text-blue-600 flex items-center justify-center">
-            <UserPlus className="w-5 h-5" />
-          </div>
-          <div>
-            <h3 className="text-sm font-bold text-slate-900">Mời nhân viên bằng Email</h3>
-            <p className="text-xs text-slate-500">
-              Chủ động thêm nhân viên đã có tài khoản vào danh sách nhân sự của quán qua địa chỉ Email
-            </p>
-          </div>
-        </div>
-
-        <form onSubmit={handleDirectInvite} className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <div>
-            <label className="block text-xs font-bold text-slate-700 mb-1">
-              Email nhân viên
-            </label>
-            <input
-              type="email"
-              placeholder="nhanvien@gmail.com"
-              value={directForm.email}
-              onChange={(e) => setDirectForm((prev) => ({ ...prev, email: e.target.value }))}
-              required
-              className="w-full p-2.5 rounded-xl border border-slate-200 text-xs text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-[#EA701B]"
-            />
-          </div>
-
-          <div>
-            <label className="block text-xs font-bold text-slate-700 mb-1">
-              Lương theo giờ khởi điểm (VNĐ/giờ)
-            </label>
-            <input
-              type="number"
-              step="1000"
-              value={directForm.hourlyWage}
-              onChange={(e) => setDirectForm((prev) => ({ ...prev, hourlyWage: e.target.value }))}
-              className="w-full p-2.5 rounded-xl border border-slate-200 text-xs font-mono font-bold text-slate-800 focus:outline-none focus:ring-2 focus:ring-[#EA701B]"
-            />
-          </div>
-
-          <div>
-            <label className="block text-xs font-bold text-slate-700 mb-1">
-              Hình thức làm việc
-            </label>
-            <select
-              value={directForm.employmentType}
-              onChange={(e) =>
-                setDirectForm((prev) => ({ ...prev, employmentType: e.target.value }))
-              }
-              className="w-full p-2.5 rounded-xl border border-slate-200 text-xs font-semibold text-slate-800 bg-white"
-            >
-              <option value="PART_TIME">Bán thời gian (Part-time)</option>
-              <option value="FULL_TIME">Toàn thời gian (Full-time)</option>
-            </select>
-          </div>
-
-          <div className="md:col-span-3 flex justify-end">
-            <button
-              type="submit"
-              disabled={invitingDirect}
-              className="px-5 py-2.5 bg-slate-900 hover:bg-slate-800 text-white text-xs font-bold rounded-xl transition shadow-xs disabled:opacity-50 flex items-center gap-2"
-            >
-              <UserPlus className="w-4 h-4 text-[#EA701B]" />
-              <span>{invitingDirect ? 'Đang thêm...' : 'Thêm nhân viên ngay'}</span>
-            </button>
-          </div>
-        </form>
-      </div>
+      <StoreDirectInviteForm
+        directForm={directForm}
+        setDirectForm={setDirectForm}
+        invitingDirect={invitingDirect}
+        onDirectInvite={handleDirectInvite}
+      />
 
       {/* SECTION 3: STORE GENERAL INFORMATION */}
       <div className="bg-white rounded-2xl border border-slate-200/80 shadow-sm p-6 space-y-4">
@@ -608,7 +452,7 @@ export const StoreManagementPage = () => {
             <button
               type="submit"
               disabled={savingStore}
-              className="px-5 py-2.5 bg-[#EA701B] hover:bg-[#D55E0D] text-white text-xs font-bold rounded-xl transition shadow-xs disabled:opacity-50 flex items-center gap-2"
+              className="px-5 py-2.5 bg-[#EA701B] hover:bg-[#D55E0D] text-white text-xs font-bold rounded-xl transition shadow-xs disabled:opacity-50 flex items-center gap-2 cursor-pointer"
             >
               <Save className="w-4 h-4" />
               <span>{savingStore ? 'Đang lưu...' : 'Lưu thông tin quán'}</span>
