@@ -107,7 +107,7 @@ Hệ thống tuân thủ nguyên tắc phân định trách nhiệm rõ ràng:
 ## 6. Nguyên Tắc Kiến Trúc Modular & Single Responsibility (Mỗi File Một Việc)
 
 ### Quyết định
-- **Tuyệt đối không viết dồn toàn bộ giao diện và logic vào một file duy nhất** (tránh các file quá lớn >250–300 dòng).
+- **Tuyệt đối không viết dồn toàn bộ giao diện và logic vào một file duy nhất cho cả backend, web và mobile** (tránh các file quá lớn >250–300 dòng).
 - Mỗi file thành phần chỉ đảm nhiệm một trách nhiệm duy nhất (**Single Responsibility Principle**):
   - **Trang chính (Page component):** Chỉ giữ vai trò quản lý state cấp cao (top-level state), fetch dữ liệu và điều phối các component con.
   - **Thành phần giao diện (UI components):** Tách riêng từng modal, từng item trong danh sách, form nhập liệu, section giới thiệu thành các sub-components độc lập đặt trong thư mục `components/<feature>/`.
