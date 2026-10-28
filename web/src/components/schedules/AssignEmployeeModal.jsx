@@ -138,7 +138,7 @@ export const AssignEmployeeModal = ({
           <button
             type="button"
             onClick={closeModal}
-            className="p-1 text-[#86868b] hover:text-[#1d1d1f] hover:bg-[#f5f5f7] rounded-full shrink-0 ml-2 transition"
+            className="p-1 text-[#86868b] hover:text-[#1d1d1f] hover:bg-[#f5f5f7] rounded-full shrink-0 ml-2 transition btn-press cursor-pointer"
           >
             <X className="w-5 h-5" />
           </button>
@@ -222,7 +222,7 @@ export const AssignEmployeeModal = ({
             <button
               type="button"
               onClick={closeModal}
-              className="px-5 py-2 text-xs font-medium text-white bg-[#0066cc] hover:bg-[#0071e3] rounded-full shadow-xs active:scale-[0.98] transition cursor-pointer"
+              className="px-5 py-2 text-xs font-medium text-white bg-[#0066cc] hover:bg-[#0071e3] rounded-full shadow-xs btn-press transition cursor-pointer"
             >
               Xong & Đóng
             </button>

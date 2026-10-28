@@ -89,7 +89,7 @@ export const StoreSwitcher = ({ isMobile = false }) => {
 
       {/* Branch List (Inline Expandable Accordion - Never overlaps nav or overflows sidebar) */}
       {isOpen && (
-        <div className="mt-2 bg-[#F5F5F7] rounded-xl border border-[#E5E5E7] overflow-hidden animate-fade-in shadow-2xs">
+        <div className="mt-2 bg-[#F5F5F7] rounded-xl border border-[#E5E5E7] overflow-hidden animate-fade-in shadow-2xs origin-top">
           {/* Header */}
           <div className="px-3 py-2 bg-white/80 border-b border-[#E5E5E7] flex items-center justify-between">
             <div className="flex items-center gap-1.5">
@@ -113,7 +113,7 @@ export const StoreSwitcher = ({ isMobile = false }) => {
                     key={s._id}
                     type="button"
                     onClick={() => handleSelectStore(s._id)}
-                    className={`w-full text-left p-2 rounded-lg transition-all flex items-start justify-between gap-2 cursor-pointer ${
+                    className={`w-full text-left p-2 rounded-lg transition-all flex items-start justify-between gap-2 cursor-pointer btn-press ${
                       isSelected
                         ? 'bg-white text-[#0066CC] font-semibold shadow-xs border border-blue-200/80'
                         : 'hover:bg-white/80 text-[#1D1D1F]'

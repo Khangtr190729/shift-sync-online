@@ -257,7 +257,7 @@ export const MySchedulePage = () => {
               <button
                 type="button"
                 onClick={() => setActiveTab('schedule')}
-                className={`flex items-center gap-2 px-4 py-1.5 rounded-full text-xs font-medium transition cursor-pointer ${
+                className={`flex items-center gap-2 px-4 py-1.5 rounded-full text-xs font-medium transition cursor-pointer btn-press ${
                   activeTab === 'schedule'
                     ? 'bg-white text-[#1d1d1f] shadow-xs'
                     : 'text-[#6e6e73] hover:text-[#1d1d1f]'
@@ -270,7 +270,7 @@ export const MySchedulePage = () => {
               <button
                 type="button"
                 onClick={() => setActiveTab('notifications')}
-                className={`flex items-center gap-2 px-4 py-1.5 rounded-full text-xs font-medium transition cursor-pointer ${
+                className={`flex items-center gap-2 px-4 py-1.5 rounded-full text-xs font-medium transition cursor-pointer btn-press ${
                   activeTab === 'notifications'
                     ? 'bg-white text-[#1d1d1f] shadow-xs'
                     : 'text-[#6e6e73] hover:text-[#1d1d1f]'
@@ -283,7 +283,7 @@ export const MySchedulePage = () => {
               <button
                 type="button"
                 onClick={() => setActiveTab('profile')}
-                className={`flex items-center gap-2 px-4 py-1.5 rounded-full text-xs font-medium transition cursor-pointer ${
+                className={`flex items-center gap-2 px-4 py-1.5 rounded-full text-xs font-medium transition cursor-pointer btn-press ${
                   activeTab === 'profile'
                     ? 'bg-white text-[#1d1d1f] shadow-xs'
                     : 'text-[#6e6e73] hover:text-[#1d1d1f]'
@@ -300,7 +300,7 @@ export const MySchedulePage = () => {
                 <button
                   type="button"
                   onClick={() => navigate('/dashboard')}
-                  className="flex items-center gap-2 px-4 py-2 bg-[#1d1d1f] hover:bg-[#333333] text-white rounded-full text-xs font-medium transition shadow-xs active:scale-[0.98] cursor-pointer"
+                  className="flex items-center gap-2 px-4 py-2 bg-[#1d1d1f] hover:bg-[#333333] text-white rounded-full text-xs font-medium transition shadow-xs btn-press cursor-pointer"
                   title="Quay lại Bảng điều khiển quản lý"
                 >
                   <LayoutDashboard className="w-4 h-4 text-[#0066cc]" />
@@ -333,45 +333,47 @@ export const MySchedulePage = () => {
             </div>
           </div>
 
-          {/* Main Scrollable Tab Content */}
+          {/* Main Scrollable Tab Content with Animated Transition */}
           <div className="flex-1 overflow-y-auto px-4 py-3 space-y-4">
-            {activeTab === 'schedule' && (
-              <PersonalScheduleSection
-                store={store}
-                user={user}
-                currentMonday={currentMonday}
-                setCurrentMonday={setCurrentMonday}
-                daysOfWeek={daysOfWeek}
-                selectedDate={selectedDate}
-                setSelectedDate={setSelectedDate}
-                scheduleData={scheduleData}
-                nextUpcomingShift={nextUpcomingShift}
-                shiftsForSelectedDate={shiftsForSelectedDate}
-                setActiveShiftDetail={setActiveShiftDetail}
-              />
-            )}
+            <div key={activeTab} className="animate-page-enter">
+              {activeTab === 'schedule' && (
+                <PersonalScheduleSection
+                  store={store}
+                  user={user}
+                  currentMonday={currentMonday}
+                  setCurrentMonday={setCurrentMonday}
+                  daysOfWeek={daysOfWeek}
+                  selectedDate={selectedDate}
+                  setSelectedDate={setSelectedDate}
+                  scheduleData={scheduleData}
+                  nextUpcomingShift={nextUpcomingShift}
+                  shiftsForSelectedDate={shiftsForSelectedDate}
+                  setActiveShiftDetail={setActiveShiftDetail}
+                />
+              )}
 
-            {activeTab === 'notifications' && (
-              <EmployeeNotificationsSection
-                store={store}
-                currentMonday={currentMonday}
-              />
-            )}
+              {activeTab === 'notifications' && (
+                <EmployeeNotificationsSection
+                  store={store}
+                  currentMonday={currentMonday}
+                />
+              )}
 
-            {activeTab === 'profile' && (
-              <EmployeeProfileSection
-                user={user}
-                store={store}
-                copiedEmail={copiedEmail}
-                handleCopyUserEmail={handleCopyUserEmail}
-                profileForm={profileForm}
-                setProfileForm={setProfileForm}
-                profileMsg={profileMsg}
-                savingProfile={savingProfile}
-                handleUpdateProfile={handleUpdateProfile}
-                logout={logout}
-              />
-            )}
+              {activeTab === 'profile' && (
+                <EmployeeProfileSection
+                  user={user}
+                  store={store}
+                  copiedEmail={copiedEmail}
+                  handleCopyUserEmail={handleCopyUserEmail}
+                  profileForm={profileForm}
+                  setProfileForm={setProfileForm}
+                  profileMsg={profileMsg}
+                  savingProfile={savingProfile}
+                  handleUpdateProfile={handleUpdateProfile}
+                  logout={logout}
+                />
+              )}
+            </div>
           </div>
 
           {/* iOS Bottom Navigation Bar (Hidden on desktop) */}

@@ -12,8 +12,9 @@ import colors from '../../../theme/colors';
 import { calculateDuration } from '../../../utils/formatters';
 import CustomInput from '../../CustomInput';
 import CustomButton from '../../CustomButton';
+import ApplePressable from '../../ApplePressable';
 
-export const ShiftFormModal = ({
+const ShiftFormModalComponent = ({
   visible,
   onClose,
   initialShift = null,
@@ -84,13 +85,16 @@ export const ShiftFormModal = ({
     >
       <View style={styles.overlay}>
         <View style={styles.modalBox}>
+          {/* Apple Sheet Grab Handle */}
+          <View style={styles.grabHandle} />
+
           <View style={styles.header}>
             <Text style={styles.title}>
               {initialShift ? 'Chỉnh sửa Ca làm' : 'Thêm Ca làm mới'}
             </Text>
-            <TouchableOpacity onPress={onClose} hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}>
+            <ApplePressable onPress={onClose} hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }} activeScale={0.9}>
               <Ionicons name="close-circle" size={24} color={colors.textSecondary} />
-            </TouchableOpacity>
+            </ApplePressable>
           </View>
 
           <ScrollView showsVerticalScrollIndicator={false}>
@@ -234,6 +238,14 @@ const styles = StyleSheet.create({
     padding: 22,
     maxHeight: '85%',
   },
+  grabHandle: {
+    width: 36,
+    height: 5,
+    borderRadius: 3,
+    backgroundColor: '#D2D2D7',
+    alignSelf: 'center',
+    marginBottom: 12,
+  },
   header: {
     flexDirection: 'row',
     justifyContent: 'space-between',
@@ -345,4 +357,5 @@ const styles = StyleSheet.create({
   },
 });
 
+export const ShiftFormModal = React.memo(ShiftFormModalComponent);
 export default ShiftFormModal;

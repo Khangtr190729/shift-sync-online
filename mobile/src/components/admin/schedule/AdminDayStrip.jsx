@@ -3,7 +3,7 @@ import { View, Text, StyleSheet } from 'react-native';
 import colors from '../../../theme/colors';
 import ApplePressable from '../../ApplePressable';
 
-export const AdminDayStrip = ({
+const AdminDayStripComponent = ({
   daysOfWeek = [],
   selectedDate,
   onSelectDate,
@@ -94,4 +94,5 @@ const styles = StyleSheet.create({
   },
 });
 
+export const AdminDayStrip = React.memo(AdminDayStripComponent);
 export default AdminDayStrip;

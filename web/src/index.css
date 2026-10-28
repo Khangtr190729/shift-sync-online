@@ -240,12 +240,61 @@ body {
   box-shadow: 0 8px 20px -4px rgba(0, 102, 204, 0.12), 0 2px 6px -1px rgba(0, 0, 0, 0.03);
 }
 
-/* Apple Frosted Glass panel */
+/* Apple Optical Typography Tuning (WWDC Details of UI Typography) */
+h1, h2 {
+  letter-spacing: -0.022em;
+  font-feature-settings: "cv02", "cv03", "cv04", "cv11";
+}
+
+h3, h4 {
+  letter-spacing: -0.014em;
+}
+
+.text-micro {
+  font-size: 10px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+/* Apple Frosted Glass Materials (Translucency conveys hierarchy) */
 .glass-panel {
-  background: rgba(255, 255, 255, 0.85);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
+  background: rgba(255, 255, 255, 0.82);
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
   border: 1px solid rgba(229, 229, 231, 0.8);
+}
+
+.glass-header {
+  background: rgba(255, 255, 255, 0.78);
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+}
+
+.glass-sidebar {
+  background: rgba(255, 255, 255, 0.84);
+  backdrop-filter: blur(24px) saturate(180%);
+  -webkit-backdrop-filter: blur(24px) saturate(180%);
+  border-right: 1px solid rgba(0, 0, 0, 0.06);
+}
+
+/* Accessibility: Respect Reduced Transparency & High Contrast */
+@media (prefers-reduced-transparency: reduce) {
+  .glass-panel,
+  .glass-header,
+  .glass-sidebar {
+    background: #ffffff !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+  }
+}
+
+@media (prefers-contrast: more) {
+  .glass-panel,
+  .glass-header,
+  .glass-sidebar {
+    border-color: #1d1d1f !important;
+  }
 }
 
 /* ==========================================================================

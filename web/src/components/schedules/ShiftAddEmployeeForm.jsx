@@ -91,7 +91,7 @@ export const ShiftAddEmployeeForm = ({
           type="button"
           disabled={!assignModal.selectedUserId || !!selectedConflict || isSelectedAlready}
           onClick={onAddEmployee}
-          className="px-5 py-2.5 bg-[#0066cc] hover:bg-[#0071e3] text-white text-xs font-medium rounded-full shadow-xs active:scale-[0.98] disabled:opacity-40 disabled:cursor-not-allowed flex items-center justify-center gap-1.5 shrink-0 whitespace-nowrap transition cursor-pointer"
+          className="px-5 py-2.5 bg-[#0066cc] hover:bg-[#0071e3] text-white text-xs font-medium rounded-full shadow-xs btn-press disabled:opacity-40 disabled:cursor-not-allowed flex items-center justify-center gap-1.5 shrink-0 whitespace-nowrap transition cursor-pointer"
         >
           <Plus className="w-4 h-4" />
           <span>Thêm vào ca</span>

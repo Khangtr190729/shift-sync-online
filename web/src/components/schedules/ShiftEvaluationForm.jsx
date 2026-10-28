@@ -8,7 +8,7 @@ import { formatVND } from '../../utils/formatters';
  * - Tự do nhập lý do vi phạm, không gắn cứng
  * - Xem trước tính toán lương thực nhận
  */
-export const ShiftEvaluationForm = ({
+const ShiftEvaluationFormComponent = ({
   assignment,
   memberWage = 20000,
   shiftHours = 4,
@@ -303,14 +303,14 @@ export const ShiftEvaluationForm = ({
           type="button"
           onClick={onCancel}
           disabled={submitting}
-          className="px-3 py-1.5 text-xs font-semibold text-slate-600 hover:bg-slate-100 rounded-lg transition"
+          className="px-3 py-1.5 text-xs font-semibold text-slate-600 hover:bg-slate-100 rounded-lg transition btn-press cursor-pointer"
         >
           Hủy
         </button>
         <button
           type="submit"
           disabled={submitting}
-          className={`flex items-center gap-1.5 px-3.5 py-1.5 text-white text-xs font-bold rounded-lg transition shadow-xs disabled:opacity-50 ${
+          className={`flex items-center gap-1.5 px-3.5 py-1.5 text-white text-xs font-bold rounded-lg transition shadow-xs btn-press disabled:opacity-50 cursor-pointer ${
             mode === 'PARTIAL'
               ? 'bg-amber-600 hover:bg-amber-700'
               : 'bg-rose-600 hover:bg-rose-700'
@@ -330,4 +330,5 @@ export const ShiftEvaluationForm = ({
   );
 };
 
+export const ShiftEvaluationForm = React.memo(ShiftEvaluationFormComponent);
 export default ShiftEvaluationForm;

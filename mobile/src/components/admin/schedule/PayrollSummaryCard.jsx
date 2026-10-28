@@ -8,8 +8,9 @@ import {
 import { Ionicons } from '@expo/vector-icons';
 import colors from '../../../theme/colors';
 import { formatVND } from '../../../utils/formatters';
+import ApplePressable from '../../ApplePressable';
 
-export const PayrollSummaryCard = ({ payrollSummary }) => {
+const PayrollSummaryCardComponent = ({ payrollSummary }) => {
   const [expanded, setExpanded] = useState(true);
 
   if (!payrollSummary) return null;
@@ -37,17 +38,17 @@ export const PayrollSummaryCard = ({ payrollSummary }) => {
           </View>
         </View>
 
-        <TouchableOpacity
+        <ApplePressable
           onPress={() => setExpanded(!expanded)}
           style={styles.expandBtn}
-          activeOpacity={0.7}
+          activeScale={0.88}
         >
           <Ionicons
             name={expanded ? 'chevron-up' : 'chevron-down'}
             size={18}
             color={colors.textSecondary}
           />
-        </TouchableOpacity>
+        </ApplePressable>
       </View>
 
       {/* Metrics Row */}
@@ -357,4 +358,5 @@ const styles = StyleSheet.create({
   },
 });
 
+export const PayrollSummaryCard = React.memo(PayrollSummaryCardComponent);
 export default PayrollSummaryCard;

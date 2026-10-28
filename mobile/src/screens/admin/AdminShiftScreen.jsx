@@ -16,6 +16,7 @@ import colors from '../../theme/colors';
 
 import ShiftSlotItem from '../../components/admin/shift/ShiftSlotItem';
 import ShiftFormModal from '../../components/admin/shift/ShiftFormModal';
+import ApplePressable from '../../components/ApplePressable';
 
 export const AdminShiftScreen = () => {
   const { store } = useAuth();
@@ -131,14 +132,14 @@ export const AdminShiftScreen = () => {
             </Text>
           </View>
 
-          <TouchableOpacity
+          <ApplePressable
             style={styles.addShiftBtn}
             onPress={handleOpenCreate}
-            activeOpacity={0.8}
+            activeScale={0.94}
           >
             <Ionicons name="add" size={18} color="#FFFFFF" />
             <Text style={styles.addShiftText}>Thêm ca</Text>
-          </TouchableOpacity>
+          </ApplePressable>
         </View>
 
         {/* Shifts List */}

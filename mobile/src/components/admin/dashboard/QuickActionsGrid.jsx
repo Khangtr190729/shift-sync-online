@@ -4,7 +4,7 @@ import { Ionicons } from '@expo/vector-icons';
 import colors from '../../../theme/colors';
 import ApplePressable from '../../ApplePressable';
 
-export const QuickActionsGrid = ({
+const QuickActionsGridComponent = ({
   onGoToSchedule,
   onGoToMembers,
   onGoToShifts,
@@ -93,7 +93,7 @@ const styles = StyleSheet.create({
     borderRadius: 20,
     padding: 16,
     borderWidth: 1,
-    borderColor: '#FED7AA',
+    borderColor: '#E5E5E7',
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.04,
@@ -123,4 +123,5 @@ const styles = StyleSheet.create({
   },
 });
 
+export const QuickActionsGrid = React.memo(QuickActionsGridComponent);
 export default QuickActionsGrid;

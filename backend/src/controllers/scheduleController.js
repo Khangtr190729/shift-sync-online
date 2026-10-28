@@ -463,14 +463,16 @@ export const getMySchedule = async (req, res) => {
     const totalSalary = myShifts.reduce((acc, cur) => acc + (cur.totalPay || 0), 0);
     const hourlyWage = myShifts.length > 0 ? myShifts[0].hourlyWage : 0;
 
+    const primarySchedule = schedules[0];
+
     return res.status(200).json({
       success: true,
       hasSchedule: true,
-      storeName: schedule.storeId ? schedule.storeId.name : 'N/A',
-      week: schedule.week,
-      year: schedule.year,
-      status: schedule.status,
-      publishedAt: schedule.publishedAt,
+      storeName: primarySchedule?.storeId ? primarySchedule.storeId.name : 'N/A',
+      week: primarySchedule?.week || Number(week),
+      year: primarySchedule?.year || Number(year),
+      status: primarySchedule?.status || 'PUBLISHED',
+      publishedAt: primarySchedule?.publishedAt,
       shifts: myShifts,
       totalHours,
       hourlyWage,

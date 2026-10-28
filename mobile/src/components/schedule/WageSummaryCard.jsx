@@ -4,7 +4,7 @@ import { Ionicons } from '@expo/vector-icons';
 import colors from '../../theme/colors';
 import { formatVND } from '../../utils/formatters';
 
-export const WageSummaryCard = ({ stats }) => {
+const WageSummaryCardComponent = ({ stats }) => {
   const estimatedWage = stats?.estimatedWage || 0;
   const hourlyWage = stats?.hourlyWage || 0;
   const totalShifts = stats?.totalShifts || 0;
@@ -125,4 +125,5 @@ const styles = StyleSheet.create({
   },
 });
 
+export const WageSummaryCard = React.memo(WageSummaryCardComponent);
 export default WageSummaryCard;

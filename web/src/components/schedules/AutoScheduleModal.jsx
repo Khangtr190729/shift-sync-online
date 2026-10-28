@@ -93,7 +93,7 @@ export const AutoScheduleModal = ({
           <button
             type="button"
             onClick={onClose}
-            className="p-1.5 text-[#86868b] hover:text-[#1d1d1f] hover:bg-[#f5f5f7] rounded-full transition"
+            className="p-1.5 text-[#86868b] hover:text-[#1d1d1f] hover:bg-[#f5f5f7] rounded-full transition btn-press cursor-pointer"
           >
             <X className="w-5 h-5" />
           </button>
@@ -268,7 +268,7 @@ export const AutoScheduleModal = ({
           <button
             type="button"
             onClick={onClose}
-            className="px-4 py-2 text-xs font-medium text-[#6e6e73] hover:text-[#1d1d1f] hover:bg-white rounded-full transition"
+            className="px-4 py-2 text-xs font-medium text-[#6e6e73] hover:text-[#1d1d1f] hover:bg-white rounded-full transition btn-press cursor-pointer"
           >
             Hủy bỏ
           </button>
@@ -276,7 +276,7 @@ export const AutoScheduleModal = ({
             type="button"
             disabled={autoGenerating || shiftsCount === 0 || membersCount === 0 || isPastWeek}
             onClick={onAutoSchedule}
-            className="px-5 py-2.5 text-xs font-medium text-white bg-[#0066cc] hover:bg-[#0071e3] rounded-full shadow-xs disabled:opacity-50 flex items-center gap-2 transition active:scale-[0.98] cursor-pointer"
+            className="px-5 py-2.5 text-xs font-medium text-white bg-[#0066cc] hover:bg-[#0071e3] rounded-full shadow-xs disabled:opacity-50 flex items-center gap-2 transition btn-press cursor-pointer"
           >
             <Sparkles className="w-4 h-4" />
             <span>{autoGenerating ? 'Đang tự động tính toán & xếp ca...' : 'Bắt đầu tự động xếp ca'}</span>
