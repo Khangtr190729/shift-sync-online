@@ -3,6 +3,8 @@ import {
   register,
   login,
   getMe,
+  refreshTokens,
+  logout,
   forgotPassword,
   verifyResetOtp,
   resetPasswordWithOtp,
@@ -30,8 +32,14 @@ router.post('/register', authLimiter, validateBody(registerSchema), register);
 // Route đăng nhập tài khoản (Public - Giới hạn 10 lần/15p chống brute-force)
 router.post('/login', authLimiter, validateBody(loginSchema), login);
 
-// Route lấy thông tin cá nhân hiện tại (Yêu cầu đăng nhập - Token)
+// Route lấy thông tin cá nhân hiện tại (Yêu cầu đăng nhập - Token qua Cookie hoặc Header)
 router.get('/me', protect, getMe);
+
+// Route làm mới Access Token bằng Refresh Token (Đọc từ Cookie HttpOnly hoặc body)
+router.post('/refresh', refreshTokens);
+
+// Route đăng xuất an toàn (Xóa sạch Cookie AT và RT)
+router.post('/logout', logout);
 
 // Route Quên mật khẩu: Yêu cầu gửi mã OTP 6 số qua Email (Public - Giới hạn 3 lần/15p bảo vệ Gmail/Nodemailer)
 router.post(

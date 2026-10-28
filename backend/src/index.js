@@ -1,5 +1,6 @@
 import express from 'express';
 import cors from 'cors';
+import cookieParser from 'cookie-parser';
 import dotenv from 'dotenv';
 import connectDB from './config/db.js';
 import authRoutes from './routes/authRoutes.js';
@@ -20,8 +21,29 @@ app.set('trust proxy', 1);
 // Kết nối cơ sở dữ liệu MongoDB
 connectDB();
 
+// Cấu hình danh sách origin được phép gửi Cookie (Web client)
+const allowedOrigins = [
+  'http://localhost:3000',
+  'http://localhost:5173',
+  'http://127.0.0.1:3000',
+  'http://127.0.0.1:5173',
+  process.env.CLIENT_URL,
+].filter(Boolean);
+
 // Middlewares toàn cục
-app.use(cors());
+app.use(
+  cors({
+    origin: (origin, callback) => {
+      // Cho phép requests không có origin (mobile apps, Postman, server-to-server) hoặc origin hợp lệ
+      if (!origin || allowedOrigins.includes(origin)) {
+        return callback(null, true);
+      }
+      return callback(new Error('Chặn bởi chính sách CORS'));
+    },
+    credentials: true, // BẮT BUỘC để trình duyệt chấp nhận và gửi HttpOnly Cookies
+  })
+);
+app.use(cookieParser());
 app.use(express.json());
 
 // Giới hạn tần suất toàn cục cho tất cả API /api/*

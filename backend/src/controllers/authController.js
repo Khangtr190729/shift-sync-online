@@ -4,9 +4,17 @@ import User from '../models/User.js';
 import { sendPasswordResetOtpEmail } from '../services/emailService.js';
 
 /**
- * Tạo token JWT cho người dùng
+ * Thời hạn và cấu hình Cookies bảo mật tối đa (HttpOnly + SameSite)
  */
-const generateToken = (user) => {
+const ACCESS_TOKEN_EXPIRY = '15m'; // 15 phút
+const REFRESH_TOKEN_EXPIRY = '30d'; // 30 ngày
+const ACCESS_COOKIE_MAX_AGE = 15 * 60 * 1000; // 15 phút tính theo ms
+const REFRESH_COOKIE_MAX_AGE = 30 * 24 * 60 * 60 * 1000; // 30 ngày tính theo ms
+
+/**
+ * Tạo Access Token (AT) - Thời gian sống ngắn (15 phút)
+ */
+export const generateAccessToken = (user) => {
   return jwt.sign(
     {
       id: user._id,
@@ -15,9 +23,64 @@ const generateToken = (user) => {
     },
     process.env.JWT_SECRET,
     {
-      expiresIn: process.env.JWT_EXPIRES_IN || '30d',
+      expiresIn: process.env.JWT_EXPIRES_IN || ACCESS_TOKEN_EXPIRY,
     }
   );
+};
+
+/**
+ * Tạo Refresh Token (RT) - Thời gian sống dài (30 ngày)
+ */
+export const generateRefreshToken = (user) => {
+  return jwt.sign(
+    {
+      id: user._id,
+    },
+    process.env.JWT_REFRESH_SECRET || process.env.JWT_SECRET,
+    {
+      expiresIn: process.env.JWT_REFRESH_EXPIRES_IN || REFRESH_TOKEN_EXPIRY,
+    }
+  );
+};
+
+/**
+ * Cấu hình tùy chọn Cookie an toàn (HttpOnly chống tấn công XSS)
+ */
+const getCookieOptions = (maxAge) => {
+  const isProduction = process.env.NODE_ENV === 'production';
+  return {
+    httpOnly: true, // Trình duyệt không cho phép JS (document.cookie) truy cập -> Chống XSS 100%
+    secure: isProduction, // Chỉ truyền qua HTTPS khi chạy production
+    sameSite: isProduction ? 'none' : 'lax', // Hỗ trợ cross-origin an toàn khi production
+    path: '/',
+    maxAge,
+  };
+};
+
+/**
+ * Đưa CẢ HAI (AT và RT) vào 2 Cookie HttpOnly riêng biệt
+ */
+export const setAuthCookies = (res, accessToken, refreshToken) => {
+  // Cookie 1: Access Token (15 phút, HttpOnly)
+  res.cookie('accessToken', accessToken, getCookieOptions(ACCESS_COOKIE_MAX_AGE));
+
+  // Cookie 2: Refresh Token (30 ngày, HttpOnly)
+  res.cookie('refreshToken', refreshToken, getCookieOptions(REFRESH_COOKIE_MAX_AGE));
+};
+
+/**
+ * Xóa sạch cả 2 Cookie khi đăng xuất
+ */
+export const clearAuthCookies = (res) => {
+  const isProduction = process.env.NODE_ENV === 'production';
+  const clearOptions = {
+    httpOnly: true,
+    secure: isProduction,
+    sameSite: isProduction ? 'none' : 'lax',
+    path: '/',
+  };
+  res.clearCookie('accessToken', clearOptions);
+  res.clearCookie('refreshToken', clearOptions);
 };
 
 /**
@@ -52,14 +115,17 @@ export const register = async (req, res) => {
       systemRole,
     });
 
-    // 4. Tạo token đăng nhập
-    const token = generateToken(newUser);
+    // 4. Tạo cặp token AT (15m) & RT (30d) và đưa vào 2 Cookie HttpOnly riêng biệt
+    const accessToken = generateAccessToken(newUser);
+    const refreshToken = generateRefreshToken(newUser);
+    setAuthCookies(res, accessToken, refreshToken);
 
     // 5. Trả về kết quả (loại bỏ mật khẩu)
     return res.status(201).json({
       success: true,
       message: 'Đăng ký tài khoản thành công!',
-      token,
+      token: accessToken,
+      refreshToken,
       user: {
         _id: newUser._id,
         email: newUser.email,
@@ -106,13 +172,16 @@ export const login = async (req, res) => {
       });
     }
 
-    // 3. Tạo token đăng nhập
-    const token = generateToken(user);
+    // 3. Tạo cặp token AT (15m) & RT (30d) và đưa vào 2 Cookie HttpOnly riêng biệt
+    const accessToken = generateAccessToken(user);
+    const refreshToken = generateRefreshToken(user);
+    setAuthCookies(res, accessToken, refreshToken);
 
     return res.status(200).json({
       success: true,
       message: 'Đăng nhập thành công!',
-      token,
+      token: accessToken,
+      refreshToken,
       user: {
         _id: user._id,
         email: user.email,
@@ -156,6 +225,93 @@ export const getMe = async (req, res) => {
     return res.status(500).json({
       success: false,
       message: `Lỗi máy chủ: ${error.message}`,
+    });
+  }
+};
+
+/**
+ * @desc    Làm mới Access Token khi hết hạn 15 phút bằng Cookie Refresh Token (30 ngày)
+ * @route   POST /api/auth/refresh
+ * @access  Public (Xác thực qua Cookie refreshToken hoặc body)
+ */
+export const refreshTokens = async (req, res) => {
+  try {
+    const refreshToken = req.cookies?.refreshToken || req.body?.refreshToken;
+
+    if (!refreshToken) {
+      return res.status(401).json({
+        success: false,
+        code: 'REFRESH_TOKEN_MISSING',
+        message: 'Không tìm thấy Refresh Token trong Cookie. Vui lòng đăng nhập lại.',
+      });
+    }
+
+    // Xác thực chữ ký số của Refresh Token
+    const decoded = jwt.verify(
+      refreshToken,
+      process.env.JWT_REFRESH_SECRET || process.env.JWT_SECRET
+    );
+
+    const user = await User.findById(decoded.id);
+    if (!user) {
+      clearAuthCookies(res);
+      return res.status(401).json({
+        success: false,
+        code: 'USER_NOT_FOUND',
+        message: 'Người dùng không còn tồn tại trên hệ thống.',
+      });
+    }
+
+    // Cấp mới Access Token (15m) & Refresh Token mới (Refresh Token Rotation)
+    const newAccessToken = generateAccessToken(user);
+    const newRefreshToken = generateRefreshToken(user);
+
+    // Cập nhật lại 2 Cookie HttpOnly cho trình duyệt
+    setAuthCookies(res, newAccessToken, newRefreshToken);
+
+    return res.status(200).json({
+      success: true,
+      message: 'Làm mới phiên đăng nhập thành công!',
+      token: newAccessToken,
+      refreshToken: newRefreshToken,
+      user: {
+        _id: user._id,
+        email: user.email,
+        fullName: user.fullName,
+        gender: user.gender,
+        age: user.age,
+        systemRole: user.systemRole,
+        avatar: user.avatar,
+      },
+    });
+  } catch (error) {
+    console.error('Lỗi làm mới token:', error.message);
+    clearAuthCookies(res);
+    return res.status(401).json({
+      success: false,
+      code: 'REFRESH_TOKEN_EXPIRED',
+      message: 'Phiên Refresh Token đã hết hạn hoặc không hợp lệ. Vui lòng đăng nhập lại.',
+    });
+  }
+};
+
+/**
+ * @desc    Đăng xuất: Xóa sạch cả 2 Cookie HttpOnly (AT & RT)
+ * @route   POST /api/auth/logout
+ * @access  Public
+ */
+export const logout = async (req, res) => {
+  try {
+    clearAuthCookies(res);
+    return res.status(200).json({
+      success: true,
+      message: 'Đăng xuất thành công. Đã dọn sạch Cookies an toàn!',
+    });
+  } catch (error) {
+    console.error('Lỗi đăng xuất:', error);
+    return res.status(500).json({
+      success: false,
+      message: `Lỗi máy chủ khi đăng xuất: ${error.message}`,
     });
   }
 };
