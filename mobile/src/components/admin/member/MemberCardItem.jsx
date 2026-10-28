@@ -1,10 +1,11 @@
 import React from 'react';
-import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
+import { View, Text, StyleSheet } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import colors from '../../../theme/colors';
 import { formatVND } from '../../../utils/formatters';
+import ApplePressable from '../../ApplePressable';
 
-export const MemberCardItem = ({
+export const MemberCardItem = React.memo(({
   member,
   onEdit,
   onDelete,
@@ -61,27 +62,31 @@ export const MemberCardItem = ({
         </View>
 
         <View style={styles.actionBtns}>
-          <TouchableOpacity
+          <ApplePressable
             style={styles.editBtn}
             onPress={() => onEdit(member)}
-            activeOpacity={0.7}
+            activeScale={0.94}
           >
-            <Ionicons name="pencil" size={14} color={colors.primary} />
-            <Text style={styles.editBtnText}>Sửa lương</Text>
-          </TouchableOpacity>
+            <View style={styles.editBtnContent}>
+              <Ionicons name="pencil" size={14} color={colors.primary} />
+              <Text style={styles.editBtnText}>Sửa lương</Text>
+            </View>
+          </ApplePressable>
 
-          <TouchableOpacity
+          <ApplePressable
             style={styles.deleteBtn}
             onPress={() => onDelete(member)}
-            activeOpacity={0.7}
+            activeScale={0.92}
           >
             <Ionicons name="trash-outline" size={14} color={colors.danger} />
-          </TouchableOpacity>
+          </ApplePressable>
         </View>
       </View>
     </View>
   );
-};
+});
+
+MemberCardItem.displayName = 'MemberCardItem';
 
 const styles = StyleSheet.create({
   card: {
@@ -213,13 +218,15 @@ const styles = StyleSheet.create({
     gap: 8,
   },
   editBtn: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 4,
     backgroundColor: colors.primaryLight,
     paddingVertical: 6,
     paddingHorizontal: 10,
     borderRadius: 8,
+  },
+  editBtnContent: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
   },
   editBtnText: {
     fontSize: 11,

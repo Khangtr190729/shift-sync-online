@@ -1,10 +1,11 @@
 import React from 'react';
-import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
+import { View, Text, StyleSheet } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import colors from '../../../theme/colors';
 import ShiftEmployeeChip from './ShiftEmployeeChip';
+import ApplePressable from '../../ApplePressable';
 
-export const AdminShiftSlotCard = ({
+const AdminShiftSlotCardComponent = ({
   shiftItem,
   onAssignEmployee,
   onRemoveEmployee,
@@ -81,14 +82,16 @@ export const AdminShiftSlotCard = ({
           })}
 
           {!isPublished && (
-            <TouchableOpacity
+            <ApplePressable
               style={styles.addBtn}
               onPress={() => onAssignEmployee && onAssignEmployee(shiftItem)}
-              activeOpacity={0.7}
+              activeScale={0.94}
             >
-              <Ionicons name="add" size={15} color={colors.primary} />
-              <Text style={styles.addBtnText}>Thêm nhân viên</Text>
-            </TouchableOpacity>
+              <View style={styles.addBtnContent}>
+                <Ionicons name="add" size={15} color={colors.primary} />
+                <Text style={styles.addBtnText}>Thêm nhân viên</Text>
+              </View>
+            </ApplePressable>
           )}
         </View>
       </View>
@@ -176,9 +179,6 @@ const styles = StyleSheet.create({
     gap: 8,
   },
   addBtn: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 4,
     backgroundColor: '#FFFFFF',
     borderWidth: 1.2,
     borderStyle: 'dashed',
@@ -187,6 +187,11 @@ const styles = StyleSheet.create({
     paddingHorizontal: 12,
     borderRadius: 12,
   },
+  addBtnContent: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+  },
   addBtnText: {
     fontSize: 11,
     fontWeight: '700',
@@ -194,4 +199,5 @@ const styles = StyleSheet.create({
   },
 });
 
+export const AdminShiftSlotCard = React.memo(AdminShiftSlotCardComponent);
 export default AdminShiftSlotCard;

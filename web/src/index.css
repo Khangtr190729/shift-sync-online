@@ -162,6 +162,54 @@ body {
   animation: badgeGlow 2s infinite ease-out;
 }
 
+/* Staggered Cascade Entrance (GPU Accelerated, zero reflow) */
+.animate-stagger-1 {
+  animation: pageEnter 0.22s cubic-bezier(0.16, 1, 0.3, 1) 0.04s both;
+}
+
+.animate-stagger-2 {
+  animation: pageEnter 0.22s cubic-bezier(0.16, 1, 0.3, 1) 0.08s both;
+}
+
+.animate-stagger-3 {
+  animation: pageEnter 0.22s cubic-bezier(0.16, 1, 0.3, 1) 0.12s both;
+}
+
+.animate-stagger-4 {
+  animation: pageEnter 0.22s cubic-bezier(0.16, 1, 0.3, 1) 0.16s both;
+}
+
+.animate-stagger-5 {
+  animation: pageEnter 0.22s cubic-bezier(0.16, 1, 0.3, 1) 0.20s both;
+}
+
+/* Shimmer Light Sweep for skeletons */
+@keyframes shimmer {
+  0% {
+    transform: translateX(-100%);
+  }
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+.animate-shimmer {
+  position: relative;
+  overflow: hidden;
+}
+
+.animate-shimmer::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  transform: translateX(-100%);
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.5), transparent);
+  animation: shimmer 1.8s infinite;
+}
+
 /* Interactive Micro-Interactions (Apple feel: scale on press, crisp lift) */
 .hover-lift {
   transition: transform 0.2s cubic-bezier(0.2, 0.8, 0.2, 1), box-shadow 0.2s cubic-bezier(0.2, 0.8, 0.2, 1), border-color 0.15s ease;
@@ -198,6 +246,23 @@ body {
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
   border: 1px solid rgba(229, 229, 231, 0.8);
+}
+
+/* ==========================================================================
+   High-Performance Rendering & Hardware Acceleration Utilities
+   ========================================================================== */
+
+/* Off-screen Content Virtualization without JS (Chromium content-visibility) */
+.content-visibility-auto {
+  content-visibility: auto;
+  contain-intrinsic-size: 0 450px;
+}
+
+/* Force Dedicated GPU Compositing Layer without layout reflows */
+.gpu-layer {
+  transform: translateZ(0);
+  backface-visibility: hidden;
+  perspective: 1000px;
 }
 
 /* Accessibility: Respect Reduced Motion */

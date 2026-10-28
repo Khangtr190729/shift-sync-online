@@ -735,7 +735,7 @@ export const ScheduleManagementPage = () => {
             type="button"
             disabled={saving || autoGenerating || isPastWeek}
             onClick={() => setAutoScheduleModalOpen(true)}
-            className="flex items-center gap-2 px-4 py-2 rounded-full border border-[#e5e5e7] bg-white hover:bg-[#f5f5f7] text-[#1d1d1f] text-xs font-medium transition active:scale-[0.98] disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer"
+            className="flex items-center gap-2 px-4 py-2 rounded-full border border-[#e5e5e7] bg-white hover:bg-[#f5f5f7] text-[#1d1d1f] text-xs font-medium transition btn-press disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer"
             title={isPastWeek ? 'Tuần này đã kết thúc trong quá khứ' : 'Tự động phân bổ ca làm tối ưu cho nhân viên và lưu bản nháp'}
           >
             <Sparkles className="w-4 h-4 text-[#0066cc]" />
@@ -746,7 +746,7 @@ export const ScheduleManagementPage = () => {
             type="button"
             disabled={saving || autoGenerating || isPastWeek}
             onClick={handleSaveDraft}
-            className="flex items-center gap-2 px-4 py-2 rounded-full border border-[#e5e5e7] text-[#1d1d1f] text-xs font-medium bg-white hover:bg-[#f5f5f7] transition active:scale-[0.98] disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer"
+            className="flex items-center gap-2 px-4 py-2 rounded-full border border-[#e5e5e7] text-[#1d1d1f] text-xs font-medium bg-white hover:bg-[#f5f5f7] transition btn-press disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer"
             title={isPastWeek ? 'Không thể lưu hoặc sửa đổi lịch của tuần đã qua' : 'Lưu bản nháp'}
           >
             <Save className="w-4 h-4 text-[#6e6e73]" />
@@ -771,7 +771,7 @@ export const ScheduleManagementPage = () => {
               }
               setPublishModalOpen(true);
             }}
-            className="flex items-center gap-2 px-5 py-2 rounded-full bg-[#0066cc] hover:bg-[#0071e3] text-white text-xs font-medium transition active:scale-[0.98] shadow-xs disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer"
+            className="flex items-center gap-2 px-5 py-2 rounded-full bg-[#0066cc] hover:bg-[#0071e3] text-white text-xs font-medium transition btn-press shadow-xs disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer"
             title={isPastWeek ? 'Tuần này đã kết thúc trong quá khứ' : 'Xuất bản lịch & gửi email'}
           >
             <Send className="w-3.5 h-3.5" />

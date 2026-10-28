@@ -1,7 +1,8 @@
 import React from 'react';
-import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
+import { View, Text, StyleSheet } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import colors from '../../theme/colors';
+import ApplePressable from '../ApplePressable';
 
 export const NextShiftCard = ({ nextShift, onOpenDetail }) => {
   if (!nextShift) return null;
@@ -31,13 +32,13 @@ export const NextShiftCard = ({ nextShift, onOpenDetail }) => {
           </View>
         </View>
 
-        <TouchableOpacity
+        <ApplePressable
           style={styles.detailButton}
           onPress={() => onOpenDetail(nextShift)}
-          activeOpacity={0.8}
+          activeScale={0.92}
         >
           <Text style={styles.detailButtonText}>Chi tiết</Text>
-        </TouchableOpacity>
+        </ApplePressable>
       </View>
     </View>
   );

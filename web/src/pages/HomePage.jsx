@@ -54,12 +54,24 @@ export const HomePage = () => {
       <HomeNavbar scrollToSection={scrollToSection} />
       <HomeHeroSection scrollToSection={scrollToSection} />
       <HomeMetricsSection />
-      <HomeSolutionsSection />
-      <HomeFeaturesSection />
-      <HomeStepsSection />
-      <HomeTestimonialsSection />
-      <HomeFaqSection />
-      <HomeDownloadSection />
+      <div className="content-visibility-auto">
+        <HomeSolutionsSection />
+      </div>
+      <div className="content-visibility-auto">
+        <HomeFeaturesSection />
+      </div>
+      <div className="content-visibility-auto">
+        <HomeStepsSection />
+      </div>
+      <div className="content-visibility-auto">
+        <HomeTestimonialsSection />
+      </div>
+      <div className="content-visibility-auto">
+        <HomeFaqSection />
+      </div>
+      <div className="content-visibility-auto">
+        <HomeDownloadSection />
+      </div>
       <HomeFooter scrollToSection={scrollToSection} />
     </div>
   );

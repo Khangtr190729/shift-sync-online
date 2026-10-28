@@ -1,6 +1,7 @@
 import React from 'react';
-import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
+import { View, Text, StyleSheet } from 'react-native';
 import colors from '../../theme/colors';
+import ApplePressable from '../ApplePressable';
 
 export const DayPickerStrip = ({
   daysOfWeek = [],
@@ -15,14 +16,15 @@ export const DayPickerStrip = ({
         const hasShift = shiftDatesSet.has(day.dateStr);
 
         return (
-          <TouchableOpacity
+          <ApplePressable
             key={day.dateStr}
             style={[
               styles.dayColumn,
               isSelected && styles.dayColumnSelected,
             ]}
             onPress={() => onSelectDate(day.dateStr)}
-            activeOpacity={0.7}
+            activeScale={0.9}
+            contentStyle={styles.dayInner}
           >
             <Text
               style={[
@@ -50,7 +52,7 @@ export const DayPickerStrip = ({
                 isSelected && hasShift && styles.shiftDotSelected,
               ]}
             />
-          </TouchableOpacity>
+          </ApplePressable>
         );
       })}
     </View>
@@ -75,9 +77,11 @@ const styles = StyleSheet.create({
   },
   dayColumn: {
     flex: 1,
+    borderRadius: 14,
+  },
+  dayInner: {
     alignItems: 'center',
     paddingVertical: 10,
-    borderRadius: 14,
   },
   dayColumnSelected: {
     backgroundColor: colors.primary,
