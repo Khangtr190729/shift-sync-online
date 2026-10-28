@@ -88,7 +88,8 @@ Máy chủ REST API xử lý nghiệp vụ, xác thực và lưu trữ dữ li�
 | **Zod** | Schema kiểm tra tính hợp lệ của dữ liệu đầu vào | `npm install zod` |
 | **express-rate-limit** | Giới hạn tần suất request nhiều tầng chống Brute-force & DoS | `npm install express-rate-limit` |
 | **Nodemailer** | Gửi email tự động (lịch làm việc, mã mời vào quán) | `npm install nodemailer` |
-| **Dotenv & Cors** | Đọc biến môi trường và cấu hình CORS | `npm install dotenv cors` |
+| **Dotenv & Cors** | Đọc biến môi trường và cấu hình CORS Whitelist credentials | `npm install dotenv cors` |
+| **cookie-parser** | Trích xuất và giải mã HttpOnly Cookies bảo mật (AT & RT) | `npm install cookie-parser` |
 | **Nodemon** | Tự động tải lại máy chủ khi sửa code | `npm install -D nodemon` |
 
 ### 3.2. Lệnh Cài Đặt Tổng Hợp Cho Backend
@@ -96,7 +97,7 @@ Máy chủ REST API xử lý nghiệp vụ, xác thực và lưu trữ dữ li�
 cd backend
 
 # 1. Cài đặt các thư viện ứng dụng (dependencies)
-npm install express mongoose jsonwebtoken bcryptjs zod express-rate-limit nodemailer dotenv cors
+npm install express mongoose jsonwebtoken bcryptjs zod express-rate-limit nodemailer dotenv cors cookie-parser
 
 # 2. Cài đặt công cụ phát triển (devDependencies)
 npm install -D nodemon

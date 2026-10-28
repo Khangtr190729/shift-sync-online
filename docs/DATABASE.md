@@ -35,6 +35,7 @@ Hệ thống sử dụng **MongoDB Atlas** với **5 bảng chính** phục vụ
 | `avatar` | String | Không | Đường dẫn ảnh đại diện cá nhân |
 | `resetPasswordOtp.code` | String | Không | Mã xác thực OTP 6 số dùng để đặt lại mật khẩu |
 | `resetPasswordOtp.expiresAt` | Date | Không | Thời điểm hết hạn của mã OTP (hiệu lực 10 phút) |
+| `refreshTokens` | Array<String> | Không | Danh sách các mã `jti` (JWT ID) của các Refresh Token đang hoạt động, phục vụ cơ chế xoay vòng token (RTR) và phát hiện gian lận (Reuse Detection) |
 | `createdAt` | Date | Có | Ngày tạo tài khoản |
 
 ---

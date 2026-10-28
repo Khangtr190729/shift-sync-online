@@ -95,10 +95,12 @@ Hệ thống tuân thủ nguyên tắc phân định trách nhiệm rõ ràng:
 - **Môi trường:** Các ứng dụng Web và Mobile sẽ kết nối tới cùng một Backend endpoint thông qua cấu hình biến môi trường (`VITE_API_URL`, `EXPO_PUBLIC_API_URL`).
 - **Phân vai trò:** Một tài khoản người dùng chỉ thuộc một vai trò chính trong mỗi phiên làm việc (ADMIN, MANAGER, hoặc EMPLOYEE).
 
-### Các quyết định kiến trúc đang chờ phê duyệt
-1. **Chia sẻ Type / Schema giữa các ứng dụng:** Hiện tại chưa tạo package dùng chung (shared library) nhằm giữ cấu trúc tối giản. Khi chuyển sang giai đoạn sau, có cần thư mục shared hoặc package riêng cho các validation schema/constants dùng chung giữa Web/Mobile/Backend không?
-2. **Cấu hình Cross-Origin Resource Sharing (CORS):** Các miền được phép truy cập backend từ web và mobile dev server sẽ được chốt trong cấu hình backend ở Phase tiếp theo.
-3. **Cơ chế tải mới Token (Refresh Token Rotation):** Cần xác nhận có triển khai cơ chế Access Token ngắn hạn kết hợp Refresh Token hay chỉ sử dụng Access Token thông thường cho bản MVP.
+### Các quyết định kiến trúc đã phê duyệt & triển khai (Resolved)
+1. **Cấu hình Cross-Origin Resource Sharing (CORS & Credentials):** Đã hoàn tất Whitelist origin động (`http://localhost:3000`, `http://localhost:5173`, `CLIENT_URL`) kết hợp `credentials: true` ở Backend và `withCredentials: true` ở Frontend Axios để hỗ trợ truyền nhận Cookie an toàn.
+2. **Cơ chế tải mới Token (Refresh Token Rotation - RTR):** Đã triển khai chuẩn bảo mật Dual HttpOnly Cookie: Access Token (15m) + Refresh Token (30d). Kèm cơ chế tự động phát hiện gian lận (Reuse Detection): nếu token cũ bị sử dụng lại, server lập tức thu hồi toàn bộ phiên đăng nhập của người dùng.
+
+### Các quyết định kiến trúc đang chờ phê duyệt (Unresolved)
+1. **Chia sẻ Type / Schema giữa các ứng dụng:** Hiện tại chưa tạo package dùng chung (shared library) nhằm giữ cấu trúc tối giản. Khi chuyển sang giai đoạn sau, có thể cân nhắc package dùng chung cho các validation schema/constants giữa Web/Mobile/Backend.
 
 ---
 

@@ -6,10 +6,18 @@ Tài liệu này tổng hợp toàn bộ các RESTful API hiện có của hệ 
 
 ## 📌 Quy Ước Chung
 - **Định dạng dữ liệu:** JSON (`Content-Type: application/json`).
-- **Xác thực người dùng:** Các API có yêu cầu Token đều gửi kèm Header:
-  ```http
-  Authorization: Bearer <your_jwt_token>
-  ```
+- **Cơ chế xác thực & Quản lý Token đa nền tảng (Dual HttpOnly Cookie + Header Fallback):**
+  * **Trên Web Client:** Hệ thống áp dụng chuẩn bảo mật cấp ngân hàng **Dual HttpOnly Cookie**:
+    * `accessToken` (sống 15 phút, `httpOnly: true`, `sameSite`, `secure`).
+    * `refreshToken` (sống 30 ngày, `httpOnly: true`, `sameSite`, `secure`).
+    * Trình duyệt tự động đính kèm và gửi cả 2 Cookie trong mọi request mà không cần can thiệp qua mã JavaScript (chống XSS 100%).
+    * **CORS & Credentials:** Backend bật `credentials: true` và Whitelist cụ thể các origin (`http://localhost:3000`, `http://localhost:5173`,...). Phía Web Axios bắt buộc cấu hình `withCredentials: true`.
+  * **Trên Mobile App:** Sử dụng Header Authorization truyền thống:
+    ```http
+    Authorization: Bearer <your_access_token>
+    ```
+    Token được lưu an toàn trong chip bảo mật phần cứng qua `Expo SecureStore` (Apple Keychain trên iOS / Android Keystore trên Android).
+  * **Xoay vòng Token tự động (Refresh Token Rotation - RTR):** Khi Access Token 15 phút hết hạn, Axios Interceptor tự động gọi `/api/auth/refresh` bằng Cookie Refresh Token để nhận cặp Cookie mới toanh. Nếu phát hiện Refresh Token cũ bị tái sử dụng (Reuse Detection), server lập tức hủy toàn bộ phiên hoạt động của tài khoản để chống tấn công đánh cắp token.
 - **Kiểm thực dữ liệu đầu vào (Zod Validation):** Tất cả request payload được kiểm thực tập trung qua Zod. Nếu dữ liệu không hợp lệ, server trả về mã `HTTP 400 Bad Request` kèm thông báo tiếng Việt chi tiết và mảng `errors`.
 - **Giới hạn tần suất gọi (Rate Limiting - HTTP 429):**
   * Toàn bộ hệ thống áp dụng `express-rate-limit` chống Brute-force và DoS.
@@ -41,8 +49,10 @@ Tài liệu này tổng hợp toàn bộ các RESTful API hiện có của hệ 
 
 | Method | Endpoint | Yêu cầu Token | Quyền hạn | Chức năng |
 |---|---|:---:|---|---|
-| `POST` | `/api/auth/register` | ❌ | Công khai *(10 req/15p)* | Đăng ký tài khoản (Chỉ chọn `ADMIN` hoặc `EMPLOYEE`, bắt buộc: email, password, fullName, gender, age) |
-| `POST` | `/api/auth/login` | ❌ | Công khai *(10 req/15p)* | Đăng nhập tài khoản, trả về JWT Token |
+| `POST` | `/api/auth/register` | ❌ | Công khai *(10 req/15p)* | Đăng ký tài khoản (Bắt buộc: email, password, fullName, gender, age). Trả về dữ liệu và tự động gán cặp Cookie HttpOnly (AT 15m & RT 30d) |
+| `POST` | `/api/auth/login` | ❌ | Công khai *(10 req/15p)* | Đăng nhập tài khoản, tự động gán 2 Cookie HttpOnly cho Web và trả về Token trong body cho Mobile |
+| `POST` | `/api/auth/refresh` | 🍪 / Body | Công khai *(Xác thực qua RT)* | **Làm mới phiên làm việc (RTR):** Đổi Refresh Token cũ lấy cặp AT & RT mới toanh. Tự động thu hồi toàn bộ phiên nếu phát hiện mã RT cũ bị dùng lại (Reuse Detection) |
+| `POST` | `/api/auth/logout` | ❌ | Công khai | **Đăng xuất an toàn:** Thu hồi phiên làm việc trong database và xóa sạch cả 2 Cookie HttpOnly trên trình duyệt |
 | `POST` | `/api/auth/forgot-password` | ❌ | Công khai *(3 req/15p)* | **Yêu cầu gửi mã OTP 6 số qua Email** để đặt lại mật khẩu |
 | `POST` | `/api/auth/verify-reset-otp` | ❌ | Công khai *(5 req/15p)* | **Xác thực mã OTP 6 số** (kiểm tra khớp mã và còn trong 10 phút) |
 | `POST` | `/api/auth/reset-password` | ❌ | Công khai *(5 req/15p)* | **Đổi mật khẩu mới bằng mã OTP 6 số** |
