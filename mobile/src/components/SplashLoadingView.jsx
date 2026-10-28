@@ -101,7 +101,7 @@ export const SplashLoadingView = ({
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#FFF9F5',
+    backgroundColor: colors.background,
     alignItems: 'center',
     justifyContent: 'space-between',
     paddingVertical: 50,
@@ -113,7 +113,7 @@ const styles = StyleSheet.create({
     width: 260,
     height: 260,
     borderRadius: 130,
-    backgroundColor: 'rgba(234, 112, 27, 0.08)',
+    backgroundColor: 'rgba(0, 102, 204, 0.05)',
   },
   bgCircleBottom: {
     position: 'absolute',
@@ -122,7 +122,7 @@ const styles = StyleSheet.create({
     width: 280,
     height: 280,
     borderRadius: 140,
-    backgroundColor: 'rgba(43, 178, 172, 0.08)',
+    backgroundColor: 'rgba(0, 102, 204, 0.03)',
   },
   centerContent: {
     alignItems: 'center',
@@ -136,14 +136,14 @@ const styles = StyleSheet.create({
     backgroundColor: '#FFFFFF',
     alignItems: 'center',
     justifyContent: 'center',
-    shadowColor: colors.primary,
-    shadowOffset: { width: 0, height: 10 },
-    shadowOpacity: 0.18,
-    shadowRadius: 20,
-    elevation: 8,
+    shadowColor: '#000000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.06,
+    shadowRadius: 16,
+    elevation: 3,
     marginBottom: 26,
-    borderWidth: 1.5,
-    borderColor: '#FED7AA',
+    borderWidth: 1,
+    borderColor: colors.cardBorder,
   },
   logoImage: {
     width: 105,

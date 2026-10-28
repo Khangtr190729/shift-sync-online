@@ -508,8 +508,8 @@ const styles = StyleSheet.create({
     borderColor: '#E2E8F0',
   },
   methodBtnActive: {
-    backgroundColor: '#FFF7ED',
-    borderColor: '#FDBA74',
+    backgroundColor: colors.primaryLight,
+    borderColor: colors.primary,
   },
   methodText: {
     fontSize: 11,
@@ -595,9 +595,9 @@ const styles = StyleSheet.create({
     textAlignVertical: 'top',
   },
   previewCard: {
-    backgroundColor: '#FFF7ED',
+    backgroundColor: colors.primaryLight,
     borderWidth: 1,
-    borderColor: '#FED7AA',
+    borderColor: '#BFDBFE',
     borderRadius: 14,
     padding: 14,
     marginBottom: 16,

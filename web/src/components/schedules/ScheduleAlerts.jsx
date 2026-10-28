@@ -43,14 +43,14 @@ export const ScheduleAlerts = ({
 
       {/* Draft Schedule Notice Banner */}
       {scheduleStatus === 'DRAFT' && hasAssignments && (
-        <div className="p-3.5 rounded-xl bg-amber-50/90 border border-amber-200/90 text-amber-900 flex items-center justify-between text-xs font-medium animate-fade-in">
+        <div className="p-3.5 rounded-2xl bg-amber-50/70 border border-amber-200/60 text-amber-900 flex items-center justify-between text-xs font-medium animate-fade-in shadow-2xs">
           <div className="flex items-center gap-2.5">
-            <Sparkles className="w-4 h-4 text-amber-600 shrink-0" />
+            <Sparkles className="w-4 h-4 text-[#ff9500] shrink-0" />
             <span>
               Lịch hiện tại đang ở trạng thái <strong>Bản nháp</strong>. Bạn có thể bấm vào từng ca để xem, thêm/bớt nhân viên, sau đó bấm <strong>"Xác nhận & gửi email"</strong> khi đã sẵn sàng công bố cho nhân viên.
             </span>
           </div>
-          <span className="px-2.5 py-1 bg-amber-200/70 text-amber-800 text-[11px] font-bold rounded-lg shrink-0 hidden sm:inline-block">
+          <span className="px-2.5 py-1 bg-white text-amber-800 text-[11px] font-medium rounded-full shrink-0 hidden sm:inline-block border border-amber-200/80 shadow-2xs">
             Bản nháp chờ quản lý duyệt
           </span>
         </div>

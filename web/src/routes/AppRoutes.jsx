@@ -19,7 +19,7 @@ const ManagementRoute = ({ children, adminOnly = false }) => {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-[#FFF7F0] flex items-center justify-center text-sm font-semibold text-slate-500">
+      <div className="min-h-screen bg-[#f5f5f7] flex items-center justify-center text-xs font-medium text-[#86868b]">
         Đang tải dữ liệu Ca Làm Online...
       </div>
     );
@@ -55,7 +55,7 @@ const PersonalScheduleRoute = ({ children }) => {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-[#FFF7F0] flex items-center justify-center text-sm font-semibold text-slate-500">
+      <div className="min-h-screen bg-[#f5f5f7] flex items-center justify-center text-xs font-medium text-[#86868b]">
         Đang tải dữ liệu Ca Làm Online...
       </div>
     );
@@ -82,10 +82,10 @@ export const AppRoutes = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-[#FFF7F0] flex items-center justify-center">
+      <div className="min-h-screen bg-[#f5f5f7] flex items-center justify-center">
         <div className="flex flex-col items-center gap-3">
-          <div className="w-10 h-10 border-3 border-[#EA701B] border-t-transparent rounded-full animate-spin" />
-          <p className="text-xs font-bold text-slate-600">Đang khởi động Ca Làm Online...</p>
+          <div className="w-8 h-8 border-2 border-[#0066cc] border-t-transparent rounded-full animate-spin" />
+          <p className="text-xs font-medium text-[#86868b]">Đang khởi động Ca Làm Online...</p>
         </div>
       </div>
     );
@@ -128,7 +128,7 @@ export const AppRoutes = () => {
         path="/my-schedule"
         element={
           <PersonalScheduleRoute>
-            <div className="min-h-screen flex flex-col bg-[#FFF7F0]">
+            <div className="min-h-screen flex flex-col bg-[#f5f5f7]">
               <MySchedulePage />
             </div>
           </PersonalScheduleRoute>

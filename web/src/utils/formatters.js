@@ -119,12 +119,12 @@ export const formatWeekRange = (mondayStr) => {
 export const getRoleLabel = (role) => {
   switch (role) {
     case 'ADMIN':
-      return { text: 'Chủ cửa hàng', color: 'bg-orange-100 text-[#EA701B] border-orange-200' };
+      return { text: 'Chủ cửa hàng', color: 'bg-blue-50 text-[#0066cc] border-blue-200/70' };
     case 'MANAGER':
-      return { text: 'Quản lý', color: 'bg-blue-100 text-blue-700 border-blue-200' };
+      return { text: 'Quản lý', color: 'bg-indigo-50 text-indigo-700 border-indigo-200/70' };
     case 'EMPLOYEE':
     default:
-      return { text: 'Nhân viên', color: 'bg-emerald-100 text-emerald-700 border-emerald-200' };
+      return { text: 'Nhân viên', color: 'bg-emerald-50 text-emerald-700 border-emerald-200/70' };
   }
 };
 

@@ -419,11 +419,11 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   roleCardActive: {
-    backgroundColor: '#FFF7ED',
+    backgroundColor: colors.primaryLight,
     borderColor: colors.primary,
     shadowColor: colors.primary,
     shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
+    shadowOpacity: 0.08,
     shadowRadius: 4,
     elevation: 2,
   },

@@ -44,7 +44,7 @@ export const RootNavigator = () => {
 const styles = StyleSheet.create({
   splashContainer: {
     flex: 1,
-    backgroundColor: '#EA701B',
+    backgroundColor: '#0066CC',
     alignItems: 'center',
     justifyContent: 'center',
   },

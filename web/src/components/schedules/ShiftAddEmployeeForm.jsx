@@ -21,11 +21,11 @@ export const ShiftAddEmployeeForm = ({
 }) => {
   if (isShiftPassed) {
     return (
-      <div className="p-4 bg-amber-50/90 border border-amber-200/90 rounded-xl text-xs text-amber-900 flex items-start gap-2.5 shadow-xs">
-        <Lock className="w-4 h-4 text-amber-600 shrink-0 mt-0.5" />
+      <div className="p-4 bg-[#fafafc] border border-[#e5e5e7] rounded-xl text-xs text-[#1d1d1f] flex items-start gap-2.5 shadow-xs">
+        <Lock className="w-4 h-4 text-[#86868b] shrink-0 mt-0.5" />
         <div>
-          <p className="font-bold text-amber-950">Ca làm việc đã kết thúc — Không thể thêm mới nhân viên</p>
-          <p className="mt-0.5 text-amber-800 leading-relaxed">
+          <p className="font-semibold text-[#1d1d1f]">Ca làm việc đã kết thúc — Không thể thêm mới nhân viên</p>
+          <p className="mt-0.5 text-[#6e6e73] leading-relaxed">
             Ca làm <strong>{targetShift?.name} ({targetShift?.startTime} — {targetShift?.endTime}, {assignModal.date})</strong> đã qua. Hệ thống khóa chỉnh sửa để bảo toàn giờ làm và tiền lương của nhân viên.
           </p>
         </div>
@@ -42,8 +42,8 @@ export const ShiftAddEmployeeForm = ({
     : false;
 
   return (
-    <div className="pt-3 border-t border-slate-100 space-y-2">
-      <label className="block text-xs font-bold text-slate-700">
+    <div className="pt-3 border-t border-[#e5e5e7] space-y-2">
+      <label className="block text-xs font-medium text-[#1d1d1f]">
         Thêm nhân viên vào ca này
       </label>
 
@@ -53,7 +53,7 @@ export const ShiftAddEmployeeForm = ({
           onChange={(e) =>
             setAssignModal((prev) => ({ ...prev, selectedUserId: e.target.value }))
           }
-          className="flex-1 min-w-0 w-full p-2.5 rounded-xl border border-slate-200 text-xs font-semibold text-slate-800 bg-white focus:outline-none focus:ring-2 focus:ring-[#EA701B] truncate"
+          className="flex-1 min-w-0 w-full p-2.5 rounded-xl border border-[#d2d2d7] text-xs font-normal text-[#1d1d1f] bg-white focus:outline-none focus:border-[#0066cc] focus:ring-2 focus:ring-[#0066cc]/20 transition truncate"
         >
           <option value="">-- Chọn nhân viên để thêm --</option>
           {members.map((m) => {
@@ -91,7 +91,7 @@ export const ShiftAddEmployeeForm = ({
           type="button"
           disabled={!assignModal.selectedUserId || !!selectedConflict || isSelectedAlready}
           onClick={onAddEmployee}
-          className="px-4 py-2.5 bg-[#EA701B] hover:bg-[#D55E0D] text-white text-xs font-bold rounded-xl shadow-xs disabled:opacity-40 disabled:cursor-not-allowed flex items-center justify-center gap-1.5 shrink-0 whitespace-nowrap transition"
+          className="px-5 py-2.5 bg-[#0066cc] hover:bg-[#0071e3] text-white text-xs font-medium rounded-full shadow-xs active:scale-[0.98] disabled:opacity-40 disabled:cursor-not-allowed flex items-center justify-center gap-1.5 shrink-0 whitespace-nowrap transition cursor-pointer"
         >
           <Plus className="w-4 h-4" />
           <span>Thêm vào ca</span>

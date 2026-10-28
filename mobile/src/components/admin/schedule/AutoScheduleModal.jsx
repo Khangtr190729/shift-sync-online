@@ -219,7 +219,7 @@ const styles = StyleSheet.create({
     width: 52,
     height: 52,
     borderRadius: 18,
-    backgroundColor: '#FFF7ED',
+    backgroundColor: colors.primaryLight,
     alignItems: 'center',
     justifyContent: 'center',
     marginBottom: 10,
@@ -277,7 +277,7 @@ const styles = StyleSheet.create({
   },
   optionCardSelected: {
     borderColor: colors.primary,
-    backgroundColor: '#FFF7ED',
+    backgroundColor: colors.primaryLight,
   },
   optionContent: {
     flex: 1,

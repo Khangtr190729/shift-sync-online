@@ -73,7 +73,7 @@ export const ShiftAssignedEmployeeItem = ({
                     ? 'bg-red-500'
                     : isShiftPassed
                       ? 'bg-slate-500'
-                      : 'bg-[#EA701B]'
+                      : 'bg-[#0066cc]'
               }`}
           >
             {name.charAt(0).toUpperCase()}

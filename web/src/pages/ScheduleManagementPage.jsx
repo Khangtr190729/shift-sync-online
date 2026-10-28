@@ -678,14 +678,14 @@ export const ScheduleManagementPage = () => {
   return (
     <div className="space-y-6">
       {/* Top Bar: Navigation & Action Buttons */}
-      <div className="bg-white p-5 rounded-2xl border border-slate-200/80 shadow-sm flex flex-col xl:flex-row xl:items-center justify-between gap-4">
+      <div className="bg-white p-4 lg:p-5 rounded-2xl border border-[#e5e5e7] shadow-xs flex flex-col xl:flex-row xl:items-center justify-between gap-4">
         {/* Left: Week Navigation Controls */}
-        <div className="flex flex-wrap items-center gap-3">
-          <div className="flex items-center bg-slate-50 border border-slate-200/80 rounded-xl p-1 shadow-2xs">
+        <div className="flex flex-wrap items-center gap-2.5">
+          <div className="flex items-center bg-[#f5f5f7] border border-[#e5e5e7] rounded-full p-1 shadow-2xs">
             <button
               type="button"
               onClick={handlePrevWeek}
-              className="p-1.5 hover:bg-white hover:text-[#EA701B] rounded-lg transition text-slate-600 shadow-xs cursor-pointer"
+              className="p-1.5 hover:bg-white hover:text-[#0066cc] rounded-full transition text-[#6e6e73] cursor-pointer"
               title="Tuần trước"
             >
               <ChevronLeft className="w-4 h-4" />
@@ -693,10 +693,10 @@ export const ScheduleManagementPage = () => {
             <button
               type="button"
               onClick={handleCurrentWeek}
-              className={`px-3 py-1 text-xs font-bold rounded-lg transition cursor-pointer ${
+              className={`px-3 py-1 text-xs font-medium rounded-full transition cursor-pointer ${
                 isCurrentWeek
-                  ? 'bg-[#EA701B] text-white shadow-xs'
-                  : 'text-slate-600 hover:bg-white hover:text-[#EA701B]'
+                  ? 'bg-white text-[#1d1d1f] shadow-xs'
+                  : 'text-[#6e6e73] hover:bg-white/80 hover:text-[#1d1d1f]'
               }`}
             >
               Tuần này
@@ -704,25 +704,25 @@ export const ScheduleManagementPage = () => {
             <button
               type="button"
               onClick={handleNextWeek}
-              className="p-1.5 hover:bg-white hover:text-[#EA701B] rounded-lg transition text-slate-600 shadow-xs cursor-pointer"
+              className="p-1.5 hover:bg-white hover:text-[#0066cc] rounded-full transition text-[#6e6e73] cursor-pointer"
               title="Tuần sau"
             >
               <ChevronRight className="w-4 h-4" />
             </button>
           </div>
 
-          <div className="flex items-center gap-2 px-3 py-1.5 bg-orange-50/60 border border-orange-100 rounded-xl text-xs font-semibold text-slate-800">
-            <Calendar className="w-4 h-4 text-[#EA701B]" />
+          <div className="flex items-center gap-2 px-3 py-1.5 bg-[#f5f5f7] border border-[#e5e5e7] rounded-full text-xs font-medium text-[#1d1d1f]">
+            <Calendar className="w-3.5 h-3.5 text-[#0066cc]" />
             <span>
               {formatWeekRange(currentMonday)} (Tuần {week}/{year})
             </span>
           </div>
 
           <span
-            className={`px-3 py-1 rounded-full text-xs font-bold border transition ${
+            className={`px-3 py-1 rounded-full text-xs font-medium border transition ${
               scheduleStatus === 'PUBLISHED'
-                ? 'bg-emerald-50 text-emerald-700 border-emerald-200'
-                : 'bg-amber-50 text-amber-700 border-amber-200'
+                ? 'bg-emerald-50 text-emerald-700 border-emerald-200/60'
+                : 'bg-amber-50 text-amber-700 border-amber-200/60'
             }`}
           >
             {scheduleStatus === 'PUBLISHED' ? 'Đã xuất bản' : 'Bản nháp (DRAFT)'}
@@ -730,15 +730,15 @@ export const ScheduleManagementPage = () => {
         </div>
 
         {/* Right: Actions */}
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-2.5">
           <button
             type="button"
             disabled={saving || autoGenerating || isPastWeek}
             onClick={() => setAutoScheduleModalOpen(true)}
-            className="flex items-center gap-2 px-4 py-2.5 rounded-xl border border-amber-300 bg-linear-to-r from-amber-50 to-orange-50 hover:from-amber-100 hover:to-orange-100 text-amber-900 text-sm font-bold transition shadow-xs disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer"
+            className="flex items-center gap-2 px-4 py-2 rounded-full border border-[#e5e5e7] bg-white hover:bg-[#f5f5f7] text-[#1d1d1f] text-xs font-medium transition active:scale-[0.98] disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer"
             title={isPastWeek ? 'Tuần này đã kết thúc trong quá khứ' : 'Tự động phân bổ ca làm tối ưu cho nhân viên và lưu bản nháp'}
           >
-            <Sparkles className="w-4 h-4 text-amber-600 animate-pulse" />
+            <Sparkles className="w-4 h-4 text-[#0066cc]" />
             <span>Tự động xếp lịch</span>
           </button>
 
@@ -746,10 +746,10 @@ export const ScheduleManagementPage = () => {
             type="button"
             disabled={saving || autoGenerating || isPastWeek}
             onClick={handleSaveDraft}
-            className="flex items-center gap-2 px-4 py-2.5 rounded-xl border border-slate-200 text-slate-700 text-sm font-bold bg-white hover:bg-slate-50 transition shadow-xs disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer"
+            className="flex items-center gap-2 px-4 py-2 rounded-full border border-[#e5e5e7] text-[#1d1d1f] text-xs font-medium bg-white hover:bg-[#f5f5f7] transition active:scale-[0.98] disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer"
             title={isPastWeek ? 'Không thể lưu hoặc sửa đổi lịch của tuần đã qua' : 'Lưu bản nháp'}
           >
-            <Save className="w-4 h-4 text-slate-500" />
+            <Save className="w-4 h-4 text-[#6e6e73]" />
             <span>{saving ? 'Đang lưu...' : 'Lưu bản nháp'}</span>
           </button>
 
@@ -771,10 +771,10 @@ export const ScheduleManagementPage = () => {
               }
               setPublishModalOpen(true);
             }}
-            className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-[#EA701B] hover:bg-[#D55E0D] text-white text-sm font-bold transition shadow-md shadow-orange-500/20 disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer"
+            className="flex items-center gap-2 px-5 py-2 rounded-full bg-[#0066cc] hover:bg-[#0071e3] text-white text-xs font-medium transition active:scale-[0.98] shadow-xs disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer"
             title={isPastWeek ? 'Tuần này đã kết thúc trong quá khứ' : 'Xuất bản lịch & gửi email'}
           >
-            <Send className="w-4 h-4" />
+            <Send className="w-3.5 h-3.5" />
             <span>Xác nhận & gửi email</span>
           </button>
         </div>

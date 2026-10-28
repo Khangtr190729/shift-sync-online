@@ -103,33 +103,33 @@ export const AssignEmployeeModal = ({
     <div className="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4 animate-backdrop-fade overflow-y-auto">
       <div className="bg-white rounded-2xl w-full max-w-xl shadow-2xl border border-slate-100 overflow-hidden my-auto max-h-[92vh] flex flex-col animate-modal-pop">
         {/* Modal Header */}
-        <div className="px-6 py-4 bg-[#FFF0E5] border-b border-orange-100 flex items-center justify-between">
+        <div className="px-6 py-4 bg-white border-b border-[#e5e5e7] flex items-center justify-between">
           <div className="flex items-center gap-2.5 min-w-0">
-            <div className="w-8 h-8 rounded-xl bg-orange-100 text-[#EA701B] flex items-center justify-center shrink-0">
+            <div className="w-8 h-8 rounded-full bg-blue-50 text-[#0066cc] flex items-center justify-center shrink-0">
               <Clock className="w-4 h-4" />
             </div>
             <div className="min-w-0">
               <div className="flex items-center gap-2 flex-wrap">
-                <h3 className="font-bold text-slate-900 text-sm truncate">
+                <h3 className="font-semibold text-[#1d1d1f] text-sm truncate">
                   Phân công ca: {targetShift?.name || 'Ca làm việc'}
                 </h3>
                 {isShiftPassed ? (
-                  <span className="px-2 py-0.5 rounded-md bg-slate-200 text-slate-700 text-[10px] font-bold shrink-0 flex items-center gap-1">
-                    <Lock className="w-3 h-3 text-slate-500" />
+                  <span className="px-2 py-0.5 rounded-full bg-[#f5f5f7] text-[#6e6e73] border border-[#e5e5e7] text-[10px] font-medium shrink-0 flex items-center gap-1">
+                    <Lock className="w-3 h-3 text-[#86868b]" />
                     Đã kết thúc
                   </span>
                 ) : isShiftStarted ? (
-                  <span className="px-2 py-0.5 rounded-md bg-amber-100 text-amber-800 text-[10px] font-bold shrink-0 flex items-center gap-1">
+                  <span className="px-2 py-0.5 rounded-full bg-amber-50 text-amber-800 border border-amber-200/60 text-[10px] font-medium shrink-0 flex items-center gap-1">
                     <Clock className="w-3 h-3 text-amber-600 animate-pulse" />
                     Đang diễn ra
                   </span>
                 ) : (
-                  <span className="px-2 py-0.5 rounded-md bg-blue-50 text-blue-700 text-[10px] font-bold shrink-0">
+                  <span className="px-2 py-0.5 rounded-full bg-blue-50 text-[#0066cc] border border-blue-200/60 text-[10px] font-medium shrink-0">
                     Sắp diễn ra
                   </span>
                 )}
               </div>
-              <p className="text-[11px] text-slate-500 font-medium truncate">
+              <p className="text-[11px] text-[#6e6e73] font-normal truncate">
                 {targetShift?.startTime} — {targetShift?.endTime} •{' '}
                 {daysOfWeek.find((d) => d.dateStr === assignModal.date)?.fullDisplay || assignModal.date}
               </p>
@@ -138,7 +138,7 @@ export const AssignEmployeeModal = ({
           <button
             type="button"
             onClick={closeModal}
-            className="p-1 text-slate-400 hover:text-slate-600 rounded-lg shrink-0 ml-2"
+            className="p-1 text-[#86868b] hover:text-[#1d1d1f] hover:bg-[#f5f5f7] rounded-full shrink-0 ml-2 transition"
           >
             <X className="w-5 h-5" />
           </button>
@@ -149,15 +149,15 @@ export const AssignEmployeeModal = ({
           {/* PHẦN 1: Danh sách nhân viên trong ca */}
           <div>
             <div className="flex items-center justify-between mb-2">
-              <label className="text-xs font-bold text-slate-700 flex items-center gap-1.5">
-                <Users className="w-4 h-4 text-[#EA701B]" />
+              <label className="text-xs font-medium text-[#1d1d1f] flex items-center gap-1.5">
+                <Users className="w-4 h-4 text-[#0066cc]" />
                 <span>Nhân viên trong ca này ({currentCellAssignments.length} người)</span>
               </label>
               {currentCellAssignments.length > 0 && !isShiftPassed && (
                 <button
                   type="button"
                   onClick={() => onClearShiftAssignments(assignModal.date, assignModal.shiftId)}
-                  className="text-[11px] text-red-600 hover:underline font-semibold"
+                  className="text-[11px] text-rose-600 hover:underline font-medium cursor-pointer"
                 >
                   Xóa tất cả
                 </button>
@@ -165,7 +165,7 @@ export const AssignEmployeeModal = ({
             </div>
 
             {currentCellAssignments.length === 0 ? (
-              <div className="p-4 rounded-xl border border-dashed border-slate-200 text-center text-xs text-slate-400 bg-slate-50/50">
+              <div className="p-4 rounded-xl border border-dashed border-[#e5e5e7] text-center text-xs text-[#86868b] bg-[#fafafc]">
                 {isShiftPassed
                   ? 'Không có nhân viên nào được xếp trong ca này.'
                   : 'Chưa có nhân viên nào trong ca này. Hãy chọn nhân viên bên dưới để thêm vào ca.'}
@@ -218,11 +218,11 @@ export const AssignEmployeeModal = ({
           />
 
           {/* Modal Footer */}
-          <div className="pt-2 flex items-center justify-end gap-3 border-t border-slate-100">
+          <div className="pt-2 flex items-center justify-end gap-3 border-t border-[#e5e5e7]">
             <button
               type="button"
               onClick={closeModal}
-              className="px-5 py-2 text-xs font-bold text-white bg-[#EA701B] hover:bg-[#D55E0D] rounded-xl shadow-xs"
+              className="px-5 py-2 text-xs font-medium text-white bg-[#0066cc] hover:bg-[#0071e3] rounded-full shadow-xs active:scale-[0.98] transition cursor-pointer"
             >
               Xong & Đóng
             </button>

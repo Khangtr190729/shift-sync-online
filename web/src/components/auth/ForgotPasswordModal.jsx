@@ -247,24 +247,24 @@ export const ForgotPasswordModal = ({
 
         {/* Header Icon & Title */}
         <div className="text-center mb-6">
-          <div className="w-14 h-14 rounded-2xl bg-gradient-to-tr from-[#EA701B] to-amber-500 flex items-center justify-center text-white shadow-lg shadow-orange-500/25 mx-auto mb-3">
+          <div className="w-12 h-12 rounded-2xl bg-blue-50 text-[#0066cc] flex items-center justify-center mx-auto mb-3">
             {step === 4 ? (
-              <CheckCircle2 className="w-8 h-8 text-white animate-bounce-short" />
+              <CheckCircle2 className="w-6 h-6 text-[#0066cc]" />
             ) : step === 3 ? (
-              <ShieldCheck className="w-7 h-7 text-white" />
+              <ShieldCheck className="w-6 h-6 text-[#0066cc]" />
             ) : step === 2 ? (
-              <KeyRound className="w-7 h-7 text-white" />
+              <KeyRound className="w-6 h-6 text-[#0066cc]" />
             ) : (
-              <Mail className="w-7 h-7 text-white" />
+              <Mail className="w-6 h-6 text-[#0066cc]" />
             )}
           </div>
-          <h3 className="text-xl font-extrabold text-slate-900">
+          <h3 className="text-lg font-semibold text-[#1d1d1f] tracking-tight">
             {step === 1 && 'Quên mật khẩu?'}
             {step === 2 && 'Xác thực mã OTP'}
             {step === 3 && 'Tạo mật khẩu mới'}
             {step === 4 && 'Đổi mật khẩu thành công!'}
           </h3>
-          <p className="text-xs text-slate-500 mt-1 max-w-xs mx-auto">
+          <p className="text-xs text-[#6e6e73] mt-1 max-w-xs mx-auto">
             {step === 1 && 'Nhập email đã đăng ký tài khoản của bạn để nhận mã OTP 6 số xác thực.'}
             {step === 2 && `Mã xác thực gồm 6 chữ số đã được gửi đến hộp thư ${email}.`}
             {step === 3 && 'Nhập mật khẩu mới an toàn có độ dài tối thiểu từ 6 ký tự.'}
@@ -277,42 +277,42 @@ export const ForgotPasswordModal = ({
           <div className="flex items-center justify-between mb-6 px-4">
             <div className="flex items-center gap-1.5">
               <span
-                className={`w-6 h-6 rounded-full text-xs font-bold flex items-center justify-center transition-all ${step >= 1
-                    ? 'bg-[#EA701B] text-white shadow-sm'
-                    : 'bg-slate-100 text-slate-400'
+                className={`w-6 h-6 rounded-full text-xs font-semibold flex items-center justify-center transition-all ${step >= 1
+                    ? 'bg-[#0066cc] text-white shadow-xs'
+                    : 'bg-[#f5f5f7] text-[#86868b]'
                   }`}
               >
                 1
               </span>
-              <span className={`text-[11px] font-semibold ${step >= 1 ? 'text-slate-800' : 'text-slate-400'}`}>
+              <span className={`text-[11px] font-medium ${step >= 1 ? 'text-[#1d1d1f]' : 'text-[#86868b]'}`}>
                 Email
               </span>
             </div>
-            <div className={`flex-1 h-0.5 mx-2 rounded ${step >= 2 ? 'bg-[#EA701B]' : 'bg-slate-200'}`} />
+            <div className={`flex-1 h-0.5 mx-2 rounded-full ${step >= 2 ? 'bg-[#0066cc]' : 'bg-[#e5e5e7]'}`} />
             <div className="flex items-center gap-1.5">
               <span
-                className={`w-6 h-6 rounded-full text-xs font-bold flex items-center justify-center transition-all ${step >= 2
-                    ? 'bg-[#EA701B] text-white shadow-sm'
-                    : 'bg-slate-100 text-slate-400'
+                className={`w-6 h-6 rounded-full text-xs font-semibold flex items-center justify-center transition-all ${step >= 2
+                    ? 'bg-[#0066cc] text-white shadow-xs'
+                    : 'bg-[#f5f5f7] text-[#86868b]'
                   }`}
               >
                 2
               </span>
-              <span className={`text-[11px] font-semibold ${step >= 2 ? 'text-slate-800' : 'text-slate-400'}`}>
+              <span className={`text-[11px] font-medium ${step >= 2 ? 'text-[#1d1d1f]' : 'text-[#86868b]'}`}>
                 Mã OTP
               </span>
             </div>
-            <div className={`flex-1 h-0.5 mx-2 rounded ${step >= 3 ? 'bg-[#EA701B]' : 'bg-slate-200'}`} />
+            <div className={`flex-1 h-0.5 mx-2 rounded-full ${step >= 3 ? 'bg-[#0066cc]' : 'bg-[#e5e5e7]'}`} />
             <div className="flex items-center gap-1.5">
               <span
-                className={`w-6 h-6 rounded-full text-xs font-bold flex items-center justify-center transition-all ${step >= 3
-                    ? 'bg-[#EA701B] text-white shadow-sm'
-                    : 'bg-slate-100 text-slate-400'
+                className={`w-6 h-6 rounded-full text-xs font-semibold flex items-center justify-center transition-all ${step >= 3
+                    ? 'bg-[#0066cc] text-white shadow-xs'
+                    : 'bg-[#f5f5f7] text-[#86868b]'
                   }`}
               >
                 3
               </span>
-              <span className={`text-[11px] font-semibold ${step >= 3 ? 'text-slate-800' : 'text-slate-400'}`}>
+              <span className={`text-[11px] font-medium ${step >= 3 ? 'text-[#1d1d1f]' : 'text-[#86868b]'}`}>
                 Đổi MK
               </span>
             </div>
@@ -337,10 +337,10 @@ export const ForgotPasswordModal = ({
 
         {/* DEV HINT / QUICK TEST BADGE NẾU GỬI MÔ PHỎNG */}
         {devOtp && step === 2 && (
-          <div className="mb-4 p-3 bg-amber-50 border border-amber-300 rounded-2xl text-xs text-amber-900 flex items-center justify-between">
+          <div className="mb-4 p-3 bg-amber-50 border border-amber-200 rounded-xl text-xs text-amber-900 flex items-center justify-between">
             <div>
-              <span className="font-bold">⚡ Mã OTP thử nghiệm:</span>{' '}
-              <span className="font-mono font-extrabold tracking-widest text-amber-800 bg-amber-100 px-2 py-0.5 rounded-lg ml-1">
+              <span className="font-semibold">⚡ Mã OTP thử nghiệm:</span>{' '}
+              <span className="font-mono font-bold tracking-widest text-amber-800 bg-amber-100 px-2 py-0.5 rounded-lg ml-1">
                 {devOtp}
               </span>
             </div>
@@ -351,7 +351,7 @@ export const ForgotPasswordModal = ({
                 setOtpDigits(chars);
                 otpInputsRef.current[5]?.focus();
               }}
-              className="text-[11px] font-bold text-[#EA701B] hover:underline"
+              className="text-[11px] font-semibold text-[#0066cc] hover:underline"
             >
               Điền nhanh
             </button>
@@ -362,17 +362,17 @@ export const ForgotPasswordModal = ({
         {step === 1 && (
           <form onSubmit={handleSendOtp} className="space-y-4">
             <div>
-              <label className="block text-xs font-bold text-slate-700 mb-1">
-                Địa chỉ Email đã đăng ký <span className="text-red-500">*</span>
+              <label className="block text-xs font-medium text-[#1d1d1f] mb-1">
+                Địa chỉ Email đã đăng ký <span className="text-rose-500">*</span>
               </label>
               <div className="relative">
-                <Mail className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
+                <Mail className="w-4 h-4 text-[#86868b] absolute left-3 top-1/2 -translate-y-1/2" />
                 <input
                   type="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder="name@example.com"
-                  className="w-full pl-9 pr-3 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-900 font-medium focus:outline-none focus:ring-2 focus:ring-[#EA701B] transition"
+                  className="w-full pl-9 pr-3 py-2.5 bg-white border border-[#d2d2d7] rounded-xl text-xs text-[#1d1d1f] font-medium focus:outline-none focus:border-[#0066cc] focus:ring-2 focus:ring-[#0066cc]/20 transition"
                   autoFocus
                   required
                 />
@@ -382,7 +382,7 @@ export const ForgotPasswordModal = ({
             <button
               type="submit"
               disabled={loading}
-              className="w-full py-3 px-4 bg-[#EA701B] hover:bg-[#D55E0D] text-white text-xs font-bold rounded-2xl shadow-md shadow-orange-500/20 hover-lift btn-press transition flex items-center justify-center gap-2 disabled:opacity-50"
+              className="w-full py-3 px-4 bg-[#0066cc] hover:bg-[#0071e3] text-white text-xs font-semibold rounded-full shadow-xs active:scale-[0.98] transition flex items-center justify-center gap-2 disabled:opacity-50"
             >
               <span>{loading ? 'Đang gửi mã OTP...' : 'Gửi mã OTP qua Email'}</span>
               <ArrowRight className="w-4 h-4" />
@@ -394,7 +394,7 @@ export const ForgotPasswordModal = ({
         {step === 2 && (
           <form onSubmit={handleVerifyOtp} className="space-y-4">
             <div>
-              <label className="block text-xs font-bold text-slate-700 mb-2 text-center">
+              <label className="block text-xs font-medium text-[#1d1d1f] mb-2 text-center">
                 Nhập mã xác thực 6 số (OTP)
               </label>
               <div className="flex justify-center gap-2" onPaste={handleOtpPaste}>
@@ -408,11 +408,11 @@ export const ForgotPasswordModal = ({
                     value={digit}
                     onChange={(e) => handleOtpChange(index, e.target.value)}
                     onKeyDown={(e) => handleOtpKeyDown(index, e)}
-                    className="w-11 h-12 text-center text-lg font-bold font-mono bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#EA701B] focus:bg-white text-slate-900 transition shadow-inner"
+                    className="w-11 h-12 text-center text-lg font-bold font-mono bg-white border border-[#d2d2d7] rounded-xl focus:outline-none focus:border-[#0066cc] focus:ring-2 focus:ring-[#0066cc]/20 text-[#1d1d1f] transition shadow-xs"
                   />
                 ))}
               </div>
-              <p className="text-[11px] text-slate-400 text-center mt-2">
+              <p className="text-[11px] text-[#86868b] text-center mt-2">
                 Mã xác thực có hiệu lực trong vòng <strong>10 phút</strong>.
               </p>
             </div>
@@ -421,7 +421,7 @@ export const ForgotPasswordModal = ({
               <button
                 type="button"
                 onClick={() => setStep(1)}
-                className="text-slate-500 hover:text-slate-800 font-semibold flex items-center gap-1 transition"
+                className="text-[#6e6e73] hover:text-[#1d1d1f] font-medium flex items-center gap-1 transition"
               >
                 <ArrowLeft className="w-3.5 h-3.5" />
                 <span>Đổi email khác</span>
@@ -431,9 +431,9 @@ export const ForgotPasswordModal = ({
                 type="button"
                 onClick={handleResendOtp}
                 disabled={resendCountdown > 0 || loading}
-                className={`font-semibold flex items-center gap-1 transition ${resendCountdown > 0
-                    ? 'text-slate-400 cursor-not-allowed'
-                    : 'text-[#EA701B] hover:text-[#D55E0D] hover:underline'
+                className={`font-medium flex items-center gap-1 transition ${resendCountdown > 0
+                    ? 'text-[#86868b] cursor-not-allowed'
+                    : 'text-[#0066cc] hover:text-[#0071e3] hover:underline'
                   }`}
               >
                 <RotateCw className={`w-3.5 h-3.5 ${loading ? 'animate-spin' : ''}`} />
@@ -446,7 +446,7 @@ export const ForgotPasswordModal = ({
             <button
               type="submit"
               disabled={loading || otpDigits.join('').length !== 6}
-              className="w-full py-3 px-4 bg-[#EA701B] hover:bg-[#D55E0D] text-white text-xs font-bold rounded-2xl shadow-md shadow-orange-500/20 hover-lift btn-press transition flex items-center justify-center gap-2 disabled:opacity-50"
+              className="w-full py-3 px-4 bg-[#0066cc] hover:bg-[#0071e3] text-white text-xs font-semibold rounded-full shadow-xs active:scale-[0.98] transition flex items-center justify-center gap-2 disabled:opacity-50"
             >
               <span>{loading ? 'Đang xác thực...' : 'Xác thực mã OTP'}</span>
               <ArrowRight className="w-4 h-4" />
@@ -458,24 +458,24 @@ export const ForgotPasswordModal = ({
         {step === 3 && (
           <form onSubmit={handleResetPassword} className="space-y-4">
             <div>
-              <label className="block text-xs font-bold text-slate-700 mb-1">
-                Mật khẩu mới <span className="text-red-500">*</span>
+              <label className="block text-xs font-medium text-[#1d1d1f] mb-1">
+                Mật khẩu mới <span className="text-rose-500">*</span>
               </label>
               <div className="relative">
-                <Lock className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
+                <Lock className="w-4 h-4 text-[#86868b] absolute left-3 top-1/2 -translate-y-1/2" />
                 <input
                   type={showNewPassword ? 'text' : 'password'}
                   value={newPassword}
                   onChange={(e) => setNewPassword(e.target.value)}
                   placeholder="Tối thiểu 6 ký tự"
-                  className="w-full pl-9 pr-10 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-900 font-medium focus:outline-none focus:ring-2 focus:ring-[#EA701B] transition"
+                  className="w-full pl-9 pr-10 py-2.5 bg-white border border-[#d2d2d7] rounded-xl text-xs text-[#1d1d1f] font-medium focus:outline-none focus:border-[#0066cc] focus:ring-2 focus:ring-[#0066cc]/20 transition"
                   autoFocus
                   required
                 />
                 <button
                   type="button"
                   onClick={() => setShowNewPassword(!showNewPassword)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600"
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-[#86868b] hover:text-[#1d1d1f]"
                 >
                   {showNewPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                 </button>
@@ -483,23 +483,23 @@ export const ForgotPasswordModal = ({
             </div>
 
             <div>
-              <label className="block text-xs font-bold text-slate-700 mb-1">
-                Xác nhận lại mật khẩu mới <span className="text-red-500">*</span>
+              <label className="block text-xs font-medium text-[#1d1d1f] mb-1">
+                Xác nhận lại mật khẩu mới <span className="text-rose-500">*</span>
               </label>
               <div className="relative">
-                <Lock className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
+                <Lock className="w-4 h-4 text-[#86868b] absolute left-3 top-1/2 -translate-y-1/2" />
                 <input
                   type={showConfirmPassword ? 'text' : 'password'}
                   value={confirmPassword}
                   onChange={(e) => setConfirmPassword(e.target.value)}
                   placeholder="Nhập lại mật khẩu mới"
-                  className="w-full pl-9 pr-10 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-900 font-medium focus:outline-none focus:ring-2 focus:ring-[#EA701B] transition"
+                  className="w-full pl-9 pr-10 py-2.5 bg-white border border-[#d2d2d7] rounded-xl text-xs text-[#1d1d1f] font-medium focus:outline-none focus:border-[#0066cc] focus:ring-2 focus:ring-[#0066cc]/20 transition"
                   required
                 />
                 <button
                   type="button"
                   onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600"
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-[#86868b] hover:text-[#1d1d1f]"
                 >
                   {showConfirmPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                 </button>
@@ -509,7 +509,7 @@ export const ForgotPasswordModal = ({
             <button
               type="submit"
               disabled={loading}
-              className="w-full py-3 px-4 bg-[#EA701B] hover:bg-[#D55E0D] text-white text-xs font-bold rounded-2xl shadow-md shadow-orange-500/20 hover-lift btn-press transition flex items-center justify-center gap-2 disabled:opacity-50"
+              className="w-full py-3 px-4 bg-[#0066cc] hover:bg-[#0071e3] text-white text-xs font-semibold rounded-full shadow-xs active:scale-[0.98] transition flex items-center justify-center gap-2 disabled:opacity-50"
             >
               <span>{loading ? 'Đang lưu mật khẩu...' : 'Lưu mật khẩu mới'}</span>
               <CheckCircle2 className="w-4 h-4" />
@@ -520,7 +520,7 @@ export const ForgotPasswordModal = ({
         {/* ===================== STEP 4: THÀNH CÔNG ===================== */}
         {step === 4 && (
           <div className="text-center space-y-4 py-2">
-            <div className="p-4 bg-emerald-50 rounded-2xl border border-emerald-200 text-emerald-800 text-xs">
+            <div className="p-4 bg-emerald-50 rounded-2xl border border-emerald-200/60 text-emerald-800 text-xs">
               <p className="font-semibold mb-1">Mật khẩu đã được đặt lại thành công!</p>
               <p className="text-emerald-700">
                 Bạn có thể sử dụng mật khẩu mới vừa thiết lập để đăng nhập ngay vào hệ thống Ca Làm Online.
@@ -530,7 +530,7 @@ export const ForgotPasswordModal = ({
             <button
               type="button"
               onClick={handleFinish}
-              className="w-full py-3 px-4 bg-[#EA701B] hover:bg-[#D55E0D] text-white text-xs font-bold rounded-2xl shadow-md shadow-orange-500/20 hover-lift btn-press transition flex items-center justify-center gap-2"
+              className="w-full py-3 px-4 bg-[#0066cc] hover:bg-[#0071e3] text-white text-xs font-semibold rounded-full shadow-xs active:scale-[0.98] transition flex items-center justify-center gap-2"
             >
               <span>Đăng nhập ngay</span>
               <ArrowRight className="w-4 h-4" />

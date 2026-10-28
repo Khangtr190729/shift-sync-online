@@ -32,29 +32,29 @@ export const GooglePlayLogo = ({ className = 'w-6 h-6' }) => (
 export const HomeDownloadSection = () => {
   return (
     <section id="download-app" className="py-16 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-      <div className="bg-gradient-to-br from-slate-900 via-slate-800 to-slate-950 rounded-3xl p-8 sm:p-12 lg:p-14 text-white shadow-2xl relative overflow-hidden border border-slate-800">
-        <div className="absolute top-0 right-0 w-[450px] h-[450px] bg-gradient-to-bl from-orange-500/20 via-amber-500/10 to-transparent rounded-full blur-3xl pointer-events-none" />
+      <div className="bg-[#1d1d1f] rounded-3xl p-8 sm:p-12 lg:p-14 text-white shadow-lg relative overflow-hidden border border-[#333333]">
+        <div className="absolute top-0 right-0 w-[450px] h-[450px] bg-gradient-to-bl from-blue-500/20 via-sky-500/10 to-transparent rounded-full blur-3xl pointer-events-none" />
 
         <div className="relative z-10 flex flex-col lg:flex-row items-center justify-between gap-10">
           {/* Left Content */}
           <div className="space-y-4 text-center lg:text-left max-w-2xl">
-            <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-orange-500/20 text-orange-400 text-xs font-bold border border-orange-500/30">
+            <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-white/10 text-[#2997ff] text-xs font-semibold border border-white/15">
               <Sparkles className="w-3.5 h-3.5" />
               <span>Bắt đầu quản lý ca làm thông minh</span>
             </div>
-            <h2 className="text-3xl sm:text-4xl font-extrabold tracking-tight text-white leading-tight">
+            <h2 className="text-3xl sm:text-4xl font-semibold tracking-tight text-white leading-tight">
               Sẵn sàng nâng tầm quản lý ca làm cho cửa hàng?
             </h2>
-            <p className="text-xs sm:text-sm text-slate-300 leading-relaxed max-w-xl">
+            <p className="text-xs sm:text-sm text-[#86868b] leading-relaxed max-w-xl">
               Tiết kiệm hàng giờ xếp ca mỗi tuần, tính lương chuẩn xác và gửi thông báo lịch làm tự động. Đăng nhập ngay trên máy tính hoặc tải ứng dụng cho điện thoại di động.
             </p>
           </div>
 
           {/* Right Action Buttons */}
-          <div className="flex flex-col sm:flex-row items-center gap-3.5 shrink-0 w-full lg:w-auto justify-center">
+          <div className="flex flex-col sm:flex-row items-center gap-3 shrink-0 w-full lg:w-auto justify-center">
             <Link
               to="/login"
-              className="w-full sm:w-auto flex items-center justify-center gap-2.5 px-7 py-3.5 bg-[#EA701B] hover:bg-[#D55E0D] text-white text-xs font-extrabold rounded-2xl shadow-lg shadow-orange-500/30 btn-press hover-lift transition-all"
+              className="w-full sm:w-auto flex items-center justify-center gap-2 px-6 py-3 bg-[#0066cc] hover:bg-[#0071e3] text-white text-xs font-semibold rounded-full shadow-xs active:scale-[0.98] transition-all"
             >
               <span>Đăng nhập ngay</span>
               <ArrowRight className="w-4 h-4" />
@@ -66,14 +66,14 @@ export const HomeDownloadSection = () => {
               href="https://apps.apple.com"
               target="_blank"
               rel="noopener noreferrer"
-              className="w-full sm:w-auto flex items-center justify-center gap-3 px-5 py-3 bg-white/10 hover:bg-white/20 border border-white/20 hover:border-white/30 text-white rounded-2xl shadow-md btn-press hover-lift transition-all text-left group"
+              className="w-full sm:w-auto flex items-center justify-center gap-2.5 px-5 py-2.5 bg-white/10 hover:bg-white/15 border border-white/20 text-white rounded-full active:scale-[0.98] transition-all text-left group"
             >
-              <AppleLogo className="w-6 h-6 fill-current text-white shrink-0 group-hover:scale-105 transition-transform" />
+              <AppleLogo className="w-5 h-5 fill-current text-white shrink-0 group-hover:scale-105 transition-transform" />
               <div className="flex flex-col">
-                <span className="text-[9px] uppercase tracking-wider text-slate-400 font-medium leading-none">
+                <span className="text-[9px] uppercase tracking-wider text-[#86868b] font-medium leading-none">
                   Tải về trên
                 </span>
-                <span className="text-xs font-extrabold text-white leading-tight mt-0.5">
+                <span className="text-xs font-semibold text-white leading-tight mt-0.5">
                   App Store (iOS)
                 </span>
               </div>
@@ -85,14 +85,14 @@ export const HomeDownloadSection = () => {
               href="https://play.google.com"
               target="_blank"
               rel="noopener noreferrer"
-              className="w-full sm:w-auto flex items-center justify-center gap-3 px-5 py-3 bg-white/10 hover:bg-white/20 border border-white/20 hover:border-white/30 text-white rounded-2xl shadow-md btn-press hover-lift transition-all text-left group"
+              className="w-full sm:w-auto flex items-center justify-center gap-2.5 px-5 py-2.5 bg-white/10 hover:bg-white/15 border border-white/20 text-white rounded-full active:scale-[0.98] transition-all text-left group"
             >
-              <GooglePlayLogo className="w-5 h-5 shrink-0 group-hover:scale-105 transition-transform" />
+              <GooglePlayLogo className="w-4 h-4 shrink-0 group-hover:scale-105 transition-transform" />
               <div className="flex flex-col">
-                <span className="text-[9px] uppercase tracking-wider text-slate-400 font-medium leading-none">
+                <span className="text-[9px] uppercase tracking-wider text-[#86868b] font-medium leading-none">
                   Tải về trên
                 </span>
-                <span className="text-xs font-extrabold text-white leading-tight mt-0.5">
+                <span className="text-xs font-semibold text-white leading-tight mt-0.5">
                   Google Play (CH Play)
                 </span>
               </div>

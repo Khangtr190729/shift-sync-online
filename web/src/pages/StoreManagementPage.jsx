@@ -211,29 +211,29 @@ export const StoreManagementPage = () => {
   if (!store) {
     return (
       <div className="max-w-xl mx-auto py-12 px-4 text-center">
-        <div className="bg-white p-8 rounded-3xl border border-orange-200/80 shadow-md space-y-4">
-          <div className="w-16 h-16 rounded-2xl bg-orange-100 text-[#EA701B] flex items-center justify-center mx-auto">
+        <div className="bg-white p-8 rounded-2xl border border-[#e5e5e7] shadow-xs space-y-4">
+          <div className="w-16 h-16 rounded-full bg-blue-50 text-[#0066cc] flex items-center justify-center mx-auto">
             <StoreIcon className="w-8 h-8" />
           </div>
-          <h2 className="text-xl font-extrabold text-slate-900">
+          <h2 className="text-xl font-semibold text-[#1d1d1f] tracking-tight">
             Tạo cửa hàng của bạn
           </h2>
-          <p className="text-xs text-slate-500 leading-relaxed">
+          <p className="text-xs text-[#6e6e73] leading-relaxed">
             Bạn vừa tạo tài khoản Chủ cửa hàng. Hãy đặt tên quán và địa chỉ để bắt đầu tạo ca làm và mời nhân sự.
           </p>
 
           {feedback && (
             <div
-              className={`p-3 rounded-xl flex items-center gap-2 text-xs font-semibold text-left ${
+              className={`p-3 rounded-xl flex items-center gap-2 text-xs font-medium text-left ${
                 feedback.type === 'success'
-                  ? 'bg-emerald-50 text-emerald-800 border border-emerald-200'
-                  : 'bg-red-50 text-red-800 border border-red-200'
+                  ? 'bg-emerald-50 text-emerald-800 border border-emerald-200/60'
+                  : 'bg-rose-50 text-rose-800 border border-rose-200/60'
               }`}
             >
               {feedback.type === 'success' ? (
                 <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
               ) : (
-                <AlertCircle className="w-4 h-4 text-red-600 shrink-0" />
+                <AlertCircle className="w-4 h-4 text-rose-600 shrink-0" />
               )}
               <span>{feedback.message}</span>
             </div>
@@ -241,7 +241,7 @@ export const StoreManagementPage = () => {
 
           <form onSubmit={handleCreateStore} className="space-y-3 pt-2 text-left">
             <div>
-              <label className="block text-xs font-bold text-slate-700 mb-1">
+              <label className="block text-xs font-medium text-[#1d1d1f] mb-1">
                 Tên cửa hàng / Quán <span className="text-red-500">*</span>
               </label>
               <input
@@ -249,12 +249,12 @@ export const StoreManagementPage = () => {
                 placeholder="Ví dụ: The Coffee House — Cơ sở 1"
                 value={newStoreForm.name}
                 onChange={(e) => setNewStoreForm({ ...newStoreForm, name: e.target.value })}
-                className="w-full p-2.5 rounded-xl border border-slate-200 text-xs font-semibold text-slate-800 focus:outline-none focus:ring-2 focus:ring-[#EA701B]"
+                className="w-full p-2.5 rounded-xl border border-[#d2d2d7] text-xs font-normal text-[#1d1d1f] focus:outline-none focus:border-[#0066cc] focus:ring-2 focus:ring-[#0066cc]/20 transition"
                 required
               />
             </div>
             <div>
-              <label className="block text-xs font-bold text-slate-700 mb-1">
+              <label className="block text-xs font-medium text-[#1d1d1f] mb-1">
                 Địa chỉ quán
               </label>
               <input
@@ -262,13 +262,13 @@ export const StoreManagementPage = () => {
                 placeholder="Ví dụ: 123 Nguyễn Huệ, Quận 1, TP. HCM"
                 value={newStoreForm.address}
                 onChange={(e) => setNewStoreForm({ ...newStoreForm, address: e.target.value })}
-                className="w-full p-2.5 rounded-xl border border-slate-200 text-xs text-slate-800 focus:outline-none focus:ring-2 focus:ring-[#EA701B]"
+                className="w-full p-2.5 rounded-xl border border-[#d2d2d7] text-xs text-[#1d1d1f] focus:outline-none focus:border-[#0066cc] focus:ring-2 focus:ring-[#0066cc]/20 transition"
               />
             </div>
             <button
               type="submit"
               disabled={creatingStore}
-              className="w-full mt-3 py-3 bg-[#EA701B] hover:bg-[#D55E0D] text-white text-xs font-bold rounded-xl transition shadow-md shadow-orange-500/20 disabled:opacity-50"
+              className="w-full mt-3 py-3 bg-[#0066cc] hover:bg-[#0071e3] text-white text-xs font-medium rounded-full transition shadow-xs active:scale-[0.98] disabled:opacity-50 cursor-pointer"
             >
               {creatingStore ? 'Đang tạo cửa hàng...' : 'Bắt đầu sử dụng Ca Làm Online'}
             </button>
@@ -286,13 +286,13 @@ export const StoreManagementPage = () => {
   return (
     <div className="max-w-4xl space-y-6">
       {/* Header */}
-      <div className="bg-white p-5 rounded-2xl border border-slate-200/80 shadow-sm flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+      <div className="bg-white p-5 rounded-2xl border border-[#e5e5e7] shadow-xs flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <div>
-          <h2 className="text-lg font-bold text-slate-900 tracking-tight flex items-center gap-2">
-            <Store className="w-5 h-5 text-[#EA701B]" />
+          <h2 className="text-lg font-semibold text-[#1d1d1f] tracking-tight flex items-center gap-2">
+            <Store className="w-5 h-5 text-[#0066cc]" />
             <span>Hệ thống Cơ sở & Mã mời</span>
           </h2>
-          <p className="text-xs text-slate-500 mt-0.5">
+          <p className="text-xs text-[#6e6e73] mt-0.5">
             Quản lý thông tin từng chi nhánh và cấp phát mã số mời nhân viên mới gia nhập.
           </p>
         </div>
@@ -300,11 +300,11 @@ export const StoreManagementPage = () => {
           <button
             type="button"
             onClick={() => setBranchModalOpen(true)}
-            className="flex items-center gap-1.5 px-3.5 py-2 bg-gradient-to-r from-[#EA701B] to-[#FF8C38] text-white text-xs font-bold rounded-xl shadow-sm hover:opacity-95 transition-all btn-press cursor-pointer"
+            className="flex items-center gap-1.5 px-4 py-2 bg-[#0066cc] text-white text-xs font-medium rounded-full shadow-xs hover:bg-[#0071e3] transition active:scale-[0.98] cursor-pointer"
           >
             <span>+ Mở thêm chi nhánh</span>
           </button>
-          <div className="hidden md:flex items-center gap-1.5 px-3 py-1.5 bg-orange-100 text-[#EA701B] rounded-xl text-xs font-bold">
+          <div className="hidden md:flex items-center gap-1.5 px-3 py-1.5 bg-blue-50 text-[#0066cc] rounded-full text-xs font-medium border border-blue-200/60">
             <ShieldCheck className="w-4 h-4" />
             <span>Chủ cửa hàng</span>
           </div>
@@ -313,15 +313,15 @@ export const StoreManagementPage = () => {
 
       {/* BRANCH SELECTOR CARDS */}
       {stores && stores.length > 0 && (
-        <div className="bg-white p-5 rounded-2xl border border-slate-200/80 shadow-sm space-y-3">
+        <div className="bg-white p-5 rounded-2xl border border-[#e5e5e7] shadow-xs space-y-3">
           <div className="flex items-center justify-between">
-            <h3 className="text-xs font-bold text-slate-700 uppercase tracking-wider flex items-center gap-1.5">
+            <h3 className="text-xs font-semibold text-[#1d1d1f] uppercase tracking-wider flex items-center gap-1.5">
               <span>Các cơ sở đang hoạt động</span>
-              <span className="px-1.5 py-0.2 bg-orange-100 text-[#EA701B] rounded-full text-[11px]">
+              <span className="px-2 py-0.5 bg-blue-50 text-[#0066cc] border border-blue-200/60 rounded-full text-[11px] font-medium">
                 {stores.length}
               </span>
             </h3>
-            <span className="text-[11px] text-slate-400">Bấm vào chi nhánh để chuyển giao diện quản lý</span>
+            <span className="text-[11px] text-[#86868b]">Bấm vào chi nhánh để chuyển giao diện quản lý</span>
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
@@ -334,26 +334,26 @@ export const StoreManagementPage = () => {
                   onClick={() => switchStore(s._id)}
                   className={`text-left p-3.5 rounded-2xl border transition-all flex flex-col justify-between gap-2 group cursor-pointer ${
                     isSelected
-                      ? 'bg-[#FFF0E5] border-orange-300 ring-2 ring-[#EA701B]/20 shadow-xs'
-                      : 'bg-slate-50/70 hover:bg-slate-50 border-slate-200/70 hover:border-orange-200'
+                      ? 'bg-white border-[#0066cc] ring-2 ring-[#0066cc]/20 shadow-xs'
+                      : 'bg-[#fafafc] hover:bg-white border-[#e5e5e7] hover:border-blue-200'
                   }`}
                 >
                   <div className="flex items-start justify-between gap-2">
                     <div className="min-w-0 flex-1">
-                      <p className={`text-xs font-bold truncate ${isSelected ? 'text-[#EA701B]' : 'text-slate-800'}`}>
+                      <p className={`text-xs font-semibold truncate ${isSelected ? 'text-[#0066cc]' : 'text-[#1d1d1f]'}`}>
                         {s.name}
                       </p>
-                      <p className="text-[11px] text-slate-500 truncate mt-0.5 flex items-center gap-1">
-                        <MapPin className="w-3 h-3 shrink-0 text-slate-400" />
+                      <p className="text-[11px] text-[#6e6e73] truncate mt-0.5 flex items-center gap-1">
+                        <MapPin className="w-3 h-3 shrink-0 text-[#86868b]" />
                         <span>{s.address || 'Chưa có địa chỉ'}</span>
                       </p>
                     </div>
                     {isSelected ? (
-                      <span className="text-[10px] font-bold px-2 py-0.5 bg-[#EA701B] text-white rounded-full shrink-0">
+                      <span className="text-[10px] font-medium px-2 py-0.5 bg-[#0066cc] text-white rounded-full shrink-0">
                         Đang chọn
                       </span>
                     ) : (
-                      <span className="text-[10px] font-medium text-slate-400 group-hover:text-[#EA701B] shrink-0">
+                      <span className="text-[10px] font-normal text-[#86868b] group-hover:text-[#0066cc] shrink-0">
                         Chọn
                       </span>
                     )}
@@ -412,14 +412,14 @@ export const StoreManagementPage = () => {
       />
 
       {/* SECTION 3: STORE GENERAL INFORMATION */}
-      <div className="bg-white rounded-2xl border border-slate-200/80 shadow-sm p-6 space-y-4">
-        <div className="pb-3 border-b border-slate-100 flex items-center gap-2.5">
-          <div className="w-9 h-9 rounded-xl bg-orange-100 text-[#EA701B] flex items-center justify-center">
-            <Store className="w-5 h-5" />
+      <div className="bg-white rounded-2xl border border-[#e5e5e7] shadow-xs p-6 space-y-4">
+        <div className="pb-3 border-b border-[#e5e5e7] flex items-center gap-2.5">
+          <div className="w-9 h-9 rounded-full bg-blue-50 text-[#0066cc] flex items-center justify-center">
+            <Store className="w-4 h-4" />
           </div>
           <div>
-            <h3 className="text-sm font-bold text-slate-900">Thông tin cơ sở quán</h3>
-            <p className="text-xs text-slate-500">
+            <h3 className="text-sm font-semibold text-[#1d1d1f]">Thông tin cơ sở quán</h3>
+            <p className="text-xs text-[#6e6e73]">
               Tên cửa hàng và địa chỉ hiển thị trên ứng dụng của nhân viên và email xếp lịch
             </p>
           </div>
@@ -427,24 +427,24 @@ export const StoreManagementPage = () => {
 
         <form onSubmit={handleSaveStore} className="space-y-4">
           <div>
-            <label className="block text-xs font-bold text-slate-700 mb-1">Tên cửa hàng</label>
+            <label className="block text-xs font-medium text-[#1d1d1f] mb-1">Tên cửa hàng</label>
             <input
               type="text"
               value={storeForm.name}
               onChange={(e) => setStoreForm((prev) => ({ ...prev, name: e.target.value }))}
-              className="w-full p-2.5 rounded-xl border border-slate-200 text-xs font-semibold text-slate-800 focus:outline-none focus:ring-2 focus:ring-[#EA701B]"
+              className="w-full p-2.5 rounded-xl border border-[#d2d2d7] text-xs font-normal text-[#1d1d1f] focus:outline-none focus:border-[#0066cc] focus:ring-2 focus:ring-[#0066cc]/20 transition"
               required
             />
           </div>
 
           <div>
-            <label className="block text-xs font-bold text-slate-700 mb-1">Địa chỉ quán</label>
+            <label className="block text-xs font-medium text-[#1d1d1f] mb-1">Địa chỉ quán</label>
             <input
               type="text"
               value={storeForm.address}
               onChange={(e) => setStoreForm((prev) => ({ ...prev, address: e.target.value }))}
               placeholder="Ví dụ: 123 Nguyễn Huệ, Phường Bến Nghé, Quận 1, TP. HCM"
-              className="w-full p-2.5 rounded-xl border border-slate-200 text-xs text-slate-800 focus:outline-none focus:ring-2 focus:ring-[#EA701B]"
+              className="w-full p-2.5 rounded-xl border border-[#d2d2d7] text-xs text-[#1d1d1f] focus:outline-none focus:border-[#0066cc] focus:ring-2 focus:ring-[#0066cc]/20 transition"
             />
           </div>
 
@@ -452,7 +452,7 @@ export const StoreManagementPage = () => {
             <button
               type="submit"
               disabled={savingStore}
-              className="px-5 py-2.5 bg-[#EA701B] hover:bg-[#D55E0D] text-white text-xs font-bold rounded-xl transition shadow-xs disabled:opacity-50 flex items-center gap-2 cursor-pointer"
+              className="px-5 py-2.5 bg-[#0066cc] hover:bg-[#0071e3] text-white text-xs font-medium rounded-full transition shadow-xs active:scale-[0.98] disabled:opacity-50 flex items-center gap-2 cursor-pointer"
             >
               <Save className="w-4 h-4" />
               <span>{savingStore ? 'Đang lưu...' : 'Lưu thông tin quán'}</span>

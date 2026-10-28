@@ -110,7 +110,7 @@ export const formatWeekRange = (mondayDate) => {
 export const getRoleLabel = (role) => {
   switch (role) {
     case 'ADMIN':
-      return { text: 'Chủ cửa hàng', shortText: 'Chủ quán', color: '#EA701B', bg: '#FFF7ED', border: '#FED7AA' };
+      return { text: 'Chủ cửa hàng', shortText: 'Chủ quán', color: '#0066CC', bg: '#EBF4FF', border: '#D0E4FF' };
     case 'MANAGER':
       return { text: 'Quản lý cửa hàng', shortText: 'Quản lý', color: '#2563EB', bg: '#EFF6FF', border: '#BFDBFE' };
     case 'EMPLOYEE':

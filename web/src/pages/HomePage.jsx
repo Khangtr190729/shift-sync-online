@@ -43,14 +43,14 @@ export const HomePage = () => {
   // Màn hình chờ nếu thiết bị đang có sẵn token và đang xác thực
   if (loading && localStorage.getItem('ca_lam_token')) {
     return (
-      <div className="min-h-screen bg-[#FFF7F0] flex items-center justify-center font-['Be_Vietnam_Pro',sans-serif]">
-        <div className="w-8 h-8 border-3 border-[#EA701B] border-t-transparent rounded-full animate-spin" />
+      <div className="min-h-screen bg-[#f5f5f7] flex items-center justify-center font-sans">
+        <div className="w-8 h-8 border-2 border-[#0066cc] border-t-transparent rounded-full animate-spin" />
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-[#FFF7F0] text-slate-800 font-['Be_Vietnam_Pro',sans-serif] selection:bg-[#EA701B] selection:text-white">
+    <div className="min-h-screen bg-white text-[#1d1d1f] font-sans selection:bg-[#0066cc] selection:text-white">
       <HomeNavbar scrollToSection={scrollToSection} />
       <HomeHeroSection scrollToSection={scrollToSection} />
       <HomeMetricsSection />
