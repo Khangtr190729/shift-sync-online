@@ -244,11 +244,11 @@ const styles = StyleSheet.create({
   },
   metricItemHighlight: {
     flex: 1.4,
-    backgroundColor: '#FFF7ED',
+    backgroundColor: colors.primaryLight,
     borderRadius: 14,
     padding: 10,
     borderWidth: 1,
-    borderColor: '#FED7AA',
+    borderColor: '#BFDBFE',
     justifyContent: 'center',
   },
   metricLabelHighlight: {

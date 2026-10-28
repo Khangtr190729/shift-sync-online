@@ -286,7 +286,7 @@ const styles = StyleSheet.create({
     marginBottom: 10,
   },
   storeItemActive: {
-    backgroundColor: '#FFF7F0',
+    backgroundColor: colors.primaryLight,
     borderColor: colors.primary,
   },
   storeInfo: {

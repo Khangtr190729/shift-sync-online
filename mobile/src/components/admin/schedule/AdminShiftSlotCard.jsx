@@ -139,17 +139,17 @@ const styles = StyleSheet.create({
     fontWeight: '600',
   },
   peakBadge: {
-    backgroundColor: '#FFF7ED',
+    backgroundColor: colors.warningLight,
     paddingVertical: 4,
     paddingHorizontal: 8,
     borderRadius: 8,
     borderWidth: 1,
-    borderColor: '#FED7AA',
+    borderColor: '#FDE68A',
   },
   peakText: {
     fontSize: 10,
     fontWeight: '700',
-    color: colors.primaryDark,
+    color: colors.warning,
   },
   employeesSection: {
     marginTop: 2,

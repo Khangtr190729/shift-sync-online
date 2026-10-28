@@ -45,7 +45,7 @@ export const LoginScreen = ({ navigation }) => {
 
   return (
     <View style={styles.screenWrapper}>
-      <StatusBar barStyle="light-content" backgroundColor="#D55E0D" />
+      <StatusBar barStyle="light-content" backgroundColor={colors.primaryDark || '#0055B3'} />
 
       {/* Hero Header with Brand Colors */}
       <View style={styles.heroBackground}>
@@ -170,7 +170,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#F8F9FC',
   },
   heroBackground: {
-    backgroundColor: '#EA701B',
+    backgroundColor: '#0066CC',
     paddingTop: Platform.OS === 'ios' ? 60 : 36,
     paddingBottom: 48,
     paddingHorizontal: 24,
