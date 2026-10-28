@@ -41,7 +41,7 @@ export const PublishScheduleModal = ({
           <button
             type="button"
             onClick={onClose}
-            className="px-4 py-2 text-xs font-medium text-[#6e6e73] hover:text-[#1d1d1f] hover:bg-white rounded-full transition"
+            className="px-4 py-2 text-xs font-medium text-[#6e6e73] hover:text-[#1d1d1f] hover:bg-white rounded-full transition btn-press cursor-pointer"
           >
             Hủy bỏ
           </button>
@@ -49,7 +49,7 @@ export const PublishScheduleModal = ({
             type="button"
             disabled={saving}
             onClick={onConfirmPublish}
-            className="px-5 py-2.5 text-xs font-medium text-white bg-[#0066cc] hover:bg-[#0071e3] rounded-full shadow-xs transition active:scale-[0.98] disabled:opacity-50 cursor-pointer"
+            className="px-5 py-2.5 text-xs font-medium text-white bg-[#0066cc] hover:bg-[#0071e3] rounded-full shadow-xs transition btn-press disabled:opacity-50 cursor-pointer"
           >
             {saving ? 'Đang gửi email...' : 'Đồng ý & Xuất bản ngay'}
           </button>

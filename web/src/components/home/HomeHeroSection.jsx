@@ -10,13 +10,13 @@ export const HomeHeroSection = ({ scrollToSection }) => {
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center space-y-8">
         {/* Badge */}
-        <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-blue-50/80 border border-blue-200/60 text-[#0066cc] text-xs font-semibold shadow-xs animate-page-enter">
+        <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-blue-50/80 border border-blue-200/60 text-[#0066cc] text-xs font-semibold shadow-xs animate-stagger-1">
           <Sparkles className="w-3.5 h-3.5" />
           <span>Nền tảng Quản trị & Tự động Xếp ca</span>
         </div>
 
         {/* Main Title */}
-        <h1 className="text-4xl sm:text-5xl lg:text-6xl font-semibold text-[#1d1d1f] tracking-tight leading-[1.12] max-w-4xl mx-auto animate-page-enter">
+        <h1 className="text-4xl sm:text-5xl lg:text-6xl font-semibold text-[#1d1d1f] tracking-tight leading-[1.08] max-w-4xl mx-auto animate-stagger-2">
           Xếp ca thông minh — Tự động tính lương{' '}
           <span className="text-[#0066cc]">
             chuẩn xác từng phút
@@ -24,17 +24,17 @@ export const HomeHeroSection = ({ scrollToSection }) => {
         </h1>
 
         {/* Subtitle */}
-        <p className="text-base sm:text-lg text-[#6e6e73] max-w-2xl mx-auto leading-relaxed animate-page-enter">
+        <p className="text-base sm:text-lg text-[#6e6e73] max-w-2xl mx-auto leading-relaxed animate-stagger-3">
           Giải pháp thay thế hoàn toàn việc xếp ca bằng giấy bút và bảng tính thủ công. Tối ưu thời gian,
           ngăn chặn trùng ca thời gian thực, đánh giá ca làm và tự động gửi email lịch trực kèm bảng
           lương chỉ với 1 cú nhấp chuột.
         </p>
 
         {/* Action CTAs */}
-        <div className="flex flex-col sm:flex-row items-center justify-center gap-3 pt-2 animate-page-enter">
+        <div className="flex flex-col sm:flex-row items-center justify-center gap-3 pt-2 animate-stagger-4">
           <Link
             to="/login"
-            className="w-full sm:w-auto flex items-center justify-center gap-2 px-7 py-3 bg-[#0066cc] hover:bg-[#0071e3] text-white text-xs font-semibold rounded-full shadow-xs active:scale-[0.98] transition-all"
+            className="w-full sm:w-auto flex items-center justify-center gap-2 px-7 py-3 bg-[#0066cc] hover:bg-[#0071e3] text-white text-xs font-semibold rounded-full shadow-xs btn-press transition-all"
           >
             <span>Đăng nhập ngay</span>
             <ArrowRight className="w-4 h-4" />
@@ -42,7 +42,7 @@ export const HomeHeroSection = ({ scrollToSection }) => {
           <button
             type="button"
             onClick={() => scrollToSection('interactive-preview')}
-            className="w-full sm:w-auto flex items-center justify-center gap-2 px-6 py-3 bg-[#f5f5f7] hover:bg-[#e5e5e7] text-[#1d1d1f] text-xs font-semibold rounded-full border border-[#e5e5e7] active:scale-[0.98] transition cursor-pointer"
+            className="w-full sm:w-auto flex items-center justify-center gap-2 px-6 py-3 bg-[#f5f5f7] hover:bg-[#e5e5e7] text-[#1d1d1f] text-xs font-semibold rounded-full border border-[#e5e5e7] btn-press transition cursor-pointer"
           >
             <Play className="w-3.5 h-3.5 text-[#0066cc] fill-[#0066cc]" />
             <span>Xem giao diện thực tế</span>

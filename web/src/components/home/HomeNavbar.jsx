@@ -12,7 +12,7 @@ export const HomeNavbar = ({ scrollToSection }) => {
   };
 
   return (
-    <header className="sticky top-0 z-40 bg-white/80 backdrop-blur-md border-b border-[#e5e5e7]/80 transition-all">
+    <header className="sticky top-0 z-40 glass-header transition-all">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
         {/* Logo */}
         <Link to="/" className="flex items-center gap-2 group">
@@ -72,7 +72,7 @@ export const HomeNavbar = ({ scrollToSection }) => {
             id="btn-nav-download"
             type="button"
             onClick={() => handleNavClick('download-app')}
-            className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-full border border-[#d2d2d7] hover:border-[#86868b] text-xs font-medium text-[#1d1d1f] bg-white active:scale-[0.98] transition cursor-pointer"
+            className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-full border border-[#d2d2d7] hover:border-[#86868b] text-xs font-medium text-[#1d1d1f] bg-white btn-press transition cursor-pointer"
             title="Cuộn xuống để tải ứng dụng cho điện thoại"
           >
             <Download className="w-3.5 h-3.5 text-[#0066cc]" />
@@ -81,7 +81,7 @@ export const HomeNavbar = ({ scrollToSection }) => {
 
           <Link
             to="/login"
-            className="flex items-center gap-2 px-4 py-1.5 bg-[#0066cc] hover:bg-[#0071e3] text-white text-xs font-semibold rounded-full shadow-xs active:scale-[0.98] transition-all"
+            className="flex items-center gap-2 px-4 py-1.5 bg-[#0066cc] hover:bg-[#0071e3] text-white text-xs font-semibold rounded-full shadow-xs btn-press transition-all"
           >
             <span>Đăng nhập</span>
             <ArrowRight className="w-3.5 h-3.5" />
