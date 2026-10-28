@@ -3,7 +3,7 @@ import { View, Text, StyleSheet } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import colors from '../../theme/colors';
 
-export const NotificationItem = ({ notification }) => {
+const NotificationItemComponent = ({ notification }) => {
   const getIcon = (type) => {
     switch (type) {
       case 'SCHEDULE':
@@ -130,4 +130,5 @@ const styles = StyleSheet.create({
   },
 });
 
+export const NotificationItem = React.memo(NotificationItemComponent);
 export default NotificationItem;

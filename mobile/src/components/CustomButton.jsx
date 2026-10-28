@@ -1,6 +1,7 @@
-import React from 'react';
+import React, { useRef } from 'react';
 import {
-  TouchableOpacity,
+  Pressable,
+  Animated,
   Text,
   ActivityIndicator,
   StyleSheet,
@@ -19,6 +20,28 @@ export const CustomButton = ({
   style,
   textStyle,
 }) => {
+  const scaleAnim = useRef(new Animated.Value(1)).current;
+
+  const handlePressIn = () => {
+    if (disabled || loading) return;
+    Animated.spring(scaleAnim, {
+      toValue: 0.96,
+      useNativeDriver: true,
+      speed: 60,
+      bounciness: 4,
+    }).start();
+  };
+
+  const handlePressOut = () => {
+    if (disabled || loading) return;
+    Animated.spring(scaleAnim, {
+      toValue: 1,
+      useNativeDriver: true,
+      speed: 60,
+      bounciness: 4,
+    }).start();
+  };
+
   const getBackgroundColor = () => {
     if (disabled) return '#CBD5E1';
     switch (variant) {
@@ -74,39 +97,41 @@ export const CustomButton = ({
   };
 
   return (
-    <TouchableOpacity
-      activeOpacity={0.8}
-      onPress={onPress}
-      disabled={disabled || loading}
-      style={[
-        styles.button,
-        variant === 'primary' && !disabled && styles.primaryShadow,
-        getPadding(),
-        {
-          backgroundColor: getBackgroundColor(),
-          borderColor: variant === 'outline' ? colors.primary : 'transparent',
-          borderWidth: variant === 'outline' ? 1.5 : 0,
-        },
-        style,
-      ]}
-    >
-      {loading ? (
-        <ActivityIndicator color={getTextColor()} size="small" />
-      ) : (
-        <View style={styles.content}>
-          {icon && <View style={styles.iconContainer}>{icon}</View>}
-          <Text
-            style={[
-              styles.text,
-              { color: getTextColor(), fontSize: getFontSize() },
-              textStyle,
-            ]}
-          >
-            {title}
-          </Text>
-        </View>
-      )}
-    </TouchableOpacity>
+    <Animated.View style={[{ transform: [{ scale: scaleAnim }] }, style]}>
+      <Pressable
+        onPress={onPress}
+        onPressIn={handlePressIn}
+        onPressOut={handlePressOut}
+        disabled={disabled || loading}
+        style={[
+          styles.button,
+          variant === 'primary' && !disabled && styles.primaryShadow,
+          getPadding(),
+          {
+            backgroundColor: getBackgroundColor(),
+            borderColor: variant === 'outline' ? colors.primary : 'transparent',
+            borderWidth: variant === 'outline' ? 1.5 : 0,
+          },
+        ]}
+      >
+        {loading ? (
+          <ActivityIndicator color={getTextColor()} size="small" />
+        ) : (
+          <View style={styles.content}>
+            {icon && <View style={styles.iconContainer}>{icon}</View>}
+            <Text
+              style={[
+                styles.text,
+                { color: getTextColor(), fontSize: getFontSize() },
+                textStyle,
+              ]}
+            >
+              {title}
+            </Text>
+          </View>
+        )}
+      </Pressable>
+    </Animated.View>
   );
 };
 

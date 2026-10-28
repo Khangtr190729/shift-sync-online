@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useRef, useEffect } from 'react';
 import {
   Modal,
   View,
@@ -6,6 +6,7 @@ import {
   TouchableOpacity,
   ScrollView,
   StyleSheet,
+  Animated,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import colors from '../theme/colors';
@@ -18,6 +19,21 @@ export const ShiftDetailModal = ({
   shift,
   storeName,
 }) => {
+  const anim = useRef(new Animated.Value(0)).current;
+
+  useEffect(() => {
+    if (visible) {
+      Animated.spring(anim, {
+        toValue: 1,
+        useNativeDriver: true,
+        speed: 50,
+        bounciness: 4,
+      }).start();
+    } else {
+      anim.setValue(0);
+    }
+  }, [visible]);
+
   const detail = shiftDetail || shift;
   if (!detail) return null;
 
@@ -41,7 +57,22 @@ export const ShiftDetailModal = ({
       onRequestClose={onClose}
     >
       <View style={styles.backdrop}>
-        <View style={styles.card}>
+        <Animated.View
+          style={[
+            styles.card,
+            {
+              opacity: anim,
+              transform: [
+                {
+                  scale: anim.interpolate({
+                    inputRange: [0, 1],
+                    outputRange: [0.94, 1],
+                  }),
+                },
+              ],
+            },
+          ]}
+        >
           {/* Header */}
           <View style={styles.header}>
             <View>
@@ -157,7 +188,7 @@ export const ShiftDetailModal = ({
               <Text style={styles.actionButtonText}>Đóng</Text>
             </TouchableOpacity>
           </View>
-        </View>
+        </Animated.View>
       </View>
     </Modal>
   );
