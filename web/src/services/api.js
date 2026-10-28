@@ -6,12 +6,14 @@ const api = axios.create({
   baseURL: API_BASE_URL,
   headers: {
     'Content-Type': 'application/json'
-  }
+  },
+  withCredentials: true // Trình duyệt tự động đính kèm và nhận cả 2 Cookie HttpOnly (AT & RT)
 });
 
-// Request interceptor to attach JWT token
+// Request interceptor: Đảm bảo withCredentials luôn bật và hỗ trợ tương thích ngược
 api.interceptors.request.use(
   (config) => {
+    config.withCredentials = true;
     const token = localStorage.getItem('ca_lam_token');
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
@@ -21,13 +23,71 @@ api.interceptors.request.use(
   (error) => Promise.reject(error)
 );
 
-// Response interceptor to handle errors cleanly
+// Hàng đợi xử lý khi nhiều request cùng gặp 401 khi Access Token 15 phút hết hạn
+let isRefreshing = false;
+let failedQueue = [];
+
+const processQueue = (error, token = null) => {
+  failedQueue.forEach((prom) => {
+    if (error) {
+      prom.reject(error);
+    } else {
+      prom.resolve(token);
+    }
+  });
+  failedQueue = [];
+};
+
+// Response interceptor: Tự động dùng Cookie RT để làm mới Cookie AT một cách trong suốt
 api.interceptors.response.use(
   (response) => response.data,
-  (error) => {
+  async (error) => {
+    const originalRequest = error.config;
+
+    if (
+      error.response?.status === 401 &&
+      originalRequest &&
+      !originalRequest._retry &&
+      !originalRequest.url?.includes('/auth/login') &&
+      !originalRequest.url?.includes('/auth/register') &&
+      !originalRequest.url?.includes('/auth/refresh')
+    ) {
+      if (isRefreshing) {
+        return new Promise((resolve, reject) => {
+          failedQueue.push({ resolve, reject });
+        })
+          .then(() => api(originalRequest))
+          .catch((err) => Promise.reject(err));
+      }
+
+      originalRequest._retry = true;
+      isRefreshing = true;
+
+      try {
+        // Gửi Cookie refreshToken lên backend để nhận cặp Cookie mới
+        const res = await axios.post(
+          `${API_BASE_URL}/auth/refresh`,
+          {},
+          { withCredentials: true }
+        );
+        processQueue(null, res.data?.token);
+        return api(originalRequest);
+      } catch (refreshErr) {
+        processQueue(refreshErr, null);
+        // Refresh Token 30 ngày cũng hết hạn -> xóa session
+        localStorage.removeItem('ca_lam_token');
+        localStorage.removeItem('ca_lam_user');
+        localStorage.removeItem('ca_lam_active_store_id');
+        return Promise.reject(refreshErr);
+      } finally {
+        isRefreshing = false;
+      }
+    }
+
     const message = error.response?.data?.message || error.message || 'Đã có lỗi xảy ra';
     const err = new Error(message);
     err.status = error.response?.status;
+    err.code = error.response?.data?.code;
     err.response = error.response;
     return Promise.reject(err);
   }
@@ -38,6 +98,8 @@ export const authApi = {
   login: (credentials) => api.post('/auth/login', credentials),
   register: (data) => api.post('/auth/register', data),
   getMe: () => api.get('/auth/me'),
+  refreshToken: () => api.post('/auth/refresh'),
+  logout: () => api.post('/auth/logout'),
   forgotPassword: (email) => api.post('/auth/forgot-password', { email }),
   verifyResetOtp: (email, otp) => api.post('/auth/verify-reset-otp', { email, otp }),
   resetPassword: (email, otp, newPassword) =>

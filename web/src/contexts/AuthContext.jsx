@@ -19,18 +19,9 @@ export const AuthProvider = ({ children }) => {
   const [error, setError] = useState(null);
 
   const loadCurrentUser = useCallback(async (requestedStoreId) => {
-    const token = localStorage.getItem('ca_lam_token');
-    if (!token) {
-      setUser(null);
-      setStore(null);
-      setStores([]);
-      setRoleInStore(null);
-      setLoading(false);
-      return;
-    }
-
     try {
       setLoading(true);
+      // Gọi API /auth/me - Trình duyệt tự động đính kèm Cookie accessToken (hoặc tự refresh nếu hết hạn)
       const res = await authApi.getMe();
       const rawUser = res.user || res.data?.user;
 
@@ -77,9 +68,7 @@ export const AuthProvider = ({ children }) => {
         setRoleInStore(null);
       }
     } catch (err) {
-      console.warn('Failed to load user session:', err);
-      // Chỉ đăng xuất khi server phản hồi 401 hoặc 403 (Token hết hạn / không hợp lệ)
-      // KHÔNG đăng xuất khi lỗi mạng hoặc server backend đang khởi động lại
+      // Khi chưa đăng nhập hoặc cookie hết hạn hoàn toàn
       if (err.status === 401 || err.status === 403 || err.message?.includes('401') || err.message?.includes('hết hạn')) {
         localStorage.removeItem('ca_lam_token');
         localStorage.removeItem('ca_lam_user');
@@ -88,6 +77,8 @@ export const AuthProvider = ({ children }) => {
         setStore(null);
         setStores([]);
         setRoleInStore(null);
+      } else {
+        console.warn('Failed to load user session:', err);
       }
     } finally {
       setLoading(false);
@@ -163,14 +154,20 @@ export const AuthProvider = ({ children }) => {
     throw new Error(res.message || 'Đăng ký không thành công');
   };
 
-  const logout = () => {
-    localStorage.removeItem('ca_lam_token');
-    localStorage.removeItem('ca_lam_user');
-    localStorage.removeItem('ca_lam_active_store_id');
-    setUser(null);
-    setStore(null);
-    setStores([]);
-    setRoleInStore(null);
+  const logout = async () => {
+    try {
+      await authApi.logout();
+    } catch (err) {
+      console.warn('Lỗi gọi API đăng xuất:', err);
+    } finally {
+      localStorage.removeItem('ca_lam_token');
+      localStorage.removeItem('ca_lam_user');
+      localStorage.removeItem('ca_lam_active_store_id');
+      setUser(null);
+      setStore(null);
+      setStores([]);
+      setRoleInStore(null);
+    }
   };
 
   const value = {
