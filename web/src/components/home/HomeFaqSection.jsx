@@ -33,11 +33,11 @@ export const HomeFaqSection = () => {
 
   return (
     <section id="faq" className="py-20 max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-      <div className="text-center space-y-4 mb-14">
-        <span className="text-xs font-extrabold text-[#EA701B] uppercase tracking-wider bg-orange-100/80 px-3 py-1 rounded-full">
+      <div className="text-center space-y-3 mb-14">
+        <span className="text-xs font-semibold text-[#0066cc] bg-blue-50/80 border border-blue-200/60 px-3 py-1 rounded-full">
           Giải đáp thắc mắc
         </span>
-        <h2 className="text-3xl sm:text-4xl font-extrabold text-slate-900 tracking-tight">
+        <h2 className="text-3xl sm:text-4xl font-semibold text-[#1d1d1f] tracking-tight">
           Câu hỏi thường gặp
         </h2>
       </div>
@@ -48,22 +48,22 @@ export const HomeFaqSection = () => {
           return (
             <div
               key={index}
-              className="bg-white rounded-2xl border border-slate-200/80 overflow-hidden transition"
+              className="bg-white rounded-2xl border border-[#e5e5e7] overflow-hidden transition shadow-2xs"
             >
               <button
                 type="button"
                 onClick={() => setActiveFaq(isOpen ? null : index)}
-                className="w-full px-6 py-4 text-left flex items-center justify-between text-xs sm:text-sm font-bold text-slate-900 hover:text-[#EA701B] transition-colors cursor-pointer"
+                className="w-full px-6 py-4 text-left flex items-center justify-between text-xs sm:text-sm font-semibold text-[#1d1d1f] hover:text-[#0066cc] transition-colors cursor-pointer"
               >
                 <span>{faq.q}</span>
                 <ChevronDown
-                  className={`w-4 h-4 text-slate-400 transition-transform duration-200 shrink-0 ml-2 ${
-                    isOpen ? 'rotate-180 text-[#EA701B]' : ''
+                  className={`w-4 h-4 text-[#86868b] transition-transform duration-200 shrink-0 ml-2 ${
+                    isOpen ? 'rotate-180 text-[#0066cc]' : ''
                   }`}
                 />
               </button>
               {isOpen && (
-                <div className="px-6 pb-4 pt-1 text-xs text-slate-600 leading-relaxed border-t border-slate-100 animate-fade-in">
+                <div className="px-6 pb-4 pt-1 text-xs text-[#6e6e73] leading-relaxed border-t border-[#e5e5e7] animate-fade-in">
                   {faq.a}
                 </div>
               )}

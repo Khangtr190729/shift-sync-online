@@ -41,65 +41,65 @@ export const LoginPage = () => {
   };
 
   return (
-    <div className="min-h-screen bg-[#FFF7F0] flex flex-col justify-center py-12 sm:px-6 lg:px-8 font-['Be_Vietnam_Pro',sans-serif]">
+    <div className="min-h-screen bg-[#f5f5f7] flex flex-col justify-center py-12 sm:px-6 lg:px-8">
       {/* Brand Header */}
       <div className="sm:mx-auto sm:w-full sm:max-w-md text-center">
         <Link to="/" className="inline-block mb-3 hover:opacity-90 transition">
           <Logo size="lg" />
         </Link>
-        <h2 className="text-2xl font-extrabold text-slate-900 tracking-tight">
+        <h2 className="text-2xl font-semibold text-[#1d1d1f] tracking-tight">
           Đăng nhập vào hệ thống
         </h2>
-        <p className="mt-1 text-xs text-slate-500">
+        <p className="mt-1 text-xs text-[#6e6e73]">
           Xếp ca nhanh chóng — Bảng lương chuẩn xác cho cửa hàng
         </p>
       </div>
 
       <div className="mt-6 sm:mx-auto sm:w-full sm:max-w-md">
-        <div className="bg-white py-8 px-6 shadow-xl shadow-orange-950/5 rounded-3xl border border-slate-200/80 sm:px-10 animate-modal-pop">
+        <div className="bg-white py-8 px-6 shadow-xs rounded-2xl border border-[#e5e5e7] sm:px-10 animate-modal-pop">
           {error && (
-            <div className="mb-4 p-3 bg-red-50 border border-red-200 text-red-700 text-xs font-semibold rounded-xl flex items-center gap-2 animate-fade-in">
-              <AlertCircle className="w-4 h-4 text-red-600 shrink-0" />
+            <div className="mb-4 p-3 bg-rose-50 border border-rose-200/60 text-rose-700 text-xs font-medium rounded-xl flex items-center gap-2 animate-fade-in">
+              <AlertCircle className="w-4 h-4 text-rose-600 shrink-0" />
               <span>{error}</span>
             </div>
           )}
 
           <form className="space-y-4" onSubmit={handleSubmit}>
             <div>
-              <label className="block text-xs font-bold text-slate-700 mb-1">
+              <label className="block text-xs font-medium text-[#1d1d1f] mb-1">
                 Địa chỉ Email <span className="text-red-500">*</span>
               </label>
               <div className="relative">
-                <Mail className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
+                <Mail className="w-4 h-4 text-[#86868b] absolute left-3 top-1/2 -translate-y-1/2" />
                 <input
                   type="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder="admin@quan.com"
-                  className="w-full pl-9 pr-3 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-900 font-medium focus:outline-none focus:ring-2 focus:ring-[#EA701B] transition"
+                  className="w-full pl-9 pr-3 py-2.5 bg-white border border-[#d2d2d7] rounded-xl text-xs text-[#1d1d1f] font-normal focus:outline-none focus:border-[#0066cc] focus:ring-2 focus:ring-[#0066cc]/20 transition"
                   required
                 />
               </div>
             </div>
 
             <div>
-              <label className="block text-xs font-bold text-slate-700 mb-1">
+              <label className="block text-xs font-medium text-[#1d1d1f] mb-1">
                 Mật khẩu <span className="text-red-500">*</span>
               </label>
               <div className="relative">
-                <Lock className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
+                <Lock className="w-4 h-4 text-[#86868b] absolute left-3 top-1/2 -translate-y-1/2" />
                 <input
                   type={showPassword ? 'text' : 'password'}
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   placeholder="••••••••"
-                  className="w-full pl-9 pr-10 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-900 font-medium focus:outline-none focus:ring-2 focus:ring-[#EA701B] transition"
+                  className="w-full pl-9 pr-10 py-2.5 bg-white border border-[#d2d2d7] rounded-xl text-xs text-[#1d1d1f] font-normal focus:outline-none focus:border-[#0066cc] focus:ring-2 focus:ring-[#0066cc]/20 transition"
                   required
                 />
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600"
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-[#86868b] hover:text-[#1d1d1f]"
                 >
                   {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                 </button>
@@ -110,7 +110,7 @@ export const LoginPage = () => {
               <button
                 type="button"
                 onClick={() => setShowForgotPassword(true)}
-                className="text-xs font-semibold text-[#EA701B] hover:text-[#D55E0D] hover:underline transition"
+                className="text-xs font-medium text-[#0066cc] hover:underline transition cursor-pointer"
               >
                 Quên mật khẩu?
               </button>
@@ -119,7 +119,7 @@ export const LoginPage = () => {
             <button
               type="submit"
               disabled={loading}
-              className="w-full mt-2 py-3 px-4 bg-[#EA701B] hover:bg-[#D55E0D] text-white text-xs font-bold rounded-2xl shadow-md shadow-orange-500/20 hover-lift btn-press transition flex items-center justify-center gap-2 disabled:opacity-50"
+              className="w-full mt-2 py-3 px-4 bg-[#0066cc] hover:bg-[#0071e3] text-white text-xs font-medium rounded-full shadow-xs active:scale-[0.98] transition flex items-center justify-center gap-2 disabled:opacity-50 cursor-pointer"
             >
               <span>{loading ? 'Đang đăng nhập...' : 'Đăng nhập ngay'}</span>
               <ArrowRight className="w-4 h-4" />
@@ -127,10 +127,10 @@ export const LoginPage = () => {
           </form>
 
           {/* Quick Demo Helper Hint */}
-          <div className="mt-6 pt-4 border-t border-slate-100 text-center">
-            <p className="text-xs text-slate-500">
+          <div className="mt-6 pt-4 border-t border-[#e5e5e7] text-center">
+            <p className="text-xs text-[#6e6e73]">
               Chưa có tài khoản?{' '}
-              <Link to="/register" className="font-bold text-[#EA701B] hover:underline">
+              <Link to="/register" className="font-medium text-[#0066cc] hover:underline">
                 Đăng ký tài khoản mới
               </Link>
             </p>

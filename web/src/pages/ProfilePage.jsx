@@ -100,41 +100,41 @@ export const ProfilePage = () => {
   return (
     <div className="max-w-3xl space-y-6">
       {/* Header */}
-      <div className="bg-white p-5 rounded-2xl border border-slate-200/80 shadow-sm flex items-center justify-between">
+      <div className="bg-white p-5 rounded-2xl border border-[#e5e5e7] shadow-xs flex items-center justify-between">
         <div>
-          <h2 className="text-lg font-bold text-slate-900 tracking-tight flex items-center gap-2">
-            <User className="w-5 h-5 text-[#EA701B]" />
+          <h2 className="text-base font-semibold text-[#1d1d1f] tracking-tight flex items-center gap-2">
+            <User className="w-5 h-5 text-[#0066cc]" />
             <span>Hồ sơ cá nhân</span>
           </h2>
-          <p className="text-xs text-slate-500 mt-0.5">
+          <p className="text-xs text-[#6e6e73] mt-0.5">
             Cập nhật họ tên, giới tính, tuổi và bảo mật tài khoản.
           </p>
         </div>
-        <span className={`inline-flex items-center gap-1 text-xs font-bold px-3 py-1 rounded-full border ${roleBadge.color}`}>
+        <span className={`inline-flex items-center gap-1 text-xs font-semibold px-3 py-1 rounded-full border ${roleBadge.color}`}>
           <Shield className="w-3.5 h-3.5" />
           {roleBadge.text}
         </span>
       </div>
 
       {/* SECTION 1: EDIT PROFILE */}
-      <div className="bg-white rounded-2xl border border-slate-200/80 shadow-sm p-6 space-y-4">
-        <h3 className="text-sm font-bold text-slate-900 pb-2 border-b border-slate-100 flex items-center gap-2">
-          <User className="w-4 h-4 text-[#EA701B]" />
+      <div className="bg-white rounded-2xl border border-[#e5e5e7] shadow-xs p-6 space-y-4">
+        <h3 className="text-xs font-semibold text-[#1d1d1f] pb-2 border-b border-[#e5e5e7] flex items-center gap-2">
+          <User className="w-4 h-4 text-[#0066cc]" />
           <span>Thông tin cá nhân</span>
         </h3>
 
         {profileFeedback && (
           <div
-            className={`p-3 rounded-xl text-xs font-semibold flex items-center gap-2 ${
+            className={`p-3 rounded-xl text-xs font-medium flex items-center gap-2 ${
               profileFeedback.type === 'success'
-                ? 'bg-emerald-50 text-emerald-800 border border-emerald-200'
-                : 'bg-red-50 text-red-800 border border-red-200'
+                ? 'bg-emerald-50 text-emerald-800 border border-emerald-200/60'
+                : 'bg-rose-50 text-rose-800 border border-rose-200/60'
             }`}
           >
             {profileFeedback.type === 'success' ? (
               <CheckCircle2 className="w-4 h-4 text-emerald-600" />
             ) : (
-              <AlertCircle className="w-4 h-4 text-red-600" />
+              <AlertCircle className="w-4 h-4 text-rose-600" />
             )}
             <span>{profileFeedback.message}</span>
           </div>
@@ -143,32 +143,32 @@ export const ProfilePage = () => {
         <form onSubmit={handleUpdateProfile} className="space-y-4">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-              <label className="block text-xs font-bold text-slate-700 mb-1">Họ và tên</label>
+              <label className="block text-xs font-medium text-[#1d1d1f] mb-1">Họ và tên</label>
               <input
                 type="text"
                 value={profileForm.name}
                 onChange={(e) => setProfileForm((prev) => ({ ...prev, name: e.target.value }))}
-                className="w-full p-2.5 rounded-xl border border-slate-200 text-xs font-semibold text-slate-800 focus:outline-none focus:ring-2 focus:ring-[#EA701B]"
+                className="w-full p-2.5 rounded-xl border border-[#d2d2d7] text-xs font-medium text-[#1d1d1f] focus:outline-none focus:border-[#0066cc] focus:ring-2 focus:ring-[#0066cc]/20 transition"
                 required
               />
             </div>
 
             <div>
               <div className="flex items-center justify-between mb-1">
-                <label className="block text-xs font-bold text-slate-700">Email tài khoản</label>
-                <span className="text-[10px] text-slate-400">Dùng để Chủ quán mời bạn vào cửa hàng</span>
+                <label className="block text-xs font-medium text-[#1d1d1f]">Email tài khoản</label>
+                <span className="text-[10px] text-[#86868b]">Dùng để Chủ quán mời bạn vào cửa hàng</span>
               </div>
               <div className="flex items-center gap-2">
                 <input
                   type="email"
                   value={user?.email || ''}
                   disabled
-                  className="w-full p-2.5 rounded-xl border border-slate-200 text-xs font-mono bg-slate-50 text-slate-700 select-all"
+                  className="w-full p-2.5 rounded-xl border border-[#e5e5e7] text-xs font-mono bg-[#f5f5f7] text-[#6e6e73] select-all"
                 />
                 <button
                   type="button"
                   onClick={handleCopyEmail}
-                  className="px-3.5 py-2.5 bg-orange-50 hover:bg-orange-100 border border-orange-200 text-[#EA701B] rounded-xl text-xs font-bold transition flex items-center gap-1.5 shrink-0"
+                  className="px-3.5 py-2.5 bg-blue-50/60 hover:bg-blue-100/60 border border-blue-200/60 text-[#0066cc] rounded-xl text-xs font-medium transition flex items-center gap-1.5 shrink-0"
                   title="Sao chép Email"
                 >
                   {copiedEmail ? (
@@ -187,11 +187,11 @@ export const ProfilePage = () => {
             </div>
 
             <div>
-              <label className="block text-xs font-bold text-slate-700 mb-1">Giới tính</label>
+              <label className="block text-xs font-medium text-[#1d1d1f] mb-1">Giới tính</label>
               <select
                 value={profileForm.gender}
                 onChange={(e) => setProfileForm((prev) => ({ ...prev, gender: e.target.value }))}
-                className="w-full p-2.5 rounded-xl border border-slate-200 text-xs font-semibold text-slate-800 bg-white"
+                className="w-full p-2.5 rounded-xl border border-[#d2d2d7] text-xs font-medium text-[#1d1d1f] bg-white focus:outline-none focus:border-[#0066cc] focus:ring-2 focus:ring-[#0066cc]/20 transition"
               >
                 <option value="Nam">Nam</option>
                 <option value="Nữ">Nữ</option>
@@ -200,14 +200,14 @@ export const ProfilePage = () => {
             </div>
 
             <div>
-              <label className="block text-xs font-bold text-slate-700 mb-1">Tuổi</label>
+              <label className="block text-xs font-medium text-[#1d1d1f] mb-1">Tuổi</label>
               <input
                 type="number"
                 min="16"
                 max="80"
                 value={profileForm.age}
                 onChange={(e) => setProfileForm((prev) => ({ ...prev, age: e.target.value }))}
-                className="w-full p-2.5 rounded-xl border border-slate-200 text-xs font-mono font-bold text-slate-800 focus:outline-none focus:ring-2 focus:ring-[#EA701B]"
+                className="w-full p-2.5 rounded-xl border border-[#d2d2d7] text-xs font-mono font-medium text-[#1d1d1f] focus:outline-none focus:border-[#0066cc] focus:ring-2 focus:ring-[#0066cc]/20 transition"
                 required
               />
             </div>
@@ -217,7 +217,7 @@ export const ProfilePage = () => {
             <button
               type="submit"
               disabled={savingProfile}
-              className="px-5 py-2.5 bg-[#EA701B] hover:bg-[#D55E0D] text-white text-xs font-bold rounded-xl transition shadow-xs disabled:opacity-50 flex items-center gap-2"
+              className="px-5 py-2.5 bg-[#0066cc] hover:bg-[#0071e3] text-white text-xs font-semibold rounded-full transition shadow-xs active:scale-[0.98] disabled:opacity-50 flex items-center gap-2"
             >
               <Save className="w-4 h-4" />
               <span>{savingProfile ? 'Đang lưu...' : 'Lưu thông tin'}</span>
@@ -227,24 +227,24 @@ export const ProfilePage = () => {
       </div>
 
       {/* SECTION 2: CHANGE PASSWORD */}
-      <div className="bg-white rounded-2xl border border-slate-200/80 shadow-sm p-6 space-y-4">
-        <h3 className="text-sm font-bold text-slate-900 pb-2 border-b border-slate-100 flex items-center gap-2">
-          <KeyRound className="w-4 h-4 text-[#EA701B]" />
+      <div className="bg-white rounded-2xl border border-[#e5e5e7] shadow-xs p-6 space-y-4">
+        <h3 className="text-xs font-semibold text-[#1d1d1f] pb-2 border-b border-[#e5e5e7] flex items-center gap-2">
+          <KeyRound className="w-4 h-4 text-[#0066cc]" />
           <span>Đổi mật khẩu</span>
         </h3>
 
         {passwordFeedback && (
           <div
-            className={`p-3 rounded-xl text-xs font-semibold flex items-center gap-2 ${
+            className={`p-3 rounded-xl text-xs font-medium flex items-center gap-2 ${
               passwordFeedback.type === 'success'
-                ? 'bg-emerald-50 text-emerald-800 border border-emerald-200'
-                : 'bg-red-50 text-red-800 border border-red-200'
+                ? 'bg-emerald-50 text-emerald-800 border border-emerald-200/60'
+                : 'bg-rose-50 text-rose-800 border border-rose-200/60'
             }`}
           >
             {passwordFeedback.type === 'success' ? (
               <CheckCircle2 className="w-4 h-4 text-emerald-600" />
             ) : (
-              <AlertCircle className="w-4 h-4 text-red-600" />
+              <AlertCircle className="w-4 h-4 text-rose-600" />
             )}
             <span>{passwordFeedback.message}</span>
           </div>
@@ -252,21 +252,21 @@ export const ProfilePage = () => {
 
         <form onSubmit={handleChangePassword} className="space-y-4">
           <div>
-            <label className="block text-xs font-bold text-slate-700 mb-1">Mật khẩu hiện tại</label>
+            <label className="block text-xs font-medium text-[#1d1d1f] mb-1">Mật khẩu hiện tại</label>
             <input
               type="password"
               value={passwordForm.currentPassword}
               onChange={(e) =>
                 setPasswordForm((prev) => ({ ...prev, currentPassword: e.target.value }))
               }
-              className="w-full p-2.5 rounded-xl border border-slate-200 text-xs text-slate-800 focus:outline-none focus:ring-2 focus:ring-[#EA701B]"
+              className="w-full p-2.5 rounded-xl border border-[#d2d2d7] text-xs text-[#1d1d1f] focus:outline-none focus:border-[#0066cc] focus:ring-2 focus:ring-[#0066cc]/20 transition"
               required
             />
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-              <label className="block text-xs font-bold text-slate-700 mb-1">Mật khẩu mới</label>
+              <label className="block text-xs font-medium text-[#1d1d1f] mb-1">Mật khẩu mới</label>
               <input
                 type="password"
                 placeholder="Ít nhất 6 ký tự"
@@ -274,13 +274,13 @@ export const ProfilePage = () => {
                 onChange={(e) =>
                   setPasswordForm((prev) => ({ ...prev, newPassword: e.target.value }))
                 }
-                className="w-full p-2.5 rounded-xl border border-slate-200 text-xs text-slate-800 focus:outline-none focus:ring-2 focus:ring-[#EA701B]"
+                className="w-full p-2.5 rounded-xl border border-[#d2d2d7] text-xs text-[#1d1d1f] focus:outline-none focus:border-[#0066cc] focus:ring-2 focus:ring-[#0066cc]/20 transition"
                 required
               />
             </div>
 
             <div>
-              <label className="block text-xs font-bold text-slate-700 mb-1">
+              <label className="block text-xs font-medium text-[#1d1d1f] mb-1">
                 Nhập lại mật khẩu mới
               </label>
               <input
@@ -289,7 +289,7 @@ export const ProfilePage = () => {
                 onChange={(e) =>
                   setPasswordForm((prev) => ({ ...prev, confirmPassword: e.target.value }))
                 }
-                className="w-full p-2.5 rounded-xl border border-slate-200 text-xs text-slate-800 focus:outline-none focus:ring-2 focus:ring-[#EA701B]"
+                className="w-full p-2.5 rounded-xl border border-[#d2d2d7] text-xs text-[#1d1d1f] focus:outline-none focus:border-[#0066cc] focus:ring-2 focus:ring-[#0066cc]/20 transition"
                 required
               />
             </div>
@@ -299,9 +299,9 @@ export const ProfilePage = () => {
             <button
               type="submit"
               disabled={savingPassword}
-              className="px-5 py-2.5 bg-slate-900 hover:bg-slate-800 text-white text-xs font-bold rounded-xl transition shadow-xs disabled:opacity-50 flex items-center gap-2"
+              className="px-5 py-2.5 bg-[#1d1d1f] hover:bg-[#333333] text-white text-xs font-semibold rounded-full transition shadow-xs active:scale-[0.98] disabled:opacity-50 flex items-center gap-2"
             >
-              <KeyRound className="w-4 h-4 text-[#EA701B]" />
+              <KeyRound className="w-4 h-4 text-[#0066cc]" />
               <span>{savingPassword ? 'Đang cập nhật...' : 'Đổi mật khẩu ngay'}</span>
             </button>
           </div>
