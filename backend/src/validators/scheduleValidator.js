@@ -93,7 +93,7 @@ export const autoGenerateScheduleSchema = z.object({
   startDate: z.string({ required_error: 'Vui lòng cung cấp ngày bắt đầu (startDate).' }),
   endDate: z.string({ required_error: 'Vui lòng cung cấp ngày kết thúc (endDate).' }),
 
-  days: z.array(z.string()).optional(),
+  days: z.array(z.any()).optional(),
   staffPerShift: z.any().optional().default('AUTO_BY_STARS'),
   maxShiftsPerDay: z.coerce.number().int().min(1).optional().default(1),
   preserveExisting: z.boolean().optional().default(false),

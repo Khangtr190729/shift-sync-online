@@ -543,10 +543,21 @@ export const generateAutoSchedule = async ({
     throw err;
   }
 
-  // Chuẩn bị danh sách 7 ngày trong tuần
+  // Chuẩn bị danh sách 7 ngày trong tuần (chuẩn hóa cả dạng object { date, dayOfWeek } hoặc string 'YYYY-MM-DD')
   let weekDays = days;
-  if (!Array.isArray(weekDays) || weekDays.length === 0) {
-    const dayNames = ['Thứ Hai', 'Thứ Ba', 'Thứ Tư', 'Thứ Năm', 'Thứ Sáu', 'Thứ Bảy', 'Chủ Nhật'];
+  const dayNames = ['Thứ Hai', 'Thứ Ba', 'Thứ Tư', 'Thứ Năm', 'Thứ Sáu', 'Thứ Bảy', 'Chủ Nhật'];
+
+  if (Array.isArray(weekDays) && weekDays.length > 0) {
+    weekDays = weekDays.map((item, index) => {
+      if (typeof item === 'string') {
+        return { date: item, dayOfWeek: dayNames[index % 7] };
+      }
+      return {
+        date: item.date || item.dateStr,
+        dayOfWeek: item.dayOfWeek || item.dayName || dayNames[index % 7],
+      };
+    });
+  } else {
     const baseDate = new Date(startDate);
     weekDays = [];
     for (let i = 0; i < 7; i++) {
