@@ -21,7 +21,8 @@ import StoreSelectorModal from '../../components/admin/dashboard/StoreSelectorMo
 import ApplePressable from '../../components/ApplePressable';
 
 export const AdminDashboardScreen = ({ navigation }) => {
-  const { user, store, stores } = useAuth();
+  const { user, store, stores, roleInStore, isAdmin } = useAuth();
+  const isManager = roleInStore === 'MANAGER' || user?.role === 'MANAGER';
   const [storeModalVisible, setStoreModalVisible] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
   const [memberCount, setMemberCount] = useState(0);
@@ -157,27 +158,50 @@ export const AdminDashboardScreen = ({ navigation }) => {
       >
         {/* Header Store & Owner info */}
         <View style={styles.topHeader}>
-          <ApplePressable
-            style={styles.storeBadgeWrap}
-            onPress={() => setStoreModalVisible(true)}
-            activeScale={0.96}
-            contentStyle={styles.storeBadge}
-          >
-            <Ionicons name="storefront" size={14} color={colors.primary} />
-            <Text style={styles.storeName}>{store?.name || 'Cửa hàng của tôi'}</Text>
-            {stores?.length > 1 && (
-              <View style={styles.branchCountBadge}>
-                <Text style={styles.branchCountText}>{stores.length}</Text>
-              </View>
+          <View style={styles.topHeaderRow}>
+            <View style={styles.storeBadgeContainer}>
+              <ApplePressable
+                style={styles.storeBadgeWrap}
+                onPress={() => setStoreModalVisible(true)}
+                activeScale={0.96}
+                contentStyle={styles.storeBadge}
+              >
+                <Ionicons name="storefront" size={14} color={colors.primary} />
+                <Text style={styles.storeName}>{store?.name || 'Cửa hàng của tôi'}</Text>
+                {stores?.length > 1 && (
+                  <View style={styles.branchCountBadge}>
+                    <Text style={styles.branchCountText}>{stores.length}</Text>
+                  </View>
+                )}
+                <Ionicons name="chevron-down" size={12} color={colors.primaryDark} style={{ marginLeft: 2 }} />
+              </ApplePressable>
+
+              {isManager && (
+                <View style={styles.managerRoleBadge}>
+                  <Text style={styles.managerRoleText}>Quản lý</Text>
+                </View>
+              )}
+            </View>
+
+            {isManager && (
+              <ApplePressable
+                onPress={() => navigation.navigate('AppTabs', { screen: 'MySchedule' })}
+                activeScale={0.95}
+                contentStyle={styles.scheduleSwitchBtn}
+              >
+                <Ionicons name="calendar-outline" size={13} color="#0066CC" />
+                <Text style={styles.scheduleSwitchBtnText}>Lịch của tôi</Text>
+              </ApplePressable>
             )}
-            <Ionicons name="chevron-down" size={12} color={colors.primaryDark} style={{ marginLeft: 2 }} />
-          </ApplePressable>
+          </View>
 
           <Text style={styles.greetingTitle}>
-            Xin chào Chủ quán {user?.fullName || ''}! 👑
+            {isAdmin
+              ? `Xin chào Chủ quán ${user?.fullName || ''}! 👑`
+              : `Xin chào Quản lý ${user?.fullName || ''}! ⭐`}
           </Text>
           <Text style={styles.weekTag}>
-            Quản trị cửa hàng • Tuần {week}/{year}
+            {isAdmin ? 'Quản trị cửa hàng' : 'Quản lý cửa hàng'} • Tuần {week}/{year}
           </Text>
         </View>
 
@@ -228,9 +252,53 @@ const styles = StyleSheet.create({
     marginBottom: 18,
     marginTop: 4,
   },
+  topHeaderRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    marginBottom: 8,
+  },
+  storeBadgeContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+  },
+  managerRoleBadge: {
+    backgroundColor: '#EFF6FF',
+    borderWidth: 1,
+    borderColor: '#BFDBFE',
+    paddingHorizontal: 8,
+    paddingVertical: 3,
+    borderRadius: 8,
+  },
+  managerRoleText: {
+    color: '#0066CC',
+    fontSize: 10,
+    fontWeight: '700',
+  },
+  scheduleSwitchBtn: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 5,
+    backgroundColor: '#FFFFFF',
+    borderWidth: 1,
+    borderColor: '#E5E5EA',
+    paddingVertical: 6,
+    paddingHorizontal: 11,
+    borderRadius: 16,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.06,
+    shadowRadius: 2,
+    elevation: 1,
+  },
+  scheduleSwitchBtnText: {
+    fontSize: 11,
+    fontWeight: '700',
+    color: '#1D1D1F',
+  },
   storeBadgeWrap: {
     alignSelf: 'flex-start',
-    marginBottom: 8,
   },
   storeBadge: {
     flexDirection: 'row',
