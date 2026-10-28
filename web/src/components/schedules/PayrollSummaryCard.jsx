@@ -2,7 +2,7 @@ import React from 'react';
 import { DollarSign, AlertCircle } from 'lucide-react';
 import { formatVND } from '../../utils/formatters';
 
-export const PayrollSummaryCard = ({ payrollSummary }) => {
+const PayrollSummaryCardComponent = ({ payrollSummary }) => {
   const hasMissedShifts = (payrollSummary.storeTotalMissedShifts || 0) > 0;
   const hasPartialShifts = (payrollSummary.storeTotalPartialShifts || 0) > 0;
 
@@ -104,4 +104,5 @@ export const PayrollSummaryCard = ({ payrollSummary }) => {
   );
 };
 
+export const PayrollSummaryCard = React.memo(PayrollSummaryCardComponent);
 export default PayrollSummaryCard;

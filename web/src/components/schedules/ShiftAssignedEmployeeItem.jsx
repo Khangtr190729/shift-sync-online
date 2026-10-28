@@ -17,7 +17,7 @@ import { ShiftEvaluationForm } from './ShiftEvaluationForm';
  * - Nút Đánh giá ca (Chưa tốt - Trừ 1 phần, Không hoàn thành, Khôi phục, Sửa mức trừ)
  * - Nhúng ShiftEvaluationForm khi đang đánh giá
  */
-export const ShiftAssignedEmployeeItem = ({
+const ShiftAssignedEmployeeItemComponent = ({
   assignment,
   member,
   targetShift,
@@ -265,4 +265,5 @@ export const ShiftAssignedEmployeeItem = ({
   );
 };
 
+export const ShiftAssignedEmployeeItem = React.memo(ShiftAssignedEmployeeItemComponent);
 export default ShiftAssignedEmployeeItem;

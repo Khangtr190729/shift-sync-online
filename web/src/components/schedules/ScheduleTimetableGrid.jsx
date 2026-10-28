@@ -1,7 +1,7 @@
 import React from 'react';
 import { Clock, Plus, Lock, CheckCircle2, AlertTriangle, Star } from 'lucide-react';
 
-export const ScheduleTimetableGrid = ({
+const ScheduleTimetableGridComponent = ({
   shifts,
   daysOfWeek,
   assignments,
@@ -328,4 +328,5 @@ export const ScheduleTimetableGrid = ({
   );
 };
 
+export const ScheduleTimetableGrid = React.memo(ScheduleTimetableGridComponent);
 export default ScheduleTimetableGrid;

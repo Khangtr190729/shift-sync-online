@@ -199,7 +199,7 @@ export const DashboardPage = () => {
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
           {/* Stat 1: Nhân viên */}
-          <div className="bg-white p-5 rounded-2xl border border-[#e5e5e7] shadow-xs flex items-center justify-between hover-lift cursor-default group transition-all duration-200">
+          <div className="bg-white p-5 rounded-2xl border border-[#e5e5e7] shadow-xs flex items-center justify-between hover-lift cursor-default group transition-all duration-200 animate-stagger-1">
             <div>
               <p className="text-xs font-medium text-[#86868b] uppercase tracking-wider">Nhân sự cửa hàng</p>
               <h3 className="text-2xl font-semibold text-[#1d1d1f] font-mono mt-1">
@@ -213,7 +213,7 @@ export const DashboardPage = () => {
           </div>
 
           {/* Stat 2: Ca tuần này */}
-          <div className="bg-white p-5 rounded-2xl border border-[#e5e5e7] shadow-xs flex items-center justify-between hover-lift cursor-default group transition-all duration-200">
+          <div className="bg-white p-5 rounded-2xl border border-[#e5e5e7] shadow-xs flex items-center justify-between hover-lift cursor-default group transition-all duration-200 animate-stagger-2">
             <div>
               <p className="text-xs font-medium text-[#86868b] uppercase tracking-wider">Ca đã phân tuần này</p>
               <h3 className="text-2xl font-semibold text-[#1d1d1f] font-mono mt-1">
@@ -229,7 +229,7 @@ export const DashboardPage = () => {
           </div>
 
           {/* Stat 3: Dự toán lương tuần */}
-          <div className="bg-white p-5 rounded-2xl border border-[#e5e5e7] shadow-xs flex items-center justify-between hover-lift cursor-default group transition-all duration-200">
+          <div className="bg-white p-5 rounded-2xl border border-[#e5e5e7] shadow-xs flex items-center justify-between hover-lift cursor-default group transition-all duration-200 animate-stagger-3">
             <div>
               <p className="text-xs font-medium text-[#86868b] uppercase tracking-wider">Dự toán lương tuần</p>
               <h3 className="text-xl font-semibold text-[#0066cc] font-mono mt-1">
@@ -243,7 +243,7 @@ export const DashboardPage = () => {
           </div>
 
           {/* Stat 4: Trạng thái lịch */}
-          <div className="bg-white p-5 rounded-2xl border border-[#e5e5e7] shadow-xs flex items-center justify-between hover-lift cursor-default group transition-all duration-200">
+          <div className="bg-white p-5 rounded-2xl border border-[#e5e5e7] shadow-xs flex items-center justify-between hover-lift cursor-default group transition-all duration-200 animate-stagger-4">
             <div>
               <p className="text-xs font-medium text-[#86868b] uppercase tracking-wider">Trạng thái lịch tuần</p>
               <div className="mt-2">
@@ -321,7 +321,7 @@ export const DashboardPage = () => {
         {/* 2 Key Monthly Stat Cards */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {/* Monthly Stat 1: Dự toán lương tháng */}
-          <div className="bg-white p-6 rounded-2xl border border-[#e5e5e7] shadow-xs flex items-center justify-between hover-lift cursor-default group transition-all duration-200">
+          <div className="bg-white p-6 rounded-2xl border border-[#e5e5e7] shadow-xs flex items-center justify-between hover-lift cursor-default group transition-all duration-200 animate-stagger-1">
             <div>
               <p className="text-xs font-medium text-[#86868b] uppercase tracking-wider">
                 {isCurrentMonth ? 'Dự đoán lương tháng này' : `Dự toán lương Tháng ${selectedMonth}/${selectedYear}`}
@@ -339,7 +339,7 @@ export const DashboardPage = () => {
           </div>
 
           {/* Monthly Stat 2: Ca đã phân trong tháng */}
-          <div className="bg-white p-6 rounded-2xl border border-[#e5e5e7] shadow-xs flex items-center justify-between hover-lift cursor-default group transition-all duration-200">
+          <div className="bg-white p-6 rounded-2xl border border-[#e5e5e7] shadow-xs flex items-center justify-between hover-lift cursor-default group transition-all duration-200 animate-stagger-2">
             <div>
               <p className="text-xs font-medium text-[#86868b] uppercase tracking-wider">
                 {isCurrentMonth ? 'Ca đã phân tháng này' : `Ca đã phân Tháng ${selectedMonth}/${selectedYear}`}
@@ -363,7 +363,7 @@ export const DashboardPage = () => {
         {/* Action 1 */}
         <div
           onClick={() => navigate('/schedules')}
-          className="bg-white p-6 rounded-2xl border border-[#e5e5e7] shadow-xs hover:border-[#0066cc]/40 hover:shadow-md transition-all duration-200 cursor-pointer group flex flex-col justify-between active:scale-[0.98]"
+          className="bg-white p-6 rounded-2xl border border-[#e5e5e7] shadow-xs hover:border-[#0066cc]/40 hover:shadow-md transition-all duration-200 cursor-pointer group flex flex-col justify-between btn-press animate-stagger-1"
         >
           <div>
             <div className="w-10 h-10 rounded-full bg-blue-50 text-[#0066cc] flex items-center justify-center mb-3 group-hover:scale-105 transition-transform duration-200">
@@ -385,7 +385,7 @@ export const DashboardPage = () => {
         {/* Action 2 */}
         <div
           onClick={() => navigate('/employees')}
-          className="bg-white p-6 rounded-2xl border border-[#e5e5e7] shadow-xs hover:border-[#0066cc]/40 hover:shadow-md transition-all duration-200 cursor-pointer group flex flex-col justify-between active:scale-[0.98]"
+          className="bg-white p-6 rounded-2xl border border-[#e5e5e7] shadow-xs hover:border-[#0066cc]/40 hover:shadow-md transition-all duration-200 cursor-pointer group flex flex-col justify-between btn-press animate-stagger-2"
         >
           <div>
             <div className="w-10 h-10 rounded-full bg-blue-50 text-[#0066cc] flex items-center justify-center mb-3 group-hover:scale-105 transition-transform duration-200">
@@ -407,7 +407,7 @@ export const DashboardPage = () => {
         {/* Action 3 */}
         <div
           onClick={() => navigate('/shifts')}
-          className="bg-white p-6 rounded-2xl border border-[#e5e5e7] shadow-xs hover:border-[#0066cc]/40 hover:shadow-md transition-all duration-200 cursor-pointer group flex flex-col justify-between active:scale-[0.98]"
+          className="bg-white p-6 rounded-2xl border border-[#e5e5e7] shadow-xs hover:border-[#0066cc]/40 hover:shadow-md transition-all duration-200 cursor-pointer group flex flex-col justify-between btn-press animate-stagger-3"
         >
           <div>
             <div className="w-10 h-10 rounded-full bg-blue-50 text-[#0066cc] flex items-center justify-center mb-3 group-hover:scale-105 transition-transform duration-200">
