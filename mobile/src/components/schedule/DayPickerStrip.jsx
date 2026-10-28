@@ -3,7 +3,7 @@ import { View, Text, StyleSheet } from 'react-native';
 import colors from '../../theme/colors';
 import ApplePressable from '../ApplePressable';
 
-export const DayPickerStrip = ({
+const DayPickerStripComponent = ({
   daysOfWeek = [],
   selectedDate,
   shiftDatesSet = new Set(),
@@ -123,4 +123,5 @@ const styles = StyleSheet.create({
   },
 });
 
+export const DayPickerStrip = React.memo(DayPickerStripComponent);
 export default DayPickerStrip;

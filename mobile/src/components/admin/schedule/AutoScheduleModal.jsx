@@ -10,8 +10,9 @@ import {
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import colors from '../../../theme/colors';
+import ApplePressable from '../../ApplePressable';
 
-export const AutoScheduleModal = ({
+const AutoScheduleModalComponent = ({
   visible,
   onClose,
   onRunAutoSchedule,
@@ -37,6 +38,9 @@ export const AutoScheduleModal = ({
     >
       <View style={styles.overlay}>
         <View style={styles.modalBox}>
+          {/* Apple Sheet Grab Handle */}
+          <View style={styles.grabHandle} />
+
           {/* Header */}
           <View style={styles.header}>
             <View style={styles.iconCircle}>
@@ -159,30 +163,30 @@ export const AutoScheduleModal = ({
 
           {/* Action buttons */}
           <View style={styles.btnRow}>
-            <TouchableOpacity
+            <ApplePressable
               style={styles.cancelBtn}
               onPress={onClose}
               disabled={loading}
-              activeOpacity={0.7}
+              activeScale={0.96}
             >
               <Text style={styles.cancelText}>Đóng</Text>
-            </TouchableOpacity>
+            </ApplePressable>
 
-            <TouchableOpacity
+            <ApplePressable
               style={styles.confirmBtn}
               onPress={handleConfirm}
               disabled={loading}
-              activeOpacity={0.8}
+              activeScale={0.96}
             >
               {loading ? (
                 <ActivityIndicator size="small" color="#FFFFFF" />
               ) : (
-                <>
+                <View style={styles.confirmContent}>
                   <Ionicons name="flash" size={16} color="#FFFFFF" />
                   <Text style={styles.confirmText}>Bắt đầu xếp ca</Text>
-                </>
+                </View>
               )}
-            </TouchableOpacity>
+            </ApplePressable>
           </View>
         </View>
       </View>
@@ -210,6 +214,14 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.2,
     shadowRadius: 20,
     elevation: 10,
+  },
+  grabHandle: {
+    width: 36,
+    height: 5,
+    borderRadius: 3,
+    backgroundColor: '#D2D2D7',
+    alignSelf: 'center',
+    marginBottom: 12,
   },
   header: {
     alignItems: 'center',
@@ -328,18 +340,20 @@ const styles = StyleSheet.create({
   },
   confirmBtn: {
     flex: 2,
-    flexDirection: 'row',
-    paddingVertical: 13,
     borderRadius: 14,
     backgroundColor: colors.primary,
-    alignItems: 'center',
-    justifyContent: 'center',
-    gap: 6,
     shadowColor: colors.primary,
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.3,
     shadowRadius: 8,
     elevation: 4,
+  },
+  confirmContent: {
+    flexDirection: 'row',
+    paddingVertical: 13,
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 6,
   },
   confirmText: {
     fontSize: 13,
@@ -348,4 +362,5 @@ const styles = StyleSheet.create({
   },
 });
 
+export const AutoScheduleModal = React.memo(AutoScheduleModalComponent);
 export default AutoScheduleModal;

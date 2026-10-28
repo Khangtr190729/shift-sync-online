@@ -18,6 +18,7 @@ import StatOverviewCards from '../../components/admin/dashboard/StatOverviewCard
 import QuickActionsGrid from '../../components/admin/dashboard/QuickActionsGrid';
 import TodayShiftsSection from '../../components/admin/dashboard/TodayShiftsSection';
 import StoreSelectorModal from '../../components/admin/dashboard/StoreSelectorModal';
+import ApplePressable from '../../components/ApplePressable';
 
 export const AdminDashboardScreen = ({ navigation }) => {
   const { user, store, stores } = useAuth();
@@ -156,10 +157,11 @@ export const AdminDashboardScreen = ({ navigation }) => {
       >
         {/* Header Store & Owner info */}
         <View style={styles.topHeader}>
-          <TouchableOpacity
-            style={styles.storeBadge}
+          <ApplePressable
+            style={styles.storeBadgeWrap}
             onPress={() => setStoreModalVisible(true)}
-            activeOpacity={0.7}
+            activeScale={0.96}
+            contentStyle={styles.storeBadge}
           >
             <Ionicons name="storefront" size={14} color={colors.primary} />
             <Text style={styles.storeName}>{store?.name || 'Cửa hàng của tôi'}</Text>
@@ -169,7 +171,7 @@ export const AdminDashboardScreen = ({ navigation }) => {
               </View>
             )}
             <Ionicons name="chevron-down" size={12} color={colors.primaryDark} style={{ marginLeft: 2 }} />
-          </TouchableOpacity>
+          </ApplePressable>
 
           <Text style={styles.greetingTitle}>
             Xin chào Chủ quán {user?.fullName || ''}! 👑
@@ -226,6 +228,10 @@ const styles = StyleSheet.create({
     marginBottom: 18,
     marginTop: 4,
   },
+  storeBadgeWrap: {
+    alignSelf: 'flex-start',
+    marginBottom: 8,
+  },
   storeBadge: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -236,8 +242,6 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     borderWidth: 1,
     borderColor: '#FED7AA',
-    alignSelf: 'flex-start',
-    marginBottom: 8,
   },
   storeName: {
     fontSize: 12,

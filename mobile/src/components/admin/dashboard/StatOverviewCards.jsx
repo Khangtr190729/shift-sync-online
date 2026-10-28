@@ -4,7 +4,7 @@ import { Ionicons } from '@expo/vector-icons';
 import colors from '../../../theme/colors';
 import { formatVND } from '../../../utils/formatters';
 
-export const StatOverviewCards = ({
+const StatOverviewCardsComponent = ({
   memberCount = 0,
   shiftCount = 0,
   totalHours = 0,
@@ -120,7 +120,7 @@ const styles = StyleSheet.create({
     borderRadius: 18,
     padding: 16,
     borderWidth: 1,
-    borderColor: '#FED7AA',
+    borderColor: '#E5E5E7',
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.04,
@@ -149,4 +149,5 @@ const styles = StyleSheet.create({
   },
 });
 
+export const StatOverviewCards = React.memo(StatOverviewCardsComponent);
 export default StatOverviewCards;

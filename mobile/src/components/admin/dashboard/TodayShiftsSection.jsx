@@ -2,8 +2,9 @@ import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import colors from '../../../theme/colors';
+import ApplePressable from '../../ApplePressable';
 
-export const TodayShiftsSection = ({ todayShifts = [], onGoToSchedule }) => {
+const TodayShiftsSectionComponent = ({ todayShifts = [], onGoToSchedule }) => {
   return (
     <View style={styles.container}>
       <View style={styles.headerRow}>
@@ -26,7 +27,12 @@ export const TodayShiftsSection = ({ todayShifts = [], onGoToSchedule }) => {
           const assignedCount = shift.assignedEmployees?.length || shift.assignments?.length || 0;
 
           return (
-            <View key={shift._id || idx} style={styles.shiftCard}>
+            <ApplePressable
+              key={shift._id || idx}
+              style={styles.shiftCard}
+              onPress={onGoToSchedule}
+              activeScale={0.97}
+            >
               <View style={styles.shiftLeft}>
                 <View style={styles.shiftIconBox}>
                   <Ionicons name="time" size={18} color={colors.primary} />
@@ -45,7 +51,7 @@ export const TodayShiftsSection = ({ todayShifts = [], onGoToSchedule }) => {
                   {assignedCount} người
                 </Text>
               </View>
-            </View>
+            </ApplePressable>
           );
         })
       )}
@@ -148,4 +154,5 @@ const styles = StyleSheet.create({
   },
 });
 
+export const TodayShiftsSection = React.memo(TodayShiftsSectionComponent);
 export default TodayShiftsSection;

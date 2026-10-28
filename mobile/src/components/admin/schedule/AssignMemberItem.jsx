@@ -1,9 +1,10 @@
 import React from 'react';
-import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
+import { View, Text, StyleSheet } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import colors from '../../../theme/colors';
+import ApplePressable from '../../ApplePressable';
 
-export const AssignMemberItem = ({
+const AssignMemberItemComponent = ({
   member,
   isAssigned,
   conflict,
@@ -12,14 +13,16 @@ export const AssignMemberItem = ({
   const isDisabled = isAssigned || Boolean(conflict);
 
   return (
-    <TouchableOpacity
+    <ApplePressable
       style={[
         styles.memberItem,
         isAssigned && styles.memberItemDisabled,
         conflict && (conflict.isCrossStore ? styles.memberItemCrossConflict : styles.memberItemLocalConflict),
       ]}
       onPress={onPress}
-      activeOpacity={isDisabled ? 0.9 : 0.7}
+      disabled={isDisabled}
+      activeScale={0.96}
+      contentStyle={styles.memberItemContent}
     >
       <View style={styles.memberLeft}>
         <View
@@ -102,15 +105,18 @@ export const AssignMemberItem = ({
           <Ionicons name="add" size={18} color={colors.primary} />
         </View>
       )}
-    </TouchableOpacity>
+    </ApplePressable>
   );
 };
 
 const styles = StyleSheet.create({
-  memberItem: {
+  memberItemContent: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
+    width: '100%',
+  },
+  memberItem: {
     padding: 12,
     borderRadius: 14,
     borderWidth: 1,
@@ -269,4 +275,5 @@ const styles = StyleSheet.create({
   },
 });
 
+export const AssignMemberItem = React.memo(AssignMemberItemComponent);
 export default AssignMemberItem;

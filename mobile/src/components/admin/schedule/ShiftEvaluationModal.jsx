@@ -157,6 +157,9 @@ export const ShiftEvaluationModal = ({
     >
       <View style={styles.overlay}>
         <View style={styles.modalBox}>
+          {/* iOS Sheet Grab Handle */}
+          <View style={styles.grabHandle} />
+
           {/* Header */}
           <View style={styles.header}>
             <View>
@@ -422,6 +425,14 @@ const styles = StyleSheet.create({
     borderTopRightRadius: 24,
     padding: 20,
     maxHeight: '85%',
+  },
+  grabHandle: {
+    width: 36,
+    height: 5,
+    borderRadius: 3,
+    backgroundColor: '#D2D2D7',
+    alignSelf: 'center',
+    marginBottom: 12,
   },
   header: {
     flexDirection: 'row',

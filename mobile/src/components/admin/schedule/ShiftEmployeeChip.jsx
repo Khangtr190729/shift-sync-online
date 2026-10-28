@@ -4,7 +4,7 @@ import { Ionicons } from '@expo/vector-icons';
 import colors from '../../../theme/colors';
 import { formatVND } from '../../../utils/formatters';
 
-export const ShiftEmployeeChip = ({
+const ShiftEmployeeChipComponent = ({
   assign,
   shiftItem,
   conflict,
@@ -229,4 +229,5 @@ const styles = StyleSheet.create({
   },
 });
 
+export const ShiftEmployeeChip = React.memo(ShiftEmployeeChipComponent);
 export default ShiftEmployeeChip;

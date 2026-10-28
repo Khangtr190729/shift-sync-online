@@ -3,7 +3,6 @@ import {
   Modal,
   View,
   Text,
-  TouchableOpacity,
   ScrollView,
   StyleSheet,
   Alert,
@@ -11,6 +10,7 @@ import {
 import { Ionicons } from '@expo/vector-icons';
 import colors from '../../../theme/colors';
 import AssignMemberItem from './AssignMemberItem';
+import ApplePressable from '../../ApplePressable';
 
 export const AssignEmployeeModal = ({
   visible,
@@ -58,6 +58,9 @@ export const AssignEmployeeModal = ({
     >
       <View style={styles.overlay}>
         <View style={styles.modalBox}>
+          {/* iOS Sheet Grab Handle */}
+          <View style={styles.grabHandle} />
+
           <View style={styles.header}>
             <View style={styles.headerTitleWrap}>
               <Text style={styles.title}>Thêm nhân viên vào ca</Text>
@@ -65,9 +68,9 @@ export const AssignEmployeeModal = ({
                 {targetShift.shiftName || targetShift.shift?.name} ({targetShift.startTime} — {targetShift.endTime})
               </Text>
             </View>
-            <TouchableOpacity onPress={onClose} hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}>
+            <ApplePressable onPress={onClose} activeScale={0.88} hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}>
               <Ionicons name="close-circle" size={24} color={colors.textSecondary} />
-            </TouchableOpacity>
+            </ApplePressable>
           </View>
 
           <Text style={styles.listLabel}>Chọn nhân viên trong danh sách:</Text>
@@ -113,6 +116,14 @@ const styles = StyleSheet.create({
     borderTopRightRadius: 24,
     padding: 22,
     maxHeight: '80%',
+  },
+  grabHandle: {
+    width: 36,
+    height: 5,
+    borderRadius: 3,
+    backgroundColor: '#D2D2D7',
+    alignSelf: 'center',
+    marginBottom: 14,
   },
   header: {
     flexDirection: 'row',

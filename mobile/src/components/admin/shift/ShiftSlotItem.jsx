@@ -1,9 +1,10 @@
 import React from 'react';
-import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
+import { View, Text, StyleSheet } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import colors from '../../../theme/colors';
+import ApplePressable from '../../ApplePressable';
 
-export const ShiftSlotItem = ({
+const ShiftSlotItemComponent = ({
   shift,
   onEdit,
   onDelete,
@@ -46,22 +47,24 @@ export const ShiftSlotItem = ({
         </Text>
 
         <View style={styles.actions}>
-          <TouchableOpacity
+          <ApplePressable
             style={styles.editBtn}
             onPress={() => onEdit(shift)}
-            activeOpacity={0.7}
+            activeScale={0.93}
           >
-            <Ionicons name="pencil" size={14} color={colors.primary} />
-            <Text style={styles.editBtnText}>Chỉnh sửa</Text>
-          </TouchableOpacity>
+            <View style={styles.editBtnInner}>
+              <Ionicons name="pencil" size={14} color={colors.primary} />
+              <Text style={styles.editBtnText}>Chỉnh sửa</Text>
+            </View>
+          </ApplePressable>
 
-          <TouchableOpacity
+          <ApplePressable
             style={styles.deleteBtn}
             onPress={() => onDelete(shift)}
-            activeOpacity={0.7}
+            activeScale={0.92}
           >
             <Ionicons name="trash-outline" size={14} color={colors.danger} />
-          </TouchableOpacity>
+          </ApplePressable>
         </View>
       </View>
     </View>
@@ -145,13 +148,15 @@ const styles = StyleSheet.create({
     gap: 8,
   },
   editBtn: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 4,
     backgroundColor: colors.primaryLight,
     paddingVertical: 6,
     paddingHorizontal: 10,
     borderRadius: 8,
+  },
+  editBtnInner: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
   },
   editBtnText: {
     fontSize: 11,
@@ -165,4 +170,5 @@ const styles = StyleSheet.create({
   },
 });
 
+export const ShiftSlotItem = React.memo(ShiftSlotItemComponent);
 export default ShiftSlotItem;

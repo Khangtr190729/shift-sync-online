@@ -29,6 +29,7 @@ import ShiftCardItem from '../components/schedule/ShiftCardItem';
 import EmptyShiftState from '../components/schedule/EmptyShiftState';
 import ShiftDetailModal from '../components/ShiftDetailModal';
 import StoreSelectorModal from '../components/admin/dashboard/StoreSelectorModal';
+import ApplePressable from '../components/ApplePressable';
 
 export const MyScheduleScreen = () => {
   const { user, store, stores } = useAuth();
@@ -139,10 +140,12 @@ export const MyScheduleScreen = () => {
       >
         {/* Store & Employee Header */}
         <View style={styles.topHeader}>
-          <TouchableOpacity
-            style={styles.storeBadge}
+          <ApplePressable
+            style={styles.storeBadgeWrap}
             onPress={() => stores?.length > 1 && setBranchModalVisible(true)}
-            activeOpacity={stores?.length > 1 ? 0.7 : 1}
+            disabled={!stores || stores.length <= 1}
+            activeScale={0.96}
+            contentStyle={styles.storeBadge}
           >
             <Ionicons name="storefront" size={14} color={colors.primary} />
             <Text style={styles.storeName}>{store?.name || 'Cửa hàng'}</Text>
@@ -154,7 +157,7 @@ export const MyScheduleScreen = () => {
             {stores?.length > 1 && (
               <Ionicons name="chevron-down" size={13} color={colors.primary} />
             )}
-          </TouchableOpacity>
+          </ApplePressable>
           <Text style={styles.greetingTitle}>
             Xin chào, {user?.fullName || 'nhân viên'}! 👋
           </Text>
@@ -248,6 +251,10 @@ const styles = StyleSheet.create({
     marginBottom: 16,
     marginTop: 4,
   },
+  storeBadgeWrap: {
+    alignSelf: 'flex-start',
+    marginBottom: 8,
+  },
   storeBadge: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -256,8 +263,6 @@ const styles = StyleSheet.create({
     paddingVertical: 5,
     paddingHorizontal: 10,
     borderRadius: 10,
-    alignSelf: 'flex-start',
-    marginBottom: 8,
   },
   storeName: {
     fontSize: 12,
