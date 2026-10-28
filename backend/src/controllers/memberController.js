@@ -1,6 +1,7 @@
 import mongoose from 'mongoose';
 import Store from '../models/Store.js';
 import StoreMember from '../models/StoreMember.js';
+import { removeMemberFutureShifts } from '../services/scheduleService.js';
 
 /**
  * Hàm kiểm tra quyền hạn của người gọi trong cửa hàng
@@ -314,9 +315,19 @@ export const removeMember = async (req, res) => {
     member.status = 'INACTIVE';
     await member.save();
 
+    // Tự động xóa luôn các ca làm việc tương lai / chưa diễn ra của nhân viên này trên lịch làm việc
+    // (Bảo toàn tuyệt đối các ca đã diễn ra trong quá khứ để không ảnh hưởng dữ liệu chấm công và lương)
+    const targetUserId = member.userId._id ? member.userId._id.toString() : member.userId.toString();
+    const removedCount = await removeMemberFutureShifts(storeId, targetUserId);
+
     return res.status(200).json({
       success: true,
-      message: `Đã xóa ${employeeName} khỏi cửa hàng thành công.`,
+      message: `Đã xóa ${employeeName} khỏi cửa hàng thành công.${
+        removedCount > 0
+          ? ` Đồng thời đã tự động dọn dẹp ${removedCount} ca làm việc tương lai của nhân viên này trên lịch làm việc.`
+          : ''
+      }`,
+      removedFutureShiftsCount: removedCount,
     });
   } catch (error) {
     console.error('Lỗi xóa nhân viên:', error);

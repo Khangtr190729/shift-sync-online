@@ -1050,3 +1050,57 @@ export const evaluateShiftAttendance = async ({
     emailResult,
   };
 };
+
+/**
+ * Service: Tự động xóa các ca làm việc trong tương lai của nhân viên bị xóa khỏi cửa hàng
+ * BẢO TOÀN TUYỆT ĐỐI các ca đã qua trong quá khứ để bảo vệ lịch sử chấm công và tiền lương
+ */
+export const removeMemberFutureShifts = async (storeId, targetUserId) => {
+  if (!storeId || !targetUserId) return 0;
+
+  const shifts = await Shift.find({ storeId });
+  const shiftMap = {};
+  shifts.forEach((s) => {
+    shiftMap[s._id.toString()] = s;
+  });
+
+  const targetIdStr = targetUserId.toString();
+
+  // Tìm tất cả các bảng lịch của cửa hàng có chứa nhân viên này
+  const schedules = await Schedule.find({
+    storeId,
+    'assignments.userId': targetIdStr,
+  });
+
+  let totalRemoved = 0;
+
+  for (const schedule of schedules) {
+    const originalCount = schedule.assignments.length;
+
+    schedule.assignments = schedule.assignments.filter((a) => {
+      const uId = extractId(a.userId);
+      if (uId !== targetIdStr) {
+        return true; // Ca của nhân viên khác -> giữ nguyên
+      }
+
+      const sId = extractId(a.shiftId);
+      const shift = shiftMap[sId];
+
+      // Kiểm tra ca này đã qua hay chưa:
+      // - Đã qua trong quá khứ -> GIỮ LẠI (bảo toàn dữ liệu chấm công & lương)
+      // - Chưa qua (tương lai hoặc hôm nay chưa tới giờ) -> XÓA BỎ
+      if (shift && isShiftTimePassed(a.date, shift)) {
+        return true;
+      }
+
+      return false;
+    });
+
+    if (schedule.assignments.length !== originalCount) {
+      totalRemoved += originalCount - schedule.assignments.length;
+      await schedule.save();
+    }
+  }
+
+  return totalRemoved;
+};
