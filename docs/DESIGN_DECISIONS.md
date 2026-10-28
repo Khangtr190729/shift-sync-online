@@ -106,14 +106,49 @@ Hệ thống tuân thủ nguyên tắc phân định trách nhiệm rõ ràng:
 
 ## 6. Nguyên Tắc Kiến Trúc Modular & Single Responsibility (Mỗi File Một Việc)
 
-### Quyết định
-- **Tuyệt đối không viết dồn toàn bộ giao diện và logic vào một file duy nhất cho cả backend, web và mobile** (tránh các file quá lớn >250–300 dòng).
-- Mỗi file thành phần chỉ đảm nhiệm một trách nhiệm duy nhất (**Single Responsibility Principle**):
-  - **Trang chính (Page component):** Chỉ giữ vai trò quản lý state cấp cao (top-level state), fetch dữ liệu và điều phối các component con.
-  - **Thành phần giao diện (UI components):** Tách riêng từng modal, từng item trong danh sách, form nhập liệu, section giới thiệu thành các sub-components độc lập đặt trong thư mục `components/<feature>/`.
-  - **Tái sử dụng & Gọi lẫn nhau:** Các component con giao tiếp qua props và callbacks rõ ràng, dễ đọc, dễ kiểm thử và dễ bảo trì.
-- **Quy chuẩn Form & Dữ liệu:**
-  - Tránh gắn cứng dữ liệu mẫu (hardcoded options).
-  - Cung cấp các công cụ chọn linh hoạt như thẻ `<select>` với bước nhảy rõ ràng (10k, 20k, 30k... hoặc 0.5h, 1h...) và ô nhập văn bản tự do để người dùng chủ động điều chỉnh.
+### 6.1. Bối cảnh & Bài học kinh nghiệm (Vì sao quy chuẩn cũ không hiệu quả)
+Trong giai đoạn đầu phát triển, tài liệu chỉ ghi khuyến nghị chung chung: *"tránh các file quá lớn >250–300 dòng"*. Kết quả là các mô hình AI và lập trình viên vẫn tiếp tục viết dồn:
+- Nhét cả 4-5 Modal bằng mã JSX trực tiếp (`inline modal`) ngay trong file Page.
+- Dồn toàn bộ thuật toán tính toán phân bổ, xung đột và lương (>200 dòng toán/logic) trực tiếp vào file Page hoặc gom 4 nghiệp vụ độc lập vào cùng 1 file Service duy nhất.
+- Hậu quả: Nhiều file phình to tới 1.000 – 1.200 dòng (ví dụ: `ScheduleManagementPage.jsx`, `scheduleService.js`), gây khó đọc, khó bảo trì, dễ sinh lỗi khi sửa đổi.
+
+---
+
+### 6.2. Các Ranh Giới Bắt Buộc (Hard Constraints & Actionable Rules)
+
+#### Quy tắc 1: Cấm tuyệt đối viết Inline Modal trong Page component
+- **BẮT BUỘC:** Mỗi Modal (tạo ca, sửa ca, sửa lương, phân quyền, xác nhận xóa...) PHẢI được tách thành file component độc lập đặt tại `src/components/<feature>/<ModalName>.jsx`.
+- **CẤM:** Không được nhúng trực tiếp khối JSX modal (`fixed inset-0 ...`) vào giữa thân hàm của Page. Page component chỉ được phép giữ `modalState` và gọi `<ModalName modalState={...} setModalState={...} onAction={...} />`.
+
+#### Quy tắc 2: Tách biệt Thuật toán & Động cơ tính toán khỏi Giao diện
+- Các thuật toán kiểm tra xung đột (Conflict Detection), thuật toán xếp ca (Auto-scheduling Engine), hoặc công thức tính toán lương & phạt (Payroll Calculator) **KHÔNG ĐƯỢC VIẾT TRỰC TIẾP TRONG FILE PAGE HOẶC CONTROLLER**.
+- **Cơ chế tách:**
+  - Logic tính toán thuần túy (pure math / business rule) $\rightarrow$ Đưa vào thư mục `src/utils/` (ví dụ: `schedulePayroll.js`, `scheduleTimeHelpers.js`).
+  - Logic kiểm tra liên quan đến React state/lifecycle $\rightarrow$ Đóng gói thành Custom Hook trong `src/hooks/` (ví dụ: `useScheduleConflicts.js`).
+  - Động cơ xếp ca thuật toán nặng phía Backend $\rightarrow$ Tách thành Engine con trong `backend/src/services/schedule/` (ví dụ: `autoScheduleEngine.js`, `payrollProcessor.js`, `scheduleValidation.js`), file service ngoài cùng (`scheduleService.js`) chỉ đóng vai trò Facade re-export.
+
+#### Quy tắc 3: Tách nhỏ các Màn hình đa Tab (Multi-tab / Multi-mode)
+- Nếu một Page phục vụ nhiều luồng khác nhau (ví dụ: `MySchedulePage` vừa xem lịch làm việc, vừa xem thông báo, vừa quản lý hồ sơ cá nhân, vừa có luồng nhập mã mời 6 chữ số):
+  - **Mỗi Tab / Section lớn PHẢI là một sub-component riêng** (ví dụ: `PersonalScheduleSection.jsx`, `JoinStoreByCodeSection.jsx`, `EmployeeProfileSection.jsx`).
+  - Page chính chỉ làm nhiệm vụ quản lý `activeTab` và truyền state xuống các section.
+
+#### Quy tắc 4: Đặc thù Mobile (React Native / StyleSheet)
+- Trên ứng dụng Mobile, việc dùng `StyleSheet.create({ ... })` thường chiếm 150 – 250 dòng thuần túy định nghĩa kiểu dáng ở cuối file.
+- **Tiêu chuẩn đánh giá:** Trừ phần `StyleSheet.create`, phần logic xử lý và JSX của component Mobile không được vượt quá **250 - 300 dòng**. Không ép buộc tách stylesheet sang file `.styles.js` riêng nếu màn hình/modal đó chỉ phục vụ duy nhất 1 mục đích nhằm tránh phân mảnh file không cần thiết.
+
+#### Quy tắc 5: Quy chuẩn Form & Dữ liệu
+- Tránh gắn cứng dữ liệu mẫu (hardcoded options).
+- Cung cấp các công cụ chọn linh hoạt như thẻ `<select>` với bước nhảy rõ ràng (10k, 20k, 30k... hoặc 0.5h, 1h...) kết hợp ô nhập văn bản tự do để người dùng chủ động điều chỉnh.
+
+---
+
+### 6.3. Bảng Kiểm Tra Nhanh (Pre-commit / Architecture Review Checklist)
+
+Mỗi khi AI hoặc lập trình viên tạo mới hoặc chỉnh sửa một tính năng, PHẢI tự rà soát theo bảng kiểm sau:
+1. [ ] File Page có chứa thẻ Modal trực tiếp không? $\rightarrow$ *Nếu có, bắt buộc bóc tách ra `components/<feature>/`.*
+2. [ ] File Page có chứa thuật toán / vòng lặp xử lý logic nặng >50 dòng không? $\rightarrow$ *Nếu có, bóc tách ra `hooks/` hoặc `utils/`.*
+3. [ ] File Service Backend có gộp nhiều domain không liên quan không? $\rightarrow$ *Nếu có, tách thành sub-services theo domain.*
+4. [ ] Tổng số dòng của file Web/Backend có vượt quá 500 dòng không? $\rightarrow$ *Nếu vượt, phải có lý do giải trình hợp lý (như Wizard tuần tự, Template HTML) hoặc phải tái cấu trúc ngay.*
+
 
 
