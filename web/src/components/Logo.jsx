@@ -30,8 +30,8 @@ export const Logo = ({ size = 'md', showText = true, className = '' }) => {
       </div>
       {showText && (
         <div className="flex flex-col">
-          <span className={`font-extrabold tracking-tight text-[#252525] ${textMap[size] || textMap.md} flex items-center gap-1 leading-none font-['Plus_Jakarta_Sans',sans-serif]`}>
-            Ca Làm <span className="text-[#EA701B]">Online</span>
+          <span className={`font-semibold tracking-tight text-[#1d1d1f] ${textMap[size] || textMap.md} flex items-center gap-1 leading-none`}>
+            Ca Làm <span className="text-[#0066cc]">Online</span>
           </span>
           {size !== 'sm' && (
             <span className="text-[11px] font-medium text-[#64748B] tracking-wide mt-0.5">
