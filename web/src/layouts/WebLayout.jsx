@@ -64,7 +64,7 @@ export const WebLayout = () => {
       {/* Sidebar for Desktop (Apple Style: Clean, Frosted, Minimalist) */}
       <aside className="hidden lg:flex flex-col w-64 bg-white/80 backdrop-blur-xl border-r border-[#E5E5E7] shrink-0 sticky top-0 h-screen select-none">
         {/* Brand Logo Header */}
-        <div className="h-18 flex items-center px-6 border-b border-[#F2F2F7]">
+        <div className="h-16 flex items-center px-6 border-b border-[#E5E5E7]">
           <Logo size="md" />
         </div>
 
